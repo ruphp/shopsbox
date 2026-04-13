@@ -16,7 +16,7 @@ GITHUB_PROJECT_ITEM_ISSUE_5=PVTI_lAHOARNVz84BUg6Hzgp0NUg
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-repo-create github-labels-setup github-labels-russianize github-labels-polish github-default-labels-delete github-milestones-setup github-milestones-russianize github-project-create github-project-link-repo github-project-status-setup github-project-status-russianize github-project-items-status-setup github-project-current-issue-done github-project-next-issue-in-progress github-project-backlog-board-create github-project-backlog-board-ru-create github-project-backlog-board-russianize github-project-old-backlog-board-delete github-issues-create github-issues-russianize github-branch-protect-master github-ruleset-master git-status git-commit-workflow git-commit-management git-branch-issue-2 git-push-master backend-create composer-update up down logs ps backend-shell composer-install migrate test
+.PHONY: help docs-list docs-check github-auth-status github-repo-create github-labels-setup github-labels-russianize github-labels-polish github-default-labels-delete github-milestones-setup github-milestones-russianize github-project-create github-project-link-repo github-project-status-setup github-project-status-russianize github-project-items-status-setup github-project-current-issue-done github-project-next-issue-in-progress github-project-backlog-board-create github-project-backlog-board-ru-create github-project-backlog-board-russianize github-project-old-backlog-board-delete github-issues-create github-issues-russianize github-branch-protect-master github-ruleset-master git-status git-commit-workflow git-commit-management git-commit-gitignore git-branch-issue-2 git-push-master backend-create composer-update up down logs ps backend-shell composer-install migrate test
 
 help:
 	@echo ShopsBox make targets:
@@ -48,6 +48,7 @@ help:
 	@echo   make git-status  Show git status
 	@echo   make git-commit-workflow  Commit GitHub workflow updates
 	@echo   make git-commit-management  Commit project management updates
+	@echo   make git-commit-gitignore  Commit gitignore updates
 	@echo   make git-branch-issue-2  Create task branch for issue 2
 	@echo   make git-push-master  Push master to origin
 	@echo   make backend-create  Create Symfony skeleton through Docker Composer
@@ -250,6 +251,10 @@ git-commit-workflow:
 git-commit-management:
 	@git add CONTEXT.md Makefile docs\tz\00-technical-spec-draft.md docs\tz\07-backend-foundation-plan.md docs\workflow\02-current-work-status.md docs\workflow\03-conversation-map.md
 	@git commit -m "Update project management status"
+
+git-commit-gitignore:
+	@git add .gitignore Makefile
+	@git commit -m "Ignore local IDE files"
 
 git-branch-issue-2:
 	@git switch -c task/02-tenant-foundation
