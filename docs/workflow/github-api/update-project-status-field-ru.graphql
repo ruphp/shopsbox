@@ -1,0 +1,26 @@
+mutation {
+  updateProjectV2Field(
+    input: {
+      fieldId: "PVTSSF_lAHOARNVz84BUg6HzhBogZg"
+      name: "Статус"
+      singleSelectOptions: [
+        { name: "Бэклог", color: GRAY, description: "Задача описана, но работа еще не началась." }
+        { name: "Готово к работе", color: BLUE, description: "Задача понятна и готова к реализации." }
+        { name: "В работе", color: YELLOW, description: "Работа идет локально или в отдельной ветке." }
+        { name: "На проверке", color: PURPLE, description: "Открыт запрос на слияние или идет проверка." }
+        { name: "Готово", color: GREEN, description: "Задача слита, проверена и закрыта." }
+      ]
+    }
+  ) {
+    projectV2Field {
+      ... on ProjectV2SingleSelectField {
+        id
+        name
+        options {
+          id
+          name
+        }
+      }
+    }
+  }
+}

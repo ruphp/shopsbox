@@ -1,0 +1,26 @@
+mutation {
+  updateProjectV2Field(
+    input: {
+      fieldId: "PVTSSF_lAHOARNVz84BUg6HzhBogZg"
+      name: "Status"
+      singleSelectOptions: [
+        { name: "Backlog", color: GRAY, description: "Task is described but work has not started." }
+        { name: "Ready", color: BLUE, description: "Task is clear and ready for implementation." }
+        { name: "In progress", color: YELLOW, description: "Work is active locally or in a task branch." }
+        { name: "In review", color: PURPLE, description: "Pull request or review is active." }
+        { name: "Done", color: GREEN, description: "Task is merged, checked and closed." }
+      ]
+    }
+  ) {
+    projectV2Field {
+      ... on ProjectV2SingleSelectField {
+        id
+        name
+        options {
+          id
+          name
+        }
+      }
+    }
+  }
+}

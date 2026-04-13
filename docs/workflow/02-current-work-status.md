@@ -1,21 +1,41 @@
 # Текущий рабочий статус
 
-Документ фиксирует локальную карточку текущей работы. Он нужен, пока реальная GitHub Project card еще не создана.
+Документ фиксирует текущую рабочую задачу и положение проекта на доске GitHub.
 
-## Current card
+## Текущая карточка
 
-- Title: `Backend foundation: Symfony skeleton and local Docker`
-- Status: `In progress`
-- Local branch: `master`
-- Milestone: `01 MVP Foundation`
-- Remote GitHub issue: create after initial push and branch protection
-- Remote GitHub Project card: create after initial push and branch protection
+- Название: `Основа бэкенда: каркас Symfony и локальный Docker-контур`
+- Статус: `В работе`
+- Локальная ветка: `master`
+- Этап: `01 Основа MVP`
+- Удаленная задача: `https://github.com/ruphp/shopsbox/issues/1`
+- Доска проекта: `https://github.com/users/ruphp/projects/2`
+- Русский вид бэклога: `https://github.com/users/ruphp/projects/2/views/3`
+- Защита ветки: заблокирована текущим тарифом GitHub для приватного репозитория; GitHub требует Pro или публичный репозиторий для защиты ветки (`branch protection`) и наборов правил (`rulesets`).
 
-## Почему карточка локальная
+## Что заведено в GitHub
 
-В папке `D:\codex\shopsbox` git-репозиторий только что инициализирован локально. Remote repository пока не привязан, поэтому нельзя честно создать или перевести реальную GitHub Project card.
+Репозиторий GitHub `ruphp/shopsbox` создан и привязан к локальному репозиторию.
 
-До появления remote/repo рабочая карточка считается локальной. Черновики будущих GitHub issues лежат в [Черновиках issues для 01 MVP Foundation](01-mvp-foundation-issue-drafts.md).
+Проект GitHub `ShopsBox` создан на уровне пользователя `ruphp` и привязан к репозиторию `ruphp/shopsbox`. Он доступен по ссылке `https://github.com/users/ruphp/projects/2`.
+
+На доске создан вид `Бэклог` с раскладкой доски (`board`), как в Freepainters. GitHub API создает вид-доску, но не принимает параметр явной группировки по полю `Статус`; если GitHub UI не сгруппирует колонки автоматически, нужно один раз выставить в интерфейсе `Group by -> Status`.
+
+В доске заведены статусы как в Freepainters:
+
+- `Бэклог`;
+- `Готово к работе`;
+- `В работе`;
+- `На проверке`;
+- `Готово`.
+
+Созданы задачи для этапа `01 Основа MVP`:
+
+- `#1 Основа бэкенда: каркас Symfony и локальный Docker-контур` - `В работе`;
+- `#2 Основа арендаторов, магазинов, пользователей и ролей` - `Бэклог`;
+- `#3 Основа файлов: локальное и S3-совместимое хранилище` - `Бэклог`;
+- `#4 Локальные операции: планировщик, заготовки бэкапов и проверки здоровья` - `Бэклог`;
+- `#5 Основа учета ресурсов и лимитов` - `Бэклог`.
 
 ## Что считается начатым
 
@@ -29,16 +49,14 @@
 - Symfony skeleton создан в `backend/`.
 - Локальный Docker Compose контур поднят.
 - Healthcheck `GET /health` отвечает `200 {"service":"shopsbox_backend","status":"ok"}`.
+- Репозиторий GitHub `ruphp/shopsbox` создан и первый push в `master` выполнен.
+- Проект GitHub `ShopsBox` создан и привязан к репозиторию.
+- В GitHub Project настроены статусы как в Freepainters: `Бэклог`, `Готово к работе`, `В работе`, `На проверке`, `Готово`.
+- Создан вид `Бэклог` с раскладкой доски (`board`).
+- Задача `#1` переведена в `В работе`.
+- Задачи `#2`-`#5` лежат в `Бэклог`.
+- Защита ветки (`branch protection`) и набор правил (`ruleset`) для `master` не включились, потому что GitHub требует Pro или публичный репозиторий для этой возможности.
 
 ## Следующий технический шаг
 
-Создать Symfony skeleton и локальный Docker Compose контур через `make`-команды:
-
-- `shopsbox_backend` / `shopsbox_web`;
-- `shopsbox_postgres`;
-- `shopsbox_redis`;
-- `shopsbox_minio`;
-- `shopsbox_worker` later;
-- `shopsbox_scheduler` later.
-
-Статус: базовый Symfony/Docker contour уже поднят. Следующий шаг - добавить Doctrine migrations, foundation entities и demo seed/fixtures.
+Статус: базовый Symfony/Docker-контур уже поднят. Следующий шаг - добавить миграции Doctrine, базовые сущности и демо-данные.
