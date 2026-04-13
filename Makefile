@@ -16,50 +16,53 @@ GITHUB_PROJECT_ITEM_ISSUE_5=PVTI_lAHOARNVz84BUg6Hzgp0NUg
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-repo-create github-labels-setup github-labels-russianize github-labels-polish github-default-labels-delete github-milestones-setup github-milestones-russianize github-project-create github-project-link-repo github-project-status-setup github-project-status-russianize github-project-items-status-setup github-project-current-issue-done github-project-next-issue-in-progress github-project-backlog-board-create github-project-backlog-board-ru-create github-project-backlog-board-russianize github-project-old-backlog-board-delete github-issues-create github-issues-russianize github-branch-protect-master github-ruleset-master git-status git-commit-workflow git-commit-management git-commit-gitignore git-branch-issue-2 git-push-master backend-create composer-update up down logs ps backend-shell composer-install migrate test
+.PHONY: help docs-list docs-check github-auth-status github-repo-create github-labels-setup github-labels-russianize github-labels-polish github-default-labels-delete github-milestones-setup github-milestones-russianize github-project-create github-project-link-repo github-project-status-setup github-project-status-russianize github-project-items-status-setup github-project-current-issue-done github-project-next-issue-in-progress github-project-backlog-board-create github-project-backlog-board-ru-create github-project-backlog-board-russianize github-project-old-backlog-board-delete github-issues-create github-issues-russianize github-branch-protect-master github-ruleset-master github-pr-create-management git-status git-commit-workflow git-commit-management git-commit-gitignore git-commit-make-help git-branch-issue-2 git-push-current git-push-master backend-create composer-update up down logs ps backend-shell composer-install migrate test
 
 help:
-	@echo ShopsBox make targets:
-	@echo   make docs-list   List project documentation files
-	@echo   make docs-check  Check documentation files exist
-	@echo   make github-auth-status  Check GitHub CLI auth status
-	@echo   make github-repo-create  Create private GitHub repo and set origin
-	@echo   make github-labels-setup  Create GitHub labels
-	@echo   make github-labels-russianize  Rename GitHub labels to Russian
-	@echo   make github-labels-polish  Polish renamed GitHub labels
-	@echo   make github-default-labels-delete  Delete unused default GitHub labels
-	@echo   make github-milestones-setup  Create GitHub milestones
-	@echo   make github-milestones-russianize  Rename GitHub milestones to Russian
-	@echo   make github-project-create  Create GitHub Project
-	@echo   make github-project-link-repo  Link GitHub Project to repository
-	@echo   make github-project-status-setup  Set GitHub Project statuses
-	@echo   make github-project-status-russianize  Set GitHub Project statuses in Russian
-	@echo   make github-project-items-status-setup  Set GitHub Project item statuses
-	@echo   make github-project-current-issue-done  Close current issue and set it Done
-	@echo   make github-project-next-issue-in-progress  Set issue 2 In progress
-	@echo   make github-project-backlog-board-create  Create Backlog board view
-	@echo   make github-project-backlog-board-ru-create  Create Russian Backlog board view
-	@echo   make github-project-backlog-board-russianize  Rename Backlog board view
-	@echo   make github-project-old-backlog-board-delete  Delete old English Backlog board view
-	@echo   make github-branch-protect-master  Protect master branch
-	@echo   make github-ruleset-master  Protect master branch through ruleset
-	@echo   make github-issues-create  Create MVP Foundation GitHub issues
-	@echo   make github-issues-russianize  Rename MVP Foundation GitHub issues
-	@echo   make git-status  Show git status
-	@echo   make git-commit-workflow  Commit GitHub workflow updates
-	@echo   make git-commit-management  Commit project management updates
-	@echo   make git-commit-gitignore  Commit gitignore updates
-	@echo   make git-branch-issue-2  Create task branch for issue 2
-	@echo   make git-push-master  Push master to origin
-	@echo   make backend-create  Create Symfony skeleton through Docker Composer
-	@echo   make composer-update  Update backend Composer dependencies through Docker Composer
-	@echo   make up          Start local Docker Compose contour
-	@echo   make down        Stop local Docker Compose contour
-	@echo   make logs        Show local Docker Compose logs
-	@echo   make ps          Show local Docker Compose services
-	@echo   make backend-shell  Open shell in backend container
-	@echo   make migrate     Run Doctrine migrations when backend is ready
-	@echo   make test        Placeholder for future project checks
+	@echo Цели make для ShopsBox:
+	@echo   make docs-list   Показать файлы документации
+	@echo   make docs-check  Проверить наличие ключевых документов
+	@echo   make github-auth-status  Проверить вход в GitHub CLI
+	@echo   make github-repo-create  Создать приватный репозиторий GitHub и привязать origin
+	@echo   make github-labels-setup  Создать метки GitHub
+	@echo   make github-labels-russianize  Перевести метки GitHub на русский
+	@echo   make github-labels-polish  Дочистить переименованные метки GitHub
+	@echo   make github-default-labels-delete  Удалить неиспользуемые стандартные метки GitHub
+	@echo   make github-milestones-setup  Создать этапы GitHub
+	@echo   make github-milestones-russianize  Перевести этапы GitHub на русский
+	@echo   make github-project-create  Создать проект GitHub
+	@echo   make github-project-link-repo  Привязать проект GitHub к репозиторию
+	@echo   make github-project-status-setup  Настроить статусы проекта GitHub
+	@echo   make github-project-status-russianize  Перевести статусы проекта GitHub на русский
+	@echo   make github-project-items-status-setup  Расставить статусы карточек проекта GitHub
+	@echo   make github-project-current-issue-done  Закрыть текущую задачу и перевести карточку в Готово
+	@echo   make github-project-next-issue-in-progress  Перевести задачу 2 в работу
+	@echo   make github-project-backlog-board-create  Создать вид-доску Backlog
+	@echo   make github-project-backlog-board-ru-create  Создать русский вид-доску Бэклог
+	@echo   make github-project-backlog-board-russianize  Переименовать вид-доску Бэклог
+	@echo   make github-project-old-backlog-board-delete  Удалить старый английский вид-доску Backlog
+	@echo   make github-branch-protect-master  Защитить ветку master
+	@echo   make github-ruleset-master  Защитить ветку master через набор правил
+	@echo   make github-issues-create  Создать задачи GitHub для 01 Основа MVP
+	@echo   make github-issues-russianize  Перевести задачи GitHub для 01 Основа MVP
+	@echo   make github-pr-create-management  Создать PR с управленческими обновлениями
+	@echo   make git-status  Показать статус git
+	@echo   make git-commit-workflow  Закоммитить обновления GitHub workflow
+	@echo   make git-commit-management  Закоммитить обновления управления проектом
+	@echo   make git-commit-gitignore  Закоммитить обновления gitignore
+	@echo   make git-commit-make-help  Закоммитить русификацию make help
+	@echo   make git-branch-issue-2  Создать ветку задачи 2
+	@echo   make git-push-current  Отправить текущую ветку в origin
+	@echo   make git-push-master  Отправить master в origin
+	@echo   make backend-create  Создать каркас Symfony через Docker Composer
+	@echo   make composer-update  Обновить зависимости Composer через Docker Composer
+	@echo   make up          Поднять локальный Docker Compose контур
+	@echo   make down        Остановить локальный Docker Compose контур
+	@echo   make logs        Показать логи локального Docker Compose контура
+	@echo   make ps          Показать сервисы локального Docker Compose контура
+	@echo   make backend-shell  Открыть shell backend-контейнера
+	@echo   make migrate     Запустить миграции Doctrine, когда backend готов
+	@echo   make test        Заглушка будущих проверок проекта
 
 docs-list:
 	@dir /s /b docs\*.md
@@ -85,6 +88,7 @@ docs-check:
 	@if not exist docs\workflow\github-issue-bodies\03-storage-foundation.md exit /b 1
 	@if not exist docs\workflow\github-issue-bodies\04-local-operations.md exit /b 1
 	@if not exist docs\workflow\github-issue-bodies\05-usage-limits-groundwork.md exit /b 1
+	@if not exist docs\workflow\github-pr-bodies\project-management-and-gitignore.md exit /b 1
 	@if not exist docs\workflow\github-api\branch-protection-master.json exit /b 1
 	@if not exist docs\workflow\github-api\master-ruleset.json exit /b 1
 	@if not exist docs\workflow\github-api\update-project-status-field.graphql exit /b 1
@@ -241,6 +245,9 @@ github-issues-russianize:
 	@gh api -X PATCH repos/$(GITHUB_FULL_REPO)/issues/4 --input docs\workflow\github-api\issue-04-title-ru.json
 	@gh api -X PATCH repos/$(GITHUB_FULL_REPO)/issues/5 --input docs\workflow\github-api\issue-05-title-ru.json
 
+github-pr-create-management:
+	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head task/02-tenant-foundation --title "Управленческие обновления перед задачей 2" --body-file docs\workflow\github-pr-bodies\project-management-and-gitignore.md
+
 git-status:
 	@git status --short --branch
 
@@ -256,8 +263,15 @@ git-commit-gitignore:
 	@git add .gitignore Makefile
 	@git commit -m "Ignore local IDE files"
 
+git-commit-make-help:
+	@git add Makefile docs\workflow\github-pr-bodies\project-management-and-gitignore.md
+	@git commit -m "Russianize make help"
+
 git-branch-issue-2:
 	@git switch -c task/02-tenant-foundation
+
+git-push-current:
+	@git push -u origin HEAD
 
 git-push-master:
 	@git push -u origin master
