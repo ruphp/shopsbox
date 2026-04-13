@@ -4,9 +4,11 @@
 
 ## Статус
 
-Папка `D:\codex\shopsbox` после переноса проверена. Git-репозитория и кода приложения пока нет. Symfony skeleton, Docker Compose контур, миграции и `src/` еще не созданы.
+Папка `D:\codex\shopsbox` после переноса проверена. Git-репозиторий создан, репозиторий GitHub `ruphp/shopsbox` привязан, первый push в `master` уже выполнен по отдельному разрешению владельца проекта.
 
-Перед созданием кода нужно отдельно подтвердить старт технической реализации. Удаленные действия GitHub не выполнять без отдельного прямого подтверждения.
+Symfony skeleton создан в `backend/`, локальный Docker Compose контур поднят, healthcheck `GET /health` отвечает `200 {"service":"shopsbox_backend","status":"ok"}`. Следующий технический шаг - Doctrine Migrations, foundation entities и demo seed/fixtures.
+
+Удаленные действия GitHub дальше не выполнять без отдельного прямого подтверждения.
 
 ## Принятые решения для MVP
 
@@ -23,17 +25,21 @@
 
 ## Что создать первым
 
-1. Git-репозиторий в `D:\codex\shopsbox`, если владелец проекта подтвердит старт локальной разработки.
-2. Task-ветку для этапа `01 MVP Foundation`, когда git уже будет инициализирован.
-3. Symfony skeleton как backend-приложение.
-4. Docker Compose контур для локального запуска.
-5. Make-команды для запуска и проверки контура.
-6. PostgreSQL service и конфигурацию подключения backend.
-7. Doctrine Migrations.
-8. Минимальную структуру модулей и слоев.
-9. Первые миграции для `tenants`, `stores`, `users`, `roles`, `user_roles`.
-10. Demo tenant/store/users для локальной разработки.
-11. Базовые healthchecks для локального контура.
+Уже создано:
+
+1. Git-репозиторий в `D:\codex\shopsbox`.
+2. Symfony skeleton как backend-приложение.
+3. Docker Compose контур для локального запуска.
+4. Make-команды для запуска и проверки контура.
+5. PostgreSQL, Redis и MinIO services в локальном контуре.
+6. Базовый healthcheck для backend.
+
+Следующий шаг:
+
+1. Doctrine Migrations.
+2. Минимальная структура модулей и слоев.
+3. Первые миграции для `tenants`, `stores`, `users`, `roles`, `user_roles`.
+4. Demo tenant/store/users для локальной разработки.
 
 ## Стартовая структура backend
 
@@ -86,7 +92,7 @@ Demo tenant/store/users описаны в [Demo seed data](../development/02-dem
 
 ## Make-команды
 
-Первый технический PR должен расширить `Makefile` минимум такими командами:
+Текущий `Makefile` должен оставаться единой точкой входа для проектных операций. Минимальный набор команд:
 
 - `make up` - поднять локальный контур.
 - `make down` - остановить локальный контур.
@@ -99,13 +105,15 @@ Demo tenant/store/users описаны в [Demo seed data](../development/02-dem
 
 ## Первые GitHub issues
 
-Перед полноценной реализацией стоит создать issues в milestone `01 MVP Foundation`:
+Issues в milestone `01 MVP Foundation` уже заведены:
 
-- `Backend foundation: Symfony skeleton and Docker Compose`.
-- `Tenant foundation: tenants, stores, users and roles`.
-- `Local development: Make commands and healthchecks`.
+- `#1 Основа бэкенда: каркас Symfony и локальный Docker-контур` - `Готово`.
+- `#2 Основа арендаторов, магазинов, пользователей и ролей` - `Бэклог`.
+- `#3 Основа файлов: локальное и S3-совместимое хранилище` - `Бэклог`.
+- `#4 Локальные операции: планировщик, заготовки бэкапов и проверки здоровья` - `Бэклог`.
+- `#5 Основа учета ресурсов и лимитов` - `Бэклог`.
 
-Создание issues через GitHub CLI делать только через `make`-команды и UTF-8 файлы с текстом задачи. Если GitHub еще не подключен, эти задачи остаются в backlog документации.
+Новые issues, PR, push, merge и перевод карточек в `Done` делать только после отдельного прямого подтверждения владельца проекта. GitHub CLI вызывать через `make`-команды и UTF-8 файлы с текстом задачи.
 
 ## Критерии готовности этапа
 
