@@ -7,6 +7,7 @@ GITHUB_PROJECT_STATUS_FIELD_ID=PVTSSF_lAHOARNVz84BUg6HzhBogZg
 GITHUB_PROJECT_BACKLOG_VIEW_ID=41851759
 GITHUB_PROJECT_STATUS_BACKLOG=92d9ded2
 GITHUB_PROJECT_STATUS_IN_PROGRESS=fc3e6bc2
+GITHUB_PROJECT_STATUS_DONE=1d39121f
 GITHUB_PROJECT_ITEM_ISSUE_1=PVTI_lAHOARNVz84BUg6Hzgp0NUs
 GITHUB_PROJECT_ITEM_ISSUE_2=PVTI_lAHOARNVz84BUg6Hzgp0NUk
 GITHUB_PROJECT_ITEM_ISSUE_3=PVTI_lAHOARNVz84BUg6Hzgp0NZk
@@ -15,7 +16,7 @@ GITHUB_PROJECT_ITEM_ISSUE_5=PVTI_lAHOARNVz84BUg6Hzgp0NUg
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-repo-create github-labels-setup github-labels-russianize github-labels-polish github-default-labels-delete github-milestones-setup github-milestones-russianize github-project-create github-project-link-repo github-project-status-setup github-project-status-russianize github-project-items-status-setup github-project-backlog-board-create github-project-backlog-board-ru-create github-project-backlog-board-russianize github-project-old-backlog-board-delete github-issues-create github-issues-russianize github-branch-protect-master github-ruleset-master git-status git-commit-workflow git-push-master backend-create composer-update up down logs ps backend-shell composer-install migrate test
+.PHONY: help docs-list docs-check github-auth-status github-repo-create github-labels-setup github-labels-russianize github-labels-polish github-default-labels-delete github-milestones-setup github-milestones-russianize github-project-create github-project-link-repo github-project-status-setup github-project-status-russianize github-project-items-status-setup github-project-current-issue-done github-project-next-issue-in-progress github-project-backlog-board-create github-project-backlog-board-ru-create github-project-backlog-board-russianize github-project-old-backlog-board-delete github-issues-create github-issues-russianize github-branch-protect-master github-ruleset-master git-status git-commit-workflow git-commit-management git-branch-issue-2 git-push-master backend-create composer-update up down logs ps backend-shell composer-install migrate test
 
 help:
 	@echo ShopsBox make targets:
@@ -34,6 +35,8 @@ help:
 	@echo   make github-project-status-setup  Set GitHub Project statuses
 	@echo   make github-project-status-russianize  Set GitHub Project statuses in Russian
 	@echo   make github-project-items-status-setup  Set GitHub Project item statuses
+	@echo   make github-project-current-issue-done  Close current issue and set it Done
+	@echo   make github-project-next-issue-in-progress  Set issue 2 In progress
 	@echo   make github-project-backlog-board-create  Create Backlog board view
 	@echo   make github-project-backlog-board-ru-create  Create Russian Backlog board view
 	@echo   make github-project-backlog-board-russianize  Rename Backlog board view
@@ -44,6 +47,8 @@ help:
 	@echo   make github-issues-russianize  Rename MVP Foundation GitHub issues
 	@echo   make git-status  Show git status
 	@echo   make git-commit-workflow  Commit GitHub workflow updates
+	@echo   make git-commit-management  Commit project management updates
+	@echo   make git-branch-issue-2  Create task branch for issue 2
 	@echo   make git-push-master  Push master to origin
 	@echo   make backend-create  Create Symfony skeleton through Docker Composer
 	@echo   make composer-update  Update backend Composer dependencies through Docker Composer
@@ -73,6 +78,7 @@ docs-check:
 	@if not exist docs\workflow\00-github-workflow.md exit /b 1
 	@if not exist docs\workflow\01-mvp-foundation-issue-drafts.md exit /b 1
 	@if not exist docs\workflow\02-current-work-status.md exit /b 1
+	@if not exist docs\workflow\03-conversation-map.md exit /b 1
 	@if not exist docs\workflow\github-issue-bodies\01-backend-foundation.md exit /b 1
 	@if not exist docs\workflow\github-issue-bodies\02-tenant-foundation.md exit /b 1
 	@if not exist docs\workflow\github-issue-bodies\03-storage-foundation.md exit /b 1
@@ -195,6 +201,13 @@ github-project-items-status-setup:
 	@gh project item-edit --project-id $(GITHUB_PROJECT_ID) --id $(GITHUB_PROJECT_ITEM_ISSUE_4) --field-id $(GITHUB_PROJECT_STATUS_FIELD_ID) --single-select-option-id $(GITHUB_PROJECT_STATUS_BACKLOG)
 	@gh project item-edit --project-id $(GITHUB_PROJECT_ID) --id $(GITHUB_PROJECT_ITEM_ISSUE_5) --field-id $(GITHUB_PROJECT_STATUS_FIELD_ID) --single-select-option-id $(GITHUB_PROJECT_STATUS_BACKLOG)
 
+github-project-current-issue-done:
+	@gh project item-edit --project-id $(GITHUB_PROJECT_ID) --id $(GITHUB_PROJECT_ITEM_ISSUE_1) --field-id $(GITHUB_PROJECT_STATUS_FIELD_ID) --single-select-option-id $(GITHUB_PROJECT_STATUS_DONE)
+	@gh issue close 1 --repo $(GITHUB_FULL_REPO) --reason completed
+
+github-project-next-issue-in-progress:
+	@gh project item-edit --project-id $(GITHUB_PROJECT_ID) --id $(GITHUB_PROJECT_ITEM_ISSUE_2) --field-id $(GITHUB_PROJECT_STATUS_FIELD_ID) --single-select-option-id $(GITHUB_PROJECT_STATUS_IN_PROGRESS)
+
 github-project-backlog-board-create:
 	@gh api -X POST users/$(GITHUB_OWNER)/projectsV2/$(GITHUB_PROJECT_NUMBER)/views --input docs\workflow\github-api\create-backlog-board-view.json
 
@@ -233,6 +246,13 @@ git-status:
 git-commit-workflow:
 	@git add AGENTS.md Makefile docs\workflow
 	@git commit -m "Configure GitHub workflow board"
+
+git-commit-management:
+	@git add CONTEXT.md Makefile docs\tz\00-technical-spec-draft.md docs\tz\07-backend-foundation-plan.md docs\workflow\02-current-work-status.md docs\workflow\03-conversation-map.md
+	@git commit -m "Update project management status"
+
+git-branch-issue-2:
+	@git switch -c task/02-tenant-foundation
 
 git-push-master:
 	@git push -u origin master
