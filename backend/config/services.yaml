@@ -21,3 +21,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Tenant\Application\Contracts\TenantRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineTenantRepository'
+    App\Tenant\Application\Contracts\StoreRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineStoreRepository'
+    App\Tenant\Application\Contracts\EntityFlusher: '@App\Tenant\Infrastructure\Adapters\DoctrineEntityFlusher'
+    App\Tenant\Application\Contracts\UuidGenerator: '@App\Tenant\Infrastructure\Adapters\SymfonyUuidGenerator'

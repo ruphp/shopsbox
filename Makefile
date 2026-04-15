@@ -12,7 +12,7 @@ GITHUB_PROJECT_ITEM_ISSUE_2=PVTI_lAHOARNVz84BUg6Hzgp0NUk
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-update up down logs ps backend-shell composer-install migrate test
+.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell composer-install migrate fixtures-load backend-check unit-test test
 
 help:
 	@echo Цели make для ShopsBox:
@@ -22,14 +22,20 @@ help:
 	@echo   make git-status  Показать статус git
 	@echo   make git-push-current  Отправить текущую ветку в origin
 	@echo   make backend-create  Создать каркас Symfony через Docker Composer
-	@echo   make composer-update  Обновить зависимости Composer через Docker Composer
+	@echo   make composer-require PACKAGES="vendor/package"  Добавить Composer-зависимости через backend-контейнер
+	@echo   make composer-require-dev PACKAGES="vendor/package"  Добавить dev Composer-зависимости через backend-контейнер
+	@echo   make composer-update  Обновить зависимости Composer через backend-контейнер
+	@echo   make composer-update-lock  Обновить lock без Symfony scripts через backend-контейнер
 	@echo   make up          Поднять локальный Docker Compose контур
 	@echo   make down        Остановить локальный Docker Compose контур
 	@echo   make logs        Показать логи локального Docker Compose контура
 	@echo   make ps          Показать сервисы локального Docker Compose контура
 	@echo   make backend-shell  Открыть shell backend-контейнера
 	@echo   make migrate     Запустить миграции Doctrine, когда backend готов
-	@echo   make test        Заглушка будущих проверок проекта
+	@echo   make fixtures-load  Загрузить demo fixtures в локальную БД
+	@echo   make backend-check  Проверить Symfony container и Doctrine mapping
+	@echo   make unit-test  Запустить unit-тесты backend
+	@echo   make test        Запустить документационные и backend-проверки
 	@echo Управление задачами GitHub:
 	@echo   make github-auth-status  Проверить вход в GitHub CLI
 	@echo   make github-project-current-issue-done  Закрыть текущую задачу и перевести карточку в Готово
@@ -62,6 +68,7 @@ docs-check:
 	@if not exist docs\workflow\03-conversation-map.md exit /b 1
 	@if not exist docs\workflow\github-pr-bodies\project-management-and-gitignore.md exit /b 1
 	@if not exist docs\development\02-demo-seed-data.md exit /b 1
+	@if not exist docs\development\03-tenant-foundation-implementation.md exit /b 1
 	@echo Documentation skeleton is present.
 
 github-auth-status:
@@ -102,8 +109,17 @@ git-pull-master:
 backend-create:
 	@if exist backend\composer.json (echo Backend skeleton already exists.) else docker run --rm --name shopsbox_composer -v "$(CURDIR):/app" -w /app composer:2 composer create-project symfony/skeleton backend
 
+composer-require:
+	@$(COMPOSE) run --rm backend composer require $(PACKAGES)
+
+composer-require-dev:
+	@$(COMPOSE) run --rm backend composer require --dev $(PACKAGES)
+
 composer-update:
-	@docker run --rm --name shopsbox_composer -v "$(CURDIR):/app" -w /app/backend composer:2 composer update
+	@$(COMPOSE) run --rm backend composer update
+
+composer-update-lock:
+	@$(COMPOSE) run --rm backend composer update --with-all-dependencies --no-scripts
 
 up:
 	@$(COMPOSE) up -d --build
@@ -126,5 +142,14 @@ composer-install:
 migrate:
 	@$(COMPOSE) run --rm backend php bin/console doctrine:migrations:migrate --no-interaction
 
-test: docs-check
-	@echo Application tests are not defined yet.
+fixtures-load:
+	@$(COMPOSE) run --rm backend php bin/console doctrine:fixtures:load --no-interaction
+
+backend-check:
+	@$(COMPOSE) run --rm backend php bin/console lint:container
+	@$(COMPOSE) run --rm backend php bin/console doctrine:schema:validate --skip-sync
+
+unit-test:
+	@$(COMPOSE) run --rm backend php bin/phpunit --testsuite "Project Test Suite"
+
+test: docs-check backend-check unit-test

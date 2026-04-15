@@ -33,7 +33,7 @@
 - Настроить Docker Compose.
 - Подключить PostgreSQL.
 - Настроить миграции.
-- Создать структуру слоев Domain/Application/Infrastructure/Interface.
+- Создать структуру модуля Tenant: Domain/Application/Infrastructure/Presentation.
 - Реализовать tenants/stores.
 - Реализовать пользователей и роли.
 - Добавить локальный demo tenant/store/users на основе [Demo seed data](../development/02-demo-seed-data.md).

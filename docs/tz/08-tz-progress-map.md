@@ -4,9 +4,9 @@
 
 ## Текущая точка
 
-Мы находимся между этапом `00 TZ and Architecture` и подготовкой к `01 MVP Foundation`.
+Мы находимся на этапе `01 MVP Foundation`.
 
-Код приложения начал создаваться. Локальная карточка `Backend foundation: Symfony skeleton and local Docker` переведена в `In progress`: создан git-репозиторий, подготовлена основная ветка `master` для первого прямого push без PR, Symfony skeleton и локальный Docker Compose контур `backend/postgres/redis/minio`. Следующий шаг - Doctrine migrations, foundation entities и demo seed/fixtures.
+Карточка `#1 Основа бэкенда: каркас Symfony и локальный Docker-контур` завершена. Локальная работа по карточке `#2 Основа арендаторов, магазинов, пользователей и ролей` идет в ветке `task/02-tenant-foundation`: подключены Doctrine ORM/Migrations/Fixtures, добавлены первые persistence-сущности, миграция tenant foundation и demo seed.
 
 ## Статусы
 
@@ -81,7 +81,7 @@
 - БД: PostgreSQL.
 - Миграции: Doctrine Migrations.
 - Multi-tenancy MVP: shared app + shared DB + `tenant_id` / `store_id`.
-- Архитектура: модульный монолит с разделением Domain/Application/Infrastructure/Interface.
+- Архитектура: модульный монолит с разделением Domain/Application/Infrastructure/Presentation.
 - Инфраструктурный рост: старт с shared managed-контура, затем object storage/CDN/metrics, horizontal scale, Dedicated Managed и только потом Kubernetes/platform при реальной необходимости.
 - Первый этап - локальная разработка в Docker Compose, где мы моделируем будущий VDS/VPS-контур. Production-пилот может позже стартовать как `VPS/VDS или cloud VM + Docker Compose + backend + PostgreSQL`. CDN для Twig + Bootstrap MVP не критичен и подключается позже по трафику витрины/изображений. Файлы, URL и окружения нужно проектировать так, чтобы потом вынести storage/БД/backend без глобальной переделки. S3-compatible storage/MinIO, Redis и cron/scheduler runner считаются плановыми расширениями, под которые нельзя закрывать дорогу в коде.
 - Production-бэкапы не являются задачей самого раннего dev-этапа, но перед реальными клиентами нужно добавить backup/restore регламент и затем автоматизировать его через scheduler.
