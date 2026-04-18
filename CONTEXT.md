@@ -73,11 +73,13 @@ Freepainters и CorporateHouse не считаются продуктовыми 
 - `docs/workflow/00-github-workflow.md` - процесс работы через GitHub.
 - `docs/workflow/01-mvp-foundation-issue-drafts.md` - локальные черновики issues для `01 MVP Foundation`.
 - `docs/workflow/02-current-work-status.md` - локальная карточка текущей работы и ее статус.
+- `docs/workflow/04-next-issue-plan.md` - черновик следующих issues после foundation-этапа.
 - `docs/development/01-move-to-shopsbox.md` - перенос проекта в папку `shopsbox`.
 - `docs/development/02-demo-seed-data.md` - demo tenant/store/users и dev-only пароли для будущего сидера.
 - `docs/development/03-tenant-foundation-implementation.md` - реализация foundation модуля Tenant.
 - `docs/development/04-file-storage-foundation.md` - рабочее решение по foundation-слою файлового хранилища.
 - `docs/development/05-local-operations-foundation.md` - локальные операции: healthcheck, dev dump/restore и будущий scheduler-runner.
+- `docs/development/06-resource-usage-foundation.md` - основа учета ресурсов и лимитов по tenant/store без billing engine.
 - `AGENTS.md` - обязательные правила работы.
 
 ## Текущий статус
@@ -92,4 +94,6 @@ Git-репозиторий в текущей рабочей папке иниц�
 
 Карточка `#3 Основа файлов: локальное и S3-совместимое хранилище` закрыта как выполненная: PR `#9` смержен в `master`, issue `#3` закрыта, карточка на доске переведена в `Готово`.
 
-Текущая локальная работа идет по карточке `#4 Локальные операции: планировщик, заготовки бэкапов и проверки здоровья` в ветке `task/04-local-operations-foundation`. На старте нужно добавить простые make-команды для healthcheck и dev dump/restore, зафиксировать будущий scheduler-runner в документации и не поднимать production backup-service раньше времени.
+Карточка `#4 Локальные операции: планировщик, заготовки бэкапов и проверки здоровья` закрыта как выполненная: PR `#10` смержен в `master`, issue `#4` закрыта, карточка на доске переведена в `Готово`.
+
+Текущая локальная работа идет по карточке `#5 Основа учета ресурсов и лимитов` в ветке `task/05-resource-usage-foundation`. На старте нужно заложить модель `resource_usage_daily` и `store_usage_limits`, зафиксировать tenant/store context для будущих метрик и не строить полноценный billing engine раньше времени.

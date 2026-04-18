@@ -20,6 +20,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Tenant/Infrastructure/Persistence/Doctrine/Entity'
                 prefix: 'App\Tenant\Infrastructure\Persistence\Doctrine\Entity'
                 alias: Tenant
+            ResourceUsage:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/ResourceUsage/Infrastructure/Persistence/Doctrine/Entity'
+                prefix: 'App\ResourceUsage\Infrastructure\Persistence\Doctrine\Entity'
+                alias: ResourceUsage
 
 when@test:
     doctrine:

@@ -66,11 +66,13 @@ docs-check:
 	@if not exist docs\workflow\00-github-workflow.md exit /b 1
 	@if not exist docs\workflow\02-current-work-status.md exit /b 1
 	@if not exist docs\workflow\03-conversation-map.md exit /b 1
+	@if not exist docs\workflow\04-next-issue-plan.md exit /b 1
 	@if not exist docs\workflow\github-pr-bodies\tenant-foundation.md exit /b 1
 	@if not exist docs\development\02-demo-seed-data.md exit /b 1
 	@if not exist docs\development\03-tenant-foundation-implementation.md exit /b 1
 	@if not exist docs\development\04-file-storage-foundation.md exit /b 1
 	@if not exist docs\development\05-local-operations-foundation.md exit /b 1
+	@if not exist docs\development\06-resource-usage-foundation.md exit /b 1
 	@echo Documentation skeleton is present.
 
 github-auth-status:
