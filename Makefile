@@ -14,7 +14,7 @@ BACKUP_FILE=$(BACKUP_DIR)\shopsbox-dev.sql
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-pr-create-current github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell health-check db-dump db-restore composer-install migration-diff migrate fixtures-load backend-check unit-test test
+.PHONY: help docs-list docs-check github-auth-status github-pr-create-current github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell health-check db-dump db-restore composer-install migration-diff migrate fixtures-load backend-check backend-routes unit-test test
 
 help:
 	@echo Make targets for ShopsBox:
@@ -35,6 +35,7 @@ help:
 	@echo   make migrate
 	@echo   make fixtures-load
 	@echo   make backend-check
+	@echo   make backend-routes
 	@echo   make unit-test
 	@echo   make test
 	@echo   make up
@@ -68,6 +69,7 @@ docs-check:
 	@if not exist docs\development\05-local-operations-foundation.md exit /b 1
 	@if not exist docs\development\06-resource-usage-foundation.md exit /b 1
 	@if not exist docs\development\07-catalog-foundation.md exit /b 1
+	@if not exist docs\development\08-admin-catalog-crud.md exit /b 1
 	@echo Documentation skeleton is present.
 
 github-auth-status:
@@ -163,6 +165,9 @@ fixtures-load:
 backend-check:
 	@$(COMPOSE) run --rm backend php bin/console lint:container
 	@$(COMPOSE) run --rm backend php bin/console doctrine:schema:validate --skip-sync
+
+backend-routes:
+	@$(COMPOSE) run --rm backend php bin/console debug:router
 
 unit-test:
 	@$(COMPOSE) run --rm backend php bin/phpunit --testsuite "Project Test Suite"
