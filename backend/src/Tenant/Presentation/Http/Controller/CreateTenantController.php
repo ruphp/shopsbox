@@ -8,6 +8,8 @@ use App\Tenant\Application\UseCase\CreateTenantUseCase;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use App\Tenant\Presentation\Http\Form\CreateTenantForm;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class CreateTenantController
@@ -19,11 +21,16 @@ final class CreateTenantController
     }
 
     #[Route('/tenants', name: 'tenant_create', methods: ['POST'])]
-    public function __invoke(\Symfony\Component\HttpFoundation\Request $request): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
-        $input = $this->form->fromRequest($request);
         try {
+            $input = $this->form->fromRequest($request);
             $result = $this->useCase->execute($input);
+        } catch (BadRequestHttpException $exception) {
+            return new JsonResponse([
+                'error' => 'bad_request',
+                'message' => $exception->getMessage(),
+            ], JsonResponse::HTTP_BAD_REQUEST);
         } catch (InvalidTenantInput $exception) {
             return new JsonResponse([
                 'error' => 'validation_error',
