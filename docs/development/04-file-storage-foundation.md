@@ -81,10 +81,10 @@ backend/src/FileStorage/
 
 ## Тестовое решение
 
-На первом шаге добавлены focused tests для `FlysystemFileStorage` на local adapter через временную директорию и для `ConfiguredFileUrlBuilder`.
+На первом шаге добавлены focused tests для `FlysystemFileStorage` на local adapter через временную директорию, для `FlysystemFactory` и для `ConfiguredFileUrlBuilder`.
 
 Integration-тест с MinIO/S3 можно отложить до сценария реальной загрузки файла через HTTP, чтобы не усложнять foundation раньше времени.
 
 Проверки:
 
-- `make test` - успешно, 9 tests / 27 assertions.
+- `make test` - успешно, 11 tests / 32 assertions.
