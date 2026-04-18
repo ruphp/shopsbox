@@ -1,5 +1,9 @@
 # Локальная разработка
 
+Основной локальный runtime - Docker Compose. Backend получает обязательные dev-переменные из `compose.yaml`, а `backend/.env` хранит только безопасные Symfony-defaults без production-секретов. Реальные `backend/.env.dev`, `backend/.env.test`, `backend/.env.local` и другие machine-specific env-файлы не хранятся в git.
+
+Для личных локальных переопределений можно создать `backend/.env` на основе `backend/.env.example`. Такой файл должен оставаться только на машине разработчика.
+
 ## Главное правило
 
 Вся проектная работа идет через `make`.
