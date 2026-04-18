@@ -142,7 +142,7 @@ backend-shell:
 	@$(COMPOSE) exec backend sh
 
 health-check:
-	@powershell -NoProfile -Command "Invoke-RestMethod -Uri 'http://localhost:8080/health' | ConvertTo-Json -Compress"
+	@curl -fsS http://localhost:8080/health
 
 db-dump:
 	@if not exist $(BACKUP_DIR) mkdir $(BACKUP_DIR)
