@@ -12,7 +12,7 @@ GITHUB_PROJECT_ITEM_ISSUE_2=PVTI_lAHOARNVz84BUg6Hzgp0NUk
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell composer-install migrate fixtures-load backend-check unit-test test
+.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-current github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell composer-install migrate fixtures-load backend-check unit-test test
 
 help:
 	@echo Цели make для ShopsBox:
@@ -80,6 +80,9 @@ github-project-current-issue-done:
 
 github-project-next-issue-in-progress:
 	@gh project item-edit --project-id $(GITHUB_PROJECT_ID) --id $(GITHUB_PROJECT_ITEM_ISSUE_2) --field-id $(GITHUB_PROJECT_STATUS_FIELD_ID) --single-select-option-id $(GITHUB_PROJECT_STATUS_IN_PROGRESS)
+
+github-pr-create-current:
+	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head $$(git branch --show-current) --title "$(PR_TITLE)" --body-file "$(PR_BODY_FILE)"
 
 github-pr-create-management:
 	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head task/02-tenant-foundation --title "Управленческие обновления перед задачей 2" --body-file docs\workflow\github-pr-bodies\project-management-and-gitignore.md
