@@ -17,6 +17,8 @@ services:
       S3_BUCKET: shopsbox-local
       S3_ACCESS_KEY: shopsbox
       S3_SECRET_KEY: shopsbox-secret
+      S3_REGION: us-east-1
+      S3_PATH_STYLE: "1"
     ports:
       - "8080:8000"
     depends_on:

@@ -64,6 +64,7 @@ docs-check:
 	@if not exist docs\workflow\github-pr-bodies\tenant-foundation.md exit /b 1
 	@if not exist docs\development\02-demo-seed-data.md exit /b 1
 	@if not exist docs\development\03-tenant-foundation-implementation.md exit /b 1
+	@if not exist docs\development\04-file-storage-foundation.md exit /b 1
 	@echo Documentation skeleton is present.
 
 github-auth-status:

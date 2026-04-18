@@ -75,6 +75,8 @@ Freepainters и CorporateHouse не считаются продуктовыми 
 - `docs/workflow/02-current-work-status.md` - локальная карточка текущей работы и ее статус.
 - `docs/development/01-move-to-shopsbox.md` - перенос проекта в папку `shopsbox`.
 - `docs/development/02-demo-seed-data.md` - demo tenant/store/users и dev-only пароли для будущего сидера.
+- `docs/development/03-tenant-foundation-implementation.md` - реализация foundation модуля Tenant.
+- `docs/development/04-file-storage-foundation.md` - рабочее решение по foundation-слою файлового хранилища.
 - `AGENTS.md` - обязательные правила работы.
 
 ## Текущий статус
@@ -85,4 +87,6 @@ Git-репозиторий в текущей рабочей папке иниц�
 
 Карточка `#1 Основа бэкенда: каркас Symfony и локальный Docker-контур` закрыта как выполненная и переведена в `Готово`.
 
-Текущая локальная работа идет по карточке `#2 Основа арендаторов, магазинов, пользователей и ролей` в ветке `task/02-tenant-foundation`. Для этой задачи создается только модуль `Tenant`; заранее не создаем `Catalog`, `Order`, `Billing` и другие модули. Удаленную карточку и PR не трогаем без отдельного подтверждения владельца проекта.
+Карточка `#2 Основа арендаторов, магазинов, пользователей и ролей` закрыта как выполненная: PR `#8` смержен в `master`, issue `#2` закрыта, карточка на доске переведена в `Готово`.
+
+Текущая локальная работа идет по карточке `#3 Основа файлов: локальное и S3-совместимое хранилище` в ветке `task/03-file-storage-foundation`. На старте нужно спроектировать storage foundation без преждевременного production-overkill: storage interface, local/S3-compatible adapters, URL builder/config и запрет на хранение пользовательских файлов внутри контейнера приложения.
