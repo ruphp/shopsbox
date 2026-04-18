@@ -16,6 +16,9 @@ use Symfony\Component\Uid\Uuid;
 
 final class DemoTenantFixtures extends Fixture
 {
+    public const DEMO_TENANT_REFERENCE = 'demo-tenant';
+    public const DEMO_STORE_REFERENCE = 'demo-store';
+
     private const DEMO_TENANT_ID = '11111111-1111-4111-8111-111111111111';
     private const DEMO_STORE_ID = '22222222-2222-4222-8222-222222222222';
 
@@ -45,6 +48,8 @@ final class DemoTenantFixtures extends Fixture
 
         $manager->persist($tenant);
         $manager->persist($store);
+        $this->addReference(self::DEMO_TENANT_REFERENCE, $tenant);
+        $this->addReference(self::DEMO_STORE_REFERENCE, $store);
 
         $roles = $this->createRoles();
         foreach ($roles as $role) {

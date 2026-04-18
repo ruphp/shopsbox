@@ -30,6 +30,8 @@ services:
     App\Catalog\Application\Contracts\ProductRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductRepository'
     App\Catalog\Application\Contracts\EntityFlusher: '@App\Catalog\Infrastructure\Adapters\DoctrineEntityFlusher'
     App\Catalog\Application\Contracts\UuidGenerator: '@App\Catalog\Infrastructure\Adapters\SymfonyUuidGenerator'
+    App\Storefront\Application\Contracts\StorefrontStoreRepository: '@App\Storefront\Infrastructure\Persistence\Doctrine\Repository\DoctrineStorefrontStoreRepository'
+    App\Storefront\Application\Contracts\StorefrontProductRepository: '@App\Storefront\Infrastructure\Persistence\Doctrine\Repository\DoctrineStorefrontProductRepository'
     App\FileStorage\Application\Contracts\FileStorage: '@App\FileStorage\Infrastructure\Storage\FlysystemFileStorage'
     App\FileStorage\Application\Contracts\FileUrlBuilder: '@App\FileStorage\Infrastructure\Url\ConfiguredFileUrlBuilder'
     League\Flysystem\FilesystemOperator:

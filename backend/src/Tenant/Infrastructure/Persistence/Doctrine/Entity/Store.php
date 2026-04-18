@@ -78,4 +78,24 @@ class Store
     {
         return $this->tenant;
     }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function slug(): string
+    {
+        return $this->slug;
+    }
+
+    public function domain(): string
+    {
+        return $this->domain;
+    }
+
+    public function status(): string
+    {
+        return $this->status;
+    }
 }
