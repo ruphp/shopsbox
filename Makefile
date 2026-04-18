@@ -15,38 +15,33 @@ COMPOSE=docker compose -p $(DOCKER_PROJECT)
 .PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-current github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell composer-install migrate fixtures-load backend-check unit-test test
 
 help:
-	@echo Цели make для ShopsBox:
-	@echo Ежедневная работа:
-	@echo   make docs-list   Показать файлы документации
-	@echo   make docs-check  Проверить наличие ключевых документов
-	@echo   make git-status  Показать статус git
-	@echo   make git-push-current  Отправить текущую ветку в origin
-	@echo   make backend-create  Создать каркас Symfony через Docker Composer
-	@echo   make composer-require PACKAGES="vendor/package"  Добавить Composer-зависимости через backend-контейнер
-	@echo   make composer-require-dev PACKAGES="vendor/package"  Добавить dev Composer-зависимости через backend-контейнер
-	@echo   make composer-update  Обновить зависимости Composer через backend-контейнер
-	@echo   make composer-update-lock  Обновить lock без Symfony scripts через backend-контейнер
-	@echo   make up          Поднять локальный Docker Compose контур
-	@echo   make down        Остановить локальный Docker Compose контур
-	@echo   make logs        Показать логи локального Docker Compose контура
-	@echo   make ps          Показать сервисы локального Docker Compose контура
-	@echo   make backend-shell  Открыть shell backend-контейнера
-	@echo   make migrate     Запустить миграции Doctrine, когда backend готов
-	@echo   make fixtures-load  Загрузить demo fixtures в локальную БД
-	@echo   make backend-check  Проверить Symfony container и Doctrine mapping
-	@echo   make unit-test  Запустить unit-тесты backend
-	@echo   make test        Запустить документационные и backend-проверки
-	@echo Управление задачами GitHub:
-	@echo   make github-auth-status  Проверить вход в GitHub CLI
-	@echo   make github-project-current-issue-done  Закрыть текущую задачу и перевести карточку в Готово
-	@echo   make github-project-next-issue-in-progress  Перевести задачу 2 в работу
-	@echo   make github-pr-create-management  Создать PR с управленческими обновлениями
-	@echo   make github-pr-merge-current  Слить текущий PR
-	@echo   make git-commit COMMIT_MESSAGE="текст"  Закоммитить текущие изменения
-	@echo Редкие административные операции:
-	@echo   make git-switch-master  Переключиться на master
-	@echo   make git-pull-master  Обновить master из origin
-	@echo   make git-push-master  Отправить master в origin
+	@echo Make targets for ShopsBox:
+	@echo   make docs-list
+	@echo   make docs-check
+	@echo   make git-status
+	@echo   make git-commit COMMIT_MESSAGE="message"
+	@echo   make git-push-current
+	@echo   make github-auth-status
+	@echo   make github-pr-create-current HEAD_BRANCH="branch" PR_TITLE="title" PR_BODY_FILE="path"
+	@echo   make github-pr-merge-current
+	@echo   make composer-install
+	@echo   make composer-require PACKAGES="vendor/package"
+	@echo   make composer-require-dev PACKAGES="vendor/package"
+	@echo   make composer-update
+	@echo   make composer-update-lock
+	@echo   make migrate
+	@echo   make fixtures-load
+	@echo   make backend-check
+	@echo   make unit-test
+	@echo   make test
+	@echo   make up
+	@echo   make down
+	@echo   make logs
+	@echo   make ps
+	@echo   make backend-shell
+	@echo   make git-switch-master
+	@echo   make git-pull-master
+	@echo   make git-push-master
 
 docs-list:
 	@dir /s /b docs\*.md
@@ -66,7 +61,7 @@ docs-check:
 	@if not exist docs\workflow\00-github-workflow.md exit /b 1
 	@if not exist docs\workflow\02-current-work-status.md exit /b 1
 	@if not exist docs\workflow\03-conversation-map.md exit /b 1
-	@if not exist docs\workflow\github-pr-bodies\project-management-and-gitignore.md exit /b 1
+	@if not exist docs\workflow\github-pr-bodies\tenant-foundation.md exit /b 1
 	@if not exist docs\development\02-demo-seed-data.md exit /b 1
 	@if not exist docs\development\03-tenant-foundation-implementation.md exit /b 1
 	@echo Documentation skeleton is present.
@@ -85,7 +80,7 @@ github-pr-create-current:
 	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head "$(HEAD_BRANCH)" --title "$(PR_TITLE)" --body-file "$(PR_BODY_FILE)"
 
 github-pr-create-management:
-	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head task/02-tenant-foundation --title "Управленческие обновления перед задачей 2" --body-file docs\workflow\github-pr-bodies\project-management-and-gitignore.md
+	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head task/02-tenant-foundation --title "Management updates before task 2" --body-file docs\workflow\github-pr-bodies\project-management-and-gitignore.md
 
 github-pr-merge-current:
 	@gh pr merge --merge
