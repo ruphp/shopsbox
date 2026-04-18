@@ -89,7 +89,9 @@ UUID генерируются через Symfony UID как UUID v7. Это time
 - Functional tests нужны, когда важно проверить HTTP-сценарий целиком: request, form, use case, response code и JSON.
 - Migrations/Docker checks нужны, когда меняется схема БД, контейнеры или runtime-команды.
 
-Для текущего правила уникальности домена чистый unit test даст мало пользы, потому что смысл правила связан с уже сохраненными stores. Когда добавим тестовый стек, первым полезным кандидатом будет integration/functional проверка: повторный `POST /tenants` с тем же `store_domain` должен вернуть `400`.
+Для текущего правила уникальности домена unit test проверяет application-ветку через fake `StoreRepository`: use case получает ответ, что домен уже занят, и возвращает ошибку по полю `store_domain`.
+
+Integration/functional проверку повторного `POST /tenants` с тем же `store_domain` пока не добавляем. Ее лучше разобрать и внедрить на более живом пользовательском сценарии, когда HTTP/API-контракт и тестовая БД станут отдельной осознанной темой.
 
 Первый unit-test пример добавлен для уже существующего use case `CreateTenant`.
 
@@ -116,9 +118,15 @@ Demo-пароли остаются только dev-only и описаны в `d
 
 ## Проверки и тестовое покрытие
 
-На текущем шаге добавлены persistence-сущности, миграция и demo fixtures. Отдельные unit tests пока не добавлены, потому что сложных доменных правил и application use cases еще нет: нет сценария, который можно полезно протестировать как бизнес-логику.
+На текущем шаге добавлены persistence-сущности, миграция, demo fixtures и первый application use case `CreateTenant`.
 
-Когда появятся сценарии приглашения пользователя, смены роли, блокировки пользователя или проверки границ tenant/store, для них нужны focused unit tests на `Domain` и `Application`.
+Добавлен unit-test на `CreateTenantUseCase`. Он проверяет:
+
+- успешное создание tenant/store;
+- ошибки формата входных данных;
+- ошибку занятого домена через fake `StoreRepository`.
+
+Когда появятся сценарии приглашения пользователя, смены роли, блокировки пользователя или проверки границ tenant/store, для них нужны focused unit tests на `Domain` и `Application`. Integration/functional tests добавляем тогда, когда нужно проверить реальную связку Symfony HTTP, Doctrine и тестовой БД.
 
 Для текущего foundation-шага обязательны локальные проверки:
 
