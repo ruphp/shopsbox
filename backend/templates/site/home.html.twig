@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Интернет-Магазин из коробки - ShopsBox{% endblock %}
+{% block og_title %}Интернет-Магазин из коробки - ShopsBox{% endblock %}
+{% block meta_description %}ShopsBox - интернет-магазин из коробки: витрина, каталог, управление товарами, подготовка к интеграции с 1С и масштабирование под 100+ магазинов.{% endblock %}
+{% block og_description %}Запустите интернет-магазин быстрее: витрина, каталог, админка и основа для роста в одной платформе.{% endblock %}
+{% block canonical_url %}{{ site_public_base_url ~ '/' }}{% endblock %}
+
+{% block body %}
+    <header class="header">
+        <div class="wrap nav">
+            <a class="brand" href="{{ path('site_home') }}">ShopsBox</a>
+            <nav class="links" aria-label="Навигация">
+                <a href="#launch">Запуск</a>
+                <a href="#catalog">Каталог</a>
+                <a href="#growth">Рост</a>
+                <a href="{{ path('storefront_home', {storeSlug: 'demo-store'}) }}">Demo Store</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="site-hero">
+            <div class="wrap">
+                <h1>Интернет-Магазин из коробки</h1>
+                <p>ShopsBox помогает быстро запустить витрину, каталог и управление товарами без долгой сборки ecommerce-платформы с нуля.</p>
+                <a class="button" href="{{ path('storefront_home', {storeSlug: 'demo-store'}) }}">Открыть demo-витрину</a>
+            </div>
+        </section>
+
+        <section id="launch" class="site-band">
+            <div class="wrap split">
+                <div>
+                    <h2>Запуск без технической трясины</h2>
+                    <p class="muted">Магазин получает рабочую основу: публичную витрину, каталог, админские сценарии и подготовку к безопасному росту.</p>
+                    <div class="feature-list">
+                        <div class="metric">
+                            <strong>1 день</strong>
+                            <span>на первый демонстрационный запуск магазина</span>
+                        </div>
+                        <div class="metric">
+                            <strong>100+</strong>
+                            <span>магазинов в целевой архитектуре без переписывания ядра</span>
+                        </div>
+                        <div class="metric">
+                            <strong>24/7</strong>
+                            <span>ориентир на проверки здоровья, бэкапы и операционный контур</span>
+                        </div>
+                    </div>
+                </div>
+                <img class="photo" src="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80" alt="Команда готовит запуск интернет-магазина">
+            </div>
+        </section>
+
+        <section id="catalog" class="site-band alt">
+            <div class="wrap">
+                <h2>Каталог, который можно объяснить и развивать</h2>
+                <div class="grid">
+                    <article class="product">
+                        <h3>Товары и категории</h3>
+                        <p class="muted">Базовая модель каталога уже отделена от витрины и админки.</p>
+                    </article>
+                    <article class="product">
+                        <h3>Публикация и скрытие</h3>
+                        <p class="muted">Товар может быть черновиком, опубликованным или архивным.</p>
+                    </article>
+                    <article class="product">
+                        <h3>Границы магазина</h3>
+                        <p class="muted">Данные читаются внутри выбранного store, без смешивания витрин.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="growth" class="site-band">
+            <div class="wrap split">
+                <div>
+                    <h2>Готовность к 1С и росту</h2>
+                    <p class="muted">Интеграция с 1С заложена как направление развития: обмен товарами, остатками, заказами и статусами без ломки публичной витрины.</p>
+                    <p class="muted">Платформа проектируется как модульный монолит: быстрее стартовать сейчас и спокойнее выносить тяжелые части позже.</p>
+                    <a class="button" href="{{ path('storefront_products', {storeSlug: 'demo-store'}) }}">Посмотреть каталог</a>
+                </div>
+                <img class="photo" src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80" alt="Операционные процессы интернет-магазина">
+            </div>
+        </section>
+    </main>
+{% endblock %}

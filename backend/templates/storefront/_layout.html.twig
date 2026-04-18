@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <header class="header">
+        <div class="wrap nav">
+            <a class="brand" href="{{ path('storefront_home', {storeSlug: store.slug}) }}">{{ store.name }}</a>
+            <nav class="links" aria-label="Навигация витрины">
+                <a href="{{ path('storefront_home', {storeSlug: store.slug}) }}">Главная</a>
+                <a href="{{ path('storefront_products', {storeSlug: store.slug}) }}">Товары</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        {% block storefront_content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="wrap nav">
+            <span>{{ store.name }}</span>
+            <span>{{ store.domain }}</span>
+        </div>
+    </footer>
+{% endblock %}

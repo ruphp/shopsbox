@@ -1,0 +1,30 @@
+{% extends 'storefront/_layout.html.twig' %}
+
+{% set store = view.store %}
+
+{% block title %}Товары - {{ store.name }}{% endblock %}
+{% block og_title %}Товары - {{ store.name }}{% endblock %}
+{% block meta_description %}Каталог опубликованных товаров магазина {{ store.name }} на ShopsBox.{% endblock %}
+{% block og_description %}Каталог товаров магазина {{ store.name }}.{% endblock %}
+{% block canonical_url %}{{ site_public_base_url ~ path('storefront_products', {storeSlug: store.slug}) }}{% endblock %}
+
+{% block storefront_content %}
+    <section class="section">
+        <div class="wrap">
+            <h1>Товары</h1>
+
+            {% if view.products is empty %}
+                <p class="muted">Пока нет опубликованных товаров.</p>
+            {% else %}
+                <div class="grid">
+                    {% for product in view.products %}
+                        <article class="product">
+                            <h2><a href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h2>
+                            <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

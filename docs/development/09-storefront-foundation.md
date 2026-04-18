@@ -1,0 +1,92 @@
+# Storefront foundation
+
+Документ фиксирует минимальную реализацию issue #14: первые публичные страницы магазина без checkout.
+
+## Что добавлено
+
+Добавлен модуль `Storefront`. Его задача - публичный показ магазина покупателю.
+
+`Catalog` хранит товары и категории. `Storefront` не становится вторым каталогом, а читает опубликованные товары для выбранного магазина и готовит данные для публичных страниц.
+
+Также добавлена главная страница платформы:
+
+```text
+GET /
+```
+
+Публичное позиционирование: `Интернет-Магазин из коробки`. Основной production-домен зафиксирован как `shopsbox.ru`.
+
+## Временный выбор магазина
+
+На MVP магазин выбирается по route:
+
+```text
+/s/{storeSlug}
+```
+
+Это временное решение для локальной разработки. Позже выбор магазина можно перевести на домен или поддомен, например `demo.shopsbox.local`.
+
+## Страницы
+
+```text
+GET /s/{storeSlug}
+GET /s/{storeSlug}/products
+GET /s/{storeSlug}/products/{productSlug}
+```
+
+Страницы рендерятся через Twig. Шаблоны физически лежат в стандартной Symfony-папке:
+
+```text
+backend/templates/storefront/
+```
+
+Логически это Presentation-слой модуля `Storefront`.
+
+## Как идет поток по слоям
+
+```text
+HTTP request
+  -> Storefront/Presentation/Http/Controller
+  -> Storefront/Application/UseCase
+  -> Storefront/Application/Contracts
+  -> Storefront/Infrastructure/Persistence/Doctrine
+  -> Twig template
+```
+
+Контроллер не ищет товары сам. Он вызывает use case и передает view model в Twig.
+
+## Tenant/store boundary
+
+Витрина сначала находит активный магазин по `storeSlug`, затем читает товары только по `store_id`.
+
+Публичные страницы показывают только товары со статусом `active`. Товары в `draft` и `archived` не попадают в список и карточку.
+
+## SEO
+
+Добавлена базовая SEO-основа:
+
+- title и meta description для главной, списка товаров и карточки товара;
+- canonical URL через `SITE_PUBLIC_BASE_URL`;
+- Open Graph и Twitter Card meta;
+- `robots.txt`;
+- `sitemap.xml`.
+
+Для локальной разработки backend доступен на `http://localhost:8080`, но canonical указывает на `https://shopsbox.ru`.
+
+Маркетинговые формулировки про 1С и `100+` используются аккуратно: интеграция с 1С описана как направление развития, а `100+` - как целевая архитектурная готовность, а не как уже существующая клиентская база.
+
+## Demo data
+
+Добавлены минимальные demo-товары:
+
+- `demo-hoodie`;
+- `demo-mug`;
+- `hidden-draft-product`.
+
+`hidden-draft-product` остается в статусе `draft` и нужен для проверки, что витрина не показывает неопубликованные товары.
+
+## Тестовое покрытие
+
+Новые unit-тесты не добавлены: в #14 не появилось нового доменного правила. Основное правило статуса товара уже покрыто тестами в `ProductStatusTest`.
+
+Functional tests на Twig-страницы пока не добавлены, потому что в проекте еще нет отдельного HTTP test stack и изолированной тестовой БД для `WebTestCase`. Для #14 это зафиксировано как перенос: локально страницы проверяются через `make backend-routes`, `make health-check` и HTTP smoke-запросы к витрине.

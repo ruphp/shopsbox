@@ -34,11 +34,13 @@ Evirox оставляем для будущих идей или более ши�
 - [Backend foundation: план первого технического шага](tz/07-backend-foundation-plan.md)
 - [Карта прогресса ТЗ](tz/08-tz-progress-map.md)
 - [Роли и права: черновик MVP](tz/09-roles-and-permissions.md)
+- [Auth code delivery: SMS/email и dev-заглушки](tz/10-auth-code-delivery.md)
 - [Анализ схем БД аналогов](research/01-ecommerce-schema-analysis.md)
 - [Локальная разработка](development/00-local-development.md)
 - [Перенос проекта в папку shopsbox](development/01-move-to-shopsbox.md)
 - [Demo seed data](development/02-demo-seed-data.md)
 - [Admin Catalog CRUD](development/08-admin-catalog-crud.md)
+- [Storefront foundation](development/09-storefront-foundation.md)
 
 ## Принятые стартовые направления
 
