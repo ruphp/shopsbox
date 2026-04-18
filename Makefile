@@ -9,10 +9,12 @@ GITHUB_PROJECT_STATUS_IN_PROGRESS=fc3e6bc2
 GITHUB_PROJECT_STATUS_DONE=1d39121f
 GITHUB_PROJECT_ITEM_ISSUE_1=PVTI_lAHOARNVz84BUg6Hzgp0NUs
 GITHUB_PROJECT_ITEM_ISSUE_2=PVTI_lAHOARNVz84BUg6Hzgp0NUk
+BACKUP_DIR=var\backups
+BACKUP_FILE=$(BACKUP_DIR)\shopsbox-dev.sql
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-current github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell composer-install migrate fixtures-load backend-check unit-test test
+.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-current github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell health-check db-dump db-restore composer-install migrate fixtures-load backend-check unit-test test
 
 help:
 	@echo Make targets for ShopsBox:
@@ -39,6 +41,9 @@ help:
 	@echo   make logs
 	@echo   make ps
 	@echo   make backend-shell
+	@echo   make health-check
+	@echo   make db-dump
+	@echo   make db-restore BACKUP_FILE="var\backups\shopsbox-dev.sql"
 	@echo   make git-switch-master
 	@echo   make git-pull-master
 	@echo   make git-push-master
@@ -65,6 +70,7 @@ docs-check:
 	@if not exist docs\development\02-demo-seed-data.md exit /b 1
 	@if not exist docs\development\03-tenant-foundation-implementation.md exit /b 1
 	@if not exist docs\development\04-file-storage-foundation.md exit /b 1
+	@if not exist docs\development\05-local-operations-foundation.md exit /b 1
 	@echo Documentation skeleton is present.
 
 github-auth-status:
@@ -134,6 +140,19 @@ ps:
 
 backend-shell:
 	@$(COMPOSE) exec backend sh
+
+health-check:
+	@curl -fsS http://localhost:8080/health
+
+db-dump:
+	@if not exist $(BACKUP_DIR) mkdir $(BACKUP_DIR)
+	@$(COMPOSE) exec -T postgres pg_dump --clean --if-exists -U shopsbox -d shopsbox > $(BACKUP_FILE)
+	@echo Database dump written to $(BACKUP_FILE)
+
+db-restore:
+	@if not exist "$(BACKUP_FILE)" (echo BACKUP_FILE not found: $(BACKUP_FILE) && exit /b 1)
+	@$(COMPOSE) exec -T postgres psql -U shopsbox -d shopsbox < "$(BACKUP_FILE)"
+	@echo Database restored from $(BACKUP_FILE)
 
 composer-install:
 	@$(COMPOSE) run --rm backend composer install
