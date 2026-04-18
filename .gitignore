@@ -4,5 +4,7 @@
 backend/var/
 backend/vendor/
 
+var/backups/
+
 *.log
 .idea/

@@ -77,6 +77,7 @@ Freepainters и CorporateHouse не считаются продуктовыми 
 - `docs/development/02-demo-seed-data.md` - demo tenant/store/users и dev-only пароли для будущего сидера.
 - `docs/development/03-tenant-foundation-implementation.md` - реализация foundation модуля Tenant.
 - `docs/development/04-file-storage-foundation.md` - рабочее решение по foundation-слою файлового хранилища.
+- `docs/development/05-local-operations-foundation.md` - локальные операции: healthcheck, dev dump/restore и будущий scheduler-runner.
 - `AGENTS.md` - обязательные правила работы.
 
 ## Текущий статус
@@ -89,4 +90,6 @@ Git-репозиторий в текущей рабочей папке иниц�
 
 Карточка `#2 Основа арендаторов, магазинов, пользователей и ролей` закрыта как выполненная: PR `#8` смержен в `master`, issue `#2` закрыта, карточка на доске переведена в `Готово`.
 
-Текущая локальная работа идет по карточке `#3 Основа файлов: локальное и S3-совместимое хранилище` в ветке `task/03-file-storage-foundation`. На старте нужно спроектировать storage foundation без преждевременного production-overkill: storage interface, local/S3-compatible adapters, URL builder/config и запрет на хранение пользовательских файлов внутри контейнера приложения.
+Карточка `#3 Основа файлов: локальное и S3-совместимое хранилище` закрыта как выполненная: PR `#9` смержен в `master`, issue `#3` закрыта, карточка на доске переведена в `Готово`.
+
+Текущая локальная работа идет по карточке `#4 Локальные операции: планировщик, заготовки бэкапов и проверки здоровья` в ветке `task/04-local-operations-foundation`. На старте нужно добавить простые make-команды для healthcheck и dev dump/restore, зафиксировать будущий scheduler-runner в документации и не поднимать production backup-service раньше времени.
