@@ -26,6 +26,10 @@ services:
     App\Tenant\Application\Contracts\StoreRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineStoreRepository'
     App\Tenant\Application\Contracts\EntityFlusher: '@App\Tenant\Infrastructure\Adapters\DoctrineEntityFlusher'
     App\Tenant\Application\Contracts\UuidGenerator: '@App\Tenant\Infrastructure\Adapters\SymfonyUuidGenerator'
+    App\Catalog\Application\Contracts\CategoryRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineCategoryRepository'
+    App\Catalog\Application\Contracts\ProductRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductRepository'
+    App\Catalog\Application\Contracts\EntityFlusher: '@App\Catalog\Infrastructure\Adapters\DoctrineEntityFlusher'
+    App\Catalog\Application\Contracts\UuidGenerator: '@App\Catalog\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\FileStorage\Application\Contracts\FileStorage: '@App\FileStorage\Infrastructure\Storage\FlysystemFileStorage'
     App\FileStorage\Application\Contracts\FileUrlBuilder: '@App\FileStorage\Infrastructure\Url\ConfiguredFileUrlBuilder'
     League\Flysystem\FilesystemOperator:

@@ -38,6 +38,7 @@ Evirox оставляем для будущих идей или более ши�
 - [Локальная разработка](development/00-local-development.md)
 - [Перенос проекта в папку shopsbox](development/01-move-to-shopsbox.md)
 - [Demo seed data](development/02-demo-seed-data.md)
+- [Admin Catalog CRUD](development/08-admin-catalog-crud.md)
 
 ## Принятые стартовые направления
 

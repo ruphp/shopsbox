@@ -98,8 +98,48 @@ class Product
         return $this->category;
     }
 
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function slug(): string
+    {
+        return $this->slug;
+    }
+
+    public function description(): ?string
+    {
+        return $this->description;
+    }
+
     public function status(): ProductStatus
     {
         return $this->status;
+    }
+
+    public function createdAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function updatedAt(): DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function updateDetails(?Category $category, string $name, string $slug, ?string $description): void
+    {
+        $this->category = $category;
+        $this->name = $name;
+        $this->slug = $slug;
+        $this->description = $description;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function changeStatus(ProductStatus $status): void
+    {
+        $this->status = $status;
+        $this->updatedAt = new DateTimeImmutable();
     }
 }
