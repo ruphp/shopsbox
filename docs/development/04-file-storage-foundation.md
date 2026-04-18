@@ -22,6 +22,9 @@ backend/src/FileStorage/
   Infrastructure/
     Storage/
     Url/
+  Presentation/
+    Http/
+      Controller/
 ```
 
 `Domain` пока не создаем, если нет самостоятельных бизнес-правил файла. Если позже появятся правила жизненного цикла файла, статусы проверки, привязки к store/tenant или права доступа, тогда добавим `Domain`.
@@ -63,6 +66,7 @@ backend/src/FileStorage/
 - `Infrastructure/Storage/FlysystemFileStorage` - реализация storage contract через Flysystem.
 - `Infrastructure/Storage/FlysystemFactory` - выбор local или S3-compatible adapter по env/config.
 - `Infrastructure/Url/ConfiguredFileUrlBuilder` - URL builder от базового публичного URL.
+- `Presentation/Http/Controller/ServeFileController` - dev/local endpoint `GET /files/{key}` для отдачи файла по публичному URL local-режима.
 
 Конфигурация:
 
@@ -73,12 +77,14 @@ backend/src/FileStorage/
 
 Таблицу `files` пока не создаем. Сейчас нет реального сценария загрузки и привязки файла к товару, store или tenant. Таблица появится, когда станет понятно, какие metadata нужны: owner, visibility, mime type, size, checksum, lifecycle/status.
 
+`GET /files/{key}` нужен только как минимальный local/dev способ проверить публичный URL. В будущем для production/S3/CDN этот endpoint может не использоваться: URL builder сможет отдавать URL object storage или CDN.
+
 ## Тестовое решение
 
-На первом шаге добавлен focused test для `FlysystemFileStorage` на local adapter через временную директорию.
+На первом шаге добавлены focused tests для `FlysystemFileStorage` на local adapter через временную директорию и для `ConfiguredFileUrlBuilder`.
 
 Integration-тест с MinIO/S3 можно отложить до сценария реальной загрузки файла через HTTP, чтобы не усложнять foundation раньше времени.
 
 Проверки:
 
-- `make test` - успешно, 8 tests / 26 assertions.
+- `make test` - успешно, 9 tests / 27 assertions.
