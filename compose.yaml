@@ -1,0 +1,85 @@
+name: shopsbox
+
+services:
+  backend:
+    container_name: shopsbox_backend
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /app/backend
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: postgresql://shopsbox:shopsbox@shopsbox_postgres:5432/shopsbox?serverVersion=16&charset=utf8
+      REDIS_URL: redis://shopsbox_redis:6379
+      S3_ENDPOINT: http://shopsbox_minio:9000
+      S3_BUCKET: shopsbox-local
+      S3_ACCESS_KEY: shopsbox
+      S3_SECRET_KEY: shopsbox-secret
+      S3_REGION: us-east-1
+      S3_PATH_STYLE: "1"
+    ports:
+      - "8080:8000"
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    networks:
+      - shopsbox_app
+    command: >
+      sh -lc "if [ -f public/index.php ];
+      then php -S 0.0.0.0:8000 -t public public/index.php;
+      else php -S 0.0.0.0:8000 -t .;
+      fi"
+
+  postgres:
+    container_name: shopsbox_postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: shopsbox
+      POSTGRES_USER: shopsbox
+      POSTGRES_PASSWORD: shopsbox
+    ports:
+      - "5432:5432"
+    volumes:
+      - shopsbox_postgres_data:/var/lib/postgresql/data
+    networks:
+      - shopsbox_app
+
+  redis:
+    container_name: shopsbox_redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - shopsbox_redis_data:/data
+    networks:
+      - shopsbox_app
+
+  minio:
+    container_name: shopsbox_minio
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: shopsbox
+      MINIO_ROOT_PASSWORD: shopsbox-secret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - shopsbox_minio_data:/data
+    networks:
+      - shopsbox_app
+
+networks:
+  shopsbox_app:
+    name: shopsbox_app
+
+volumes:
+  shopsbox_postgres_data:
+    name: shopsbox_postgres_data
+  shopsbox_redis_data:
+    name: shopsbox_redis_data
+  shopsbox_minio_data:
+    name: shopsbox_minio_data
