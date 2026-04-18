@@ -80,7 +80,7 @@
 - `make backend-check` - успешно;
 - `make migrate` - успешно, миграция `DoctrineMigrations\Version20260414090000` применена;
 - `make fixtures-load` - успешно, demo fixtures загружены;
-- `make unit-test` - успешно, 7 tests / 17 assertions;
+- `make unit-test` - успешно, 7 tests / 22 assertions;
 - `make test` - успешно, документационный скелет, Symfony container lint и Doctrine mapping проходят.
 
 Следующий шаг - пройти финальную ревизию diff по коду `#2` и подготовить локальный отчет по проверкам. Integration/functional тесты для повторного `POST /tenants` с тем же `store_domain` пока не добавляем: этот уровень тестов лучше разобрать на более живом пользовательском сценарии, когда тестовая БД и HTTP/API-контракт станут отдельной темой.

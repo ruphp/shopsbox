@@ -60,7 +60,7 @@ backend/src/Tenant/
 - `Application` - сценарии приложения: DTO, use cases и contracts.
 - `Application/Dto` - входные и выходные данные use case.
 - `Application/UseCase` - шаги сценария: что нужно сделать и в каком порядке.
-- `Application/Contracts` - договоры к внешним действиям: подготовить entity к записи (`persist`), проверить наличие, отправить уведомление, сгенерировать id.
+- `Application/Contracts` - договоры к внешним действиям: подготовить данные к записи (`persist`), проверить наличие, отправить уведомление, сгенерировать id.
 - `Application/Exception` - ошибки application-сценариев, например неверный input.
 - `Infrastructure` - технические реализации contracts: Doctrine, адаптеры, внешние сервисы.
 - `Presentation` - вход и выход приложения: контроллеры, формы, подготовка HTTP/Twig/API-ответа.
@@ -75,6 +75,8 @@ Use case `CreateTenant` показывает базовый поток:
 4. Реализации контрактов лежат в `Infrastructure/Adapters` и `Infrastructure/Persistence/Doctrine/Repository`.
 
 Repository contracts в этом шаге используют имя `persist`, а не `save`, потому что Doctrine реально пишет изменения в БД только на `flush`. Поэтому поток читается как `persist tenant`, `persist store`, затем `flush`.
+
+Application слой не импортирует Doctrine entity из `Infrastructure`. Use case передает в repository contracts данные сценария, а persistence-entity создаются внутри infrastructure-реализаций. Так Doctrine остается технической деталью модуля.
 
 UUID генерируются через Symfony UID как UUID v7. Это time-ordered UUID: он остается распределенным идентификатором, но лучше подходит для индексов БД, чем полностью случайный UUID v4.
 

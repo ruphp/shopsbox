@@ -11,8 +11,6 @@ use App\Tenant\Application\Contracts\UuidGenerator;
 use App\Tenant\Application\Dto\CreateTenantInput;
 use App\Tenant\Application\Dto\CreateTenantResult;
 use App\Tenant\Application\Exception\InvalidTenantInput;
-use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\Store;
-use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\Tenant;
 use DateTimeZone;
 
 final class CreateTenantUseCase
@@ -33,16 +31,16 @@ final class CreateTenantUseCase
         $tenantId = $this->uuidGenerator->generate();
         $storeId = $this->uuidGenerator->generate();
 
-        $tenant = new Tenant(
+        $this->tenantRepository->persist(
             $tenantId,
             $input->tenantName,
             'active',
             $input->billingEmail,
         );
 
-        $store = new Store(
+        $this->storeRepository->persist(
             $storeId,
-            $tenant,
+            $tenantId,
             $input->storeName,
             $input->storeSlug,
             $input->storeDomain,
@@ -50,9 +48,6 @@ final class CreateTenantUseCase
             $input->defaultCurrency,
             $input->timezone,
         );
-
-        $this->tenantRepository->persist($tenant);
-        $this->storeRepository->persist($store);
         $this->entityFlusher->flush();
 
         return new CreateTenantResult($tenantId, $storeId);

@@ -11,8 +11,6 @@ use App\Tenant\Application\Contracts\UuidGenerator;
 use App\Tenant\Application\Dto\CreateTenantInput;
 use App\Tenant\Application\UseCase\CreateTenantUseCase;
 use App\Tenant\Application\Exception\InvalidTenantInput;
-use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\Store;
-use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\Tenant;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -40,6 +38,11 @@ final class CreateTenantUseCaseTest extends TestCase
         self::assertSame('22222222-2222-4222-8222-222222222222', $result->storeId);
         self::assertCount(1, $tenantRepository->saved);
         self::assertCount(1, $storeRepository->saved);
+        self::assertSame('Demo Tenant', $tenantRepository->saved[0]['name']);
+        self::assertSame('billing@demo.shopsbox.local', $tenantRepository->saved[0]['billingEmail']);
+        self::assertSame('Demo Store', $storeRepository->saved[0]['name']);
+        self::assertSame('demo-store', $storeRepository->saved[0]['slug']);
+        self::assertSame('demo.shopsbox.local', $storeRepository->saved[0]['domain']);
         self::assertTrue($entityFlusher->flushed);
     }
 
@@ -147,20 +150,25 @@ final class CreateTenantUseCaseTest extends TestCase
 final class FakeTenantRepository implements TenantRepository
 {
     /**
-     * @var list<Tenant>
+     * @var list<array{id: string, name: string, status: string, billingEmail: string}>
      */
     public array $saved = [];
 
-    public function persist(Tenant $tenant): void
+    public function persist(string $id, string $name, string $status, string $billingEmail): void
     {
-        $this->saved[] = $tenant;
+        $this->saved[] = [
+            'id' => $id,
+            'name' => $name,
+            'status' => $status,
+            'billingEmail' => $billingEmail,
+        ];
     }
 }
 
 final class FakeStoreRepository implements StoreRepository
 {
     /**
-     * @var list<Store>
+     * @var list<array{id: string, tenantId: string, name: string, slug: string, domain: string, status: string, defaultCurrency: string, timezone: string}>
      */
     public array $saved = [];
 
@@ -176,9 +184,27 @@ final class FakeStoreRepository implements StoreRepository
         return in_array($domain, $this->existingDomains, true);
     }
 
-    public function persist(Store $store): void
+    public function persist(
+        string $id,
+        string $tenantId,
+        string $name,
+        string $slug,
+        string $domain,
+        string $status,
+        string $defaultCurrency,
+        string $timezone,
+    ): void
     {
-        $this->saved[] = $store;
+        $this->saved[] = [
+            'id' => $id,
+            'tenantId' => $tenantId,
+            'name' => $name,
+            'slug' => $slug,
+            'domain' => $domain,
+            'status' => $status,
+            'defaultCurrency' => $defaultCurrency,
+            'timezone' => $timezone,
+        ];
     }
 }
 

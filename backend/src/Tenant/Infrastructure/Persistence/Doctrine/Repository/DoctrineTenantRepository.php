@@ -14,8 +14,8 @@ final class DoctrineTenantRepository implements TenantRepository
     {
     }
 
-    public function persist(Tenant $tenant): void
+    public function persist(string $id, string $name, string $status, string $billingEmail): void
     {
-        $this->entityManager->persist($tenant);
+        $this->entityManager->persist(new Tenant($id, $name, $status, $billingEmail));
     }
 }
