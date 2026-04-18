@@ -82,7 +82,7 @@ github-project-next-issue-in-progress:
 	@gh project item-edit --project-id $(GITHUB_PROJECT_ID) --id $(GITHUB_PROJECT_ITEM_ISSUE_2) --field-id $(GITHUB_PROJECT_STATUS_FIELD_ID) --single-select-option-id $(GITHUB_PROJECT_STATUS_IN_PROGRESS)
 
 github-pr-create-current:
-	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head $$(git branch --show-current) --title "$(PR_TITLE)" --body-file "$(PR_BODY_FILE)"
+	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head "$(HEAD_BRANCH)" --title "$(PR_TITLE)" --body-file "$(PR_BODY_FILE)"
 
 github-pr-create-management:
 	@gh pr create --repo $(GITHUB_FULL_REPO) --base master --head task/02-tenant-foundation --title "Управленческие обновления перед задачей 2" --body-file docs\workflow\github-pr-bodies\project-management-and-gitignore.md
