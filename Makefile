@@ -14,7 +14,7 @@ BACKUP_FILE=$(BACKUP_DIR)\shopsbox-dev.sql
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-current github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell health-check db-dump db-restore composer-install migrate fixtures-load backend-check unit-test test
+.PHONY: help docs-list docs-check github-auth-status github-project-current-issue-done github-project-next-issue-in-progress github-pr-create-current github-pr-create-management github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell health-check db-dump db-restore composer-install migration-diff migrate fixtures-load backend-check unit-test test
 
 help:
 	@echo Make targets for ShopsBox:
@@ -31,6 +31,7 @@ help:
 	@echo   make composer-require-dev PACKAGES="vendor/package"
 	@echo   make composer-update
 	@echo   make composer-update-lock
+	@echo   make migration-diff
 	@echo   make migrate
 	@echo   make fixtures-load
 	@echo   make backend-check
@@ -159,6 +160,9 @@ db-restore:
 
 composer-install:
 	@$(COMPOSE) run --rm backend composer install
+
+migration-diff:
+	@$(COMPOSE) run --rm backend php bin/console doctrine:migrations:diff --no-interaction
 
 migrate:
 	@$(COMPOSE) run --rm backend php bin/console doctrine:migrations:migrate --no-interaction
