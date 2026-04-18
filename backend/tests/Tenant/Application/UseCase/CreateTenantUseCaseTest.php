@@ -21,14 +21,14 @@ final class CreateTenantUseCaseTest extends TestCase
 {
     public function testItCreatesTenantAndStore(): void
     {
-        $tenantRepository = new InMemoryTenantRepository();
-        $storeRepository = new InMemoryStoreRepository();
+        $tenantRepository = new FakeTenantRepository();
+        $storeRepository = new FakeStoreRepository();
         $entityFlusher = new SpyEntityFlusher();
         $useCase = new CreateTenantUseCase(
             $tenantRepository,
             $storeRepository,
             $entityFlusher,
-            new SequentialUuidGenerator([
+            new StubListUuidGenerator([
                 '11111111-1111-4111-8111-111111111111',
                 '22222222-2222-4222-8222-222222222222',
             ]),
@@ -85,12 +85,12 @@ final class CreateTenantUseCaseTest extends TestCase
 
     public function testItRejectsAlreadyUsedDomain(): void
     {
-        $storeRepository = new InMemoryStoreRepository(['demo.shopsbox.local']);
+        $storeRepository = new FakeStoreRepository(['demo.shopsbox.local']);
         $useCase = new CreateTenantUseCase(
-            new InMemoryTenantRepository(),
+            new FakeTenantRepository(),
             $storeRepository,
             new SpyEntityFlusher(),
-            new SequentialUuidGenerator([
+            new StubListUuidGenerator([
                 '11111111-1111-4111-8111-111111111111',
                 '22222222-2222-4222-8222-222222222222',
             ]),
@@ -108,10 +108,10 @@ final class CreateTenantUseCaseTest extends TestCase
     private function useCase(): CreateTenantUseCase
     {
         return new CreateTenantUseCase(
-            new InMemoryTenantRepository(),
-            new InMemoryStoreRepository(),
+            new FakeTenantRepository(),
+            new FakeStoreRepository(),
             new SpyEntityFlusher(),
-            new SequentialUuidGenerator([
+            new StubListUuidGenerator([
                 '11111111-1111-4111-8111-111111111111',
                 '22222222-2222-4222-8222-222222222222',
             ]),
@@ -144,7 +144,7 @@ final class CreateTenantUseCaseTest extends TestCase
     }
 }
 
-final class InMemoryTenantRepository implements TenantRepository
+final class FakeTenantRepository implements TenantRepository
 {
     /**
      * @var list<Tenant>
@@ -157,7 +157,7 @@ final class InMemoryTenantRepository implements TenantRepository
     }
 }
 
-final class InMemoryStoreRepository implements StoreRepository
+final class FakeStoreRepository implements StoreRepository
 {
     /**
      * @var list<Store>
@@ -192,7 +192,7 @@ final class SpyEntityFlusher implements EntityFlusher
     }
 }
 
-final class SequentialUuidGenerator implements UuidGenerator
+final class StubListUuidGenerator implements UuidGenerator
 {
     /**
      * @param list<string> $uuids
