@@ -75,6 +75,8 @@ Freepainters и CorporateHouse не считаются продуктовыми 
 - `docs/workflow/02-current-work-status.md` - локальная карточка текущей работы и ее статус.
 - `docs/development/01-move-to-shopsbox.md` - перенос проекта в папку `shopsbox`.
 - `docs/development/02-demo-seed-data.md` - demo tenant/store/users и dev-only пароли для будущего сидера.
+- `docs/development/03-tenant-foundation-implementation.md` - реализация foundation модуля Tenant.
+- `docs/development/04-file-storage-foundation.md` - рабочее решение по foundation-слою файлового хранилища.
 - `AGENTS.md` - обязательные правила работы.
 
 ## Текущий статус
