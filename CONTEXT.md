@@ -80,6 +80,7 @@ Freepainters и CorporateHouse не считаются продуктовыми 
 - `docs/development/04-file-storage-foundation.md` - рабочее решение по foundation-слою файлового хранилища.
 - `docs/development/05-local-operations-foundation.md` - локальные операции: healthcheck, dev dump/restore и будущий scheduler-runner.
 - `docs/development/06-resource-usage-foundation.md` - основа учета ресурсов и лимитов по tenant/store без billing engine.
+- `docs/development/07-catalog-foundation.md` - основа модуля Catalog: товары, категории и границы tenant/store.
 - `AGENTS.md` - обязательные правила работы.
 
 ## Текущий статус
@@ -96,4 +97,6 @@ Git-репозиторий в текущей рабочей папке иниц�
 
 Карточка `#4 Локальные операции: планировщик, заготовки бэкапов и проверки здоровья` закрыта как выполненная: PR `#10` смержен в `master`, issue `#4` закрыта, карточка на доске переведена в `Готово`.
 
-Текущая локальная работа идет по карточке `#5 Основа учета ресурсов и лимитов` в ветке `task/05-resource-usage-foundation`. На старте нужно заложить модель `resource_usage_daily` и `store_usage_limits`, зафиксировать tenant/store context для будущих метрик и не строить полноценный billing engine раньше времени.
+Карточка `#5 Основа учета ресурсов и лимитов` закрыта как выполненная: PR `#11` смержен в `master`, issue `#5` закрыта, карточка на доске переведена в `Готово`.
+
+Текущая локальная работа идет по карточке `#12 Основа каталога: товары и категории` в ветке `task/12-catalog-foundation`. На старте нужно создать минимальный модуль `Catalog`, таблицы `products` и `categories`, учесть `tenant_id`/`store_id` и не добавлять изображения, остатки, скидки, варианты, SEO, админский CRUD или витрину.

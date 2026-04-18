@@ -73,6 +73,7 @@ docs-check:
 	@if not exist docs\development\04-file-storage-foundation.md exit /b 1
 	@if not exist docs\development\05-local-operations-foundation.md exit /b 1
 	@if not exist docs\development\06-resource-usage-foundation.md exit /b 1
+	@if not exist docs\development\07-catalog-foundation.md exit /b 1
 	@echo Documentation skeleton is present.
 
 github-auth-status:

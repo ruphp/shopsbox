@@ -10,7 +10,7 @@
 
 ## Предлагаемые следующие issues
 
-### #6 Catalog foundation
+### #12 Catalog foundation
 
 Цель: создать минимальный модуль `Catalog` для товаров и категорий.
 
@@ -29,7 +29,7 @@
 - Doctrine mapping проходит;
 - если появятся правила статусов товара, добавить unit-тесты.
 
-### #7 Product image upload
+### #15 Product image upload
 
 Цель: впервые использовать `FileStorage` в реальном сценарии.
 
@@ -47,7 +47,7 @@
 - integration/functional проверка загрузки через HTTP;
 - проверка, что файл не хранится внутри контейнера приложения.
 
-### #8 Storefront skeleton
+### #14 Storefront skeleton
 
 Цель: показать первые публичные страницы магазина без checkout.
 
@@ -64,7 +64,7 @@
 - functional tests на доступность страниц;
 - проверка tenant/store boundary.
 
-### #9 Admin catalog CRUD
+### #13 Admin catalog CRUD
 
 Цель: дать владельцу магазина минимальное управление товарами.
 
@@ -91,6 +91,6 @@
 
 ## Рекомендуемый следующий шаг
 
-После закрытия `#5` создать `#6 Catalog foundation`.
+После закрытия `#5` создана задача `#12 Catalog foundation`.
 
 Это даст первый настоящий бизнес-модуль и начнет связывать уже готовые foundation-слои: tenant boundary, migrations, file storage позже, resource usage позже.
