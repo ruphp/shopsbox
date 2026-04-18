@@ -73,6 +73,7 @@ Freepainters и CorporateHouse не считаются продуктовыми 
 - `docs/workflow/00-github-workflow.md` - процесс работы через GitHub.
 - `docs/workflow/01-mvp-foundation-issue-drafts.md` - локальные черновики issues для `01 MVP Foundation`.
 - `docs/workflow/02-current-work-status.md` - локальная карточка текущей работы и ее статус.
+- `docs/workflow/04-next-issue-plan.md` - черновик следующих issues после foundation-этапа.
 - `docs/development/01-move-to-shopsbox.md` - перенос проекта в папку `shopsbox`.
 - `docs/development/02-demo-seed-data.md` - demo tenant/store/users и dev-only пароли для будущего сидера.
 - `docs/development/03-tenant-foundation-implementation.md` - реализация foundation модуля Tenant.
