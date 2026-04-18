@@ -23,7 +23,7 @@ Managed Store:
   -> API магазина / internal service layer
 ```
 
-На старте допускается один Symfony backend, но с четким разделением доменов и модулей. Важно не смешивать бизнес-логику с контроллерами и ORM.
+На старте выбран модульный монолит: один Symfony backend, одна кодовая база и один runtime-контур, но с четким разделением доменов и модулей. Важно не смешивать бизнес-логику с контроллерами и ORM.
 
 ## Вариант для Own Infra
 
@@ -87,9 +87,9 @@ Doctrine Migrations не считается проблемой производ�
 Рекомендуемое разделение внутри backend:
 
 - Domain: сущности, value objects, доменные сервисы, события, интерфейсы репозиториев.
-- Application: use cases, команды, запросы, DTO, транзакционные сценарии.
+- Application: use cases, команды, запросы, DTO в `Application/Dto`, контракты внешних действий в `Application/Contracts`, транзакционные сценарии. DTO может собираться в Presentation из формы или HTTP-запроса, но класс DTO принадлежит Application.
 - Infrastructure: Doctrine, внешние API, файловое хранилище, очереди, почта.
-- Interface: HTTP controllers, CLI commands, admin API, webhooks.
+- Presentation: HTTP controllers, forms, Twig/API output, search/view models, CLI commands, admin API, webhooks. DTO для сценариев по умолчанию не кладем в Presentation.
 
 Подробные правила разработки на Symfony вынесены в [Правила разработки на Symfony](01-symfony-development-rules.md).
 

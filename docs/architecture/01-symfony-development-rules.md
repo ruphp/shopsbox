@@ -65,6 +65,10 @@ src/Catalog/Domain/Repository/ProductRepository.php
 - use cases;
 - команды и query-модели;
 - DTO входа/выхода;
+- DTO держим в `Application/Dto`, без лишней вложенности вида `Application/CreateTenant/CreateTenantData.php`, чтобы структура оставалась простой для чтения;
+- `Presentation` может собрать DTO из HTTP-запроса или формы, но сам класс DTO остается в `Application/Dto`, потому что это вход сценария use case;
+- контракты application-слоя держим в `Application/Contracts`: это интерфейсы к внешним действиям, которые сценарий просит выполнить через infrastructure-реализацию, например хранение файлов, отправка уведомления или генерация ссылки;
+- `Application/Contracts` вызываются из `Application/UseCase`; контроллеры и формы не дергают эти контракты напрямую без отдельного архитектурного обоснования;
 - orchestration: загрузить сущность, вызвать доменное правило, сохранить, отправить событие;
 - транзакционные сценарии.
 
@@ -79,8 +83,9 @@ src/Catalog/Domain/Repository/ProductRepository.php
 Пример:
 
 ```text
-src/Catalog/Application/CreateProduct/CreateProductCommand.php
-src/Catalog/Application/CreateProduct/CreateProductHandler.php
+src/Tenant/Application/Dto/CreateTenantInput.php
+src/Tenant/Application/Contracts/Notifier.php
+src/Tenant/Application/UseCase/CreateTenantUseCase.php
 ```
 
 ### Infrastructure
@@ -100,11 +105,14 @@ src/Catalog/Infrastructure/Doctrine/DoctrineProductRepository.php
 src/Order/Infrastructure/Payment/YooKassaPaymentGateway.php
 ```
 
-### Interface
+### Presentation
 
 Что здесь живет:
 
 - HTTP controllers;
+- forms;
+- Twig/API output;
+- view models;
 - console commands;
 - API request/response transformers;
 - webhook controllers;
@@ -113,7 +121,7 @@ src/Order/Infrastructure/Payment/YooKassaPaymentGateway.php
 Контроллер должен быть тонким:
 
 1. Принять HTTP-запрос.
-2. Собрать command/query.
+2. Собрать application DTO или command/query из HTTP-запроса или формы.
 3. Вызвать handler.
 4. Вернуть response.
 
@@ -122,36 +130,29 @@ src/Order/Infrastructure/Payment/YooKassaPaymentGateway.php
 Пример:
 
 ```text
-src/Catalog/Interface/Http/Admin/CreateProductController.php
-src/Order/Interface/Http/Storefront/CheckoutController.php
+src/Tenant/Presentation/Http/Controller/CreateTenantController.php
+src/Tenant/Presentation/Http/Form/CreateTenantForm.php
 ```
 
 ## Модули
 
 Проект лучше делить по доменным зонам, а не по техническим папкам на весь проект.
 
-Предварительный формат:
+Формат модуля:
 
 ```text
 src/
-  Catalog/
-    Domain/
-    Application/
-    Infrastructure/
-    Interface/
-  Order/
-    Domain/
-    Application/
-    Infrastructure/
-    Interface/
   Tenant/
     Domain/
     Application/
+      Dto/
+      Contracts/
+      UseCase/
     Infrastructure/
-    Interface/
+    Presentation/
 ```
 
-Так проще объяснять: "все по каталогу лежит в Catalog", а внутри уже видно слои.
+Так проще объяснять: "все по арендаторам, магазинам, пользователям и ролям лежит в Tenant", а внутри уже видно слои. Это модульный монолит, не микросервисы: один Symfony backend, одна кодовая база и один runtime-контур. Новые модули, например Catalog или Order, создаем только в своих задачах, а не заранее.
 
 ## Symfony best practices для проекта
 

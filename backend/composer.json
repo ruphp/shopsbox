@@ -7,14 +7,17 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^2.18.2",
+        "doctrine/doctrine-migrations-bundle": "^3.7",
+        "doctrine/orm": "^3.6.3",
         "symfony/console": "^7.4.8",
         "symfony/dotenv": "^7.4.8",
         "symfony/flex": "^2.10",
         "symfony/framework-bundle": "^7.4.8",
         "symfony/runtime": "^7.4.8",
+        "symfony/security-bundle": "^7.4.8",
+        "symfony/uid": "^7.4",
         "symfony/yaml": "^7.4.8"
-    },
-    "require-dev": {
     },
     "config": {
         "allow-plugins": {
@@ -23,6 +26,9 @@
             "symfony/runtime": true
         },
         "bump-after-update": true,
+        "platform": {
+            "php": "8.3.30"
+        },
         "sort-packages": true
     },
     "autoload": {
@@ -65,5 +71,9 @@
             "allow-contrib": false,
             "require": "^7.4"
         }
+    },
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.7.3",
+        "phpunit/phpunit": "^12"
     }
 }

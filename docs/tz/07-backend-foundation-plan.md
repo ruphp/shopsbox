@@ -18,6 +18,8 @@ Symfony skeleton создан в `backend/`, локальный Docker Compose �
 - Миграции: Doctrine Migrations.
 - ORM: Doctrine ORM для обычных CRUD-сценариев.
 - Быстрые и сложные запросы: Doctrine DBAL/native SQL внутри infrastructure-слоя, когда это реально нужно.
+- Архитектура backend: модульный монолит, один Symfony backend без микросервисов на MVP.
+- Структура модуля: `Domain`, `Application`, `Infrastructure`, `Presentation`.
 - Web MVP: Twig + Bootstrap, точечная интерактивность через Stimulus или простой JavaScript.
 - Multi-tenancy: shared app + shared DB + `tenant_id` / `store_id`.
 - Первый режим размещения: Managed Store.
@@ -49,25 +51,10 @@ src/
     Domain/
     Application/
     Infrastructure/
-    Interface/
-  Catalog/
-    Domain/
-    Application/
-    Infrastructure/
-    Interface/
-  Order/
-    Domain/
-    Application/
-    Infrastructure/
-    Interface/
-  Shared/
-    Domain/
-    Application/
-    Infrastructure/
-    Interface/
+    Presentation/
 ```
 
-`Tenant` нужен первым, потому что он задает границу данных для магазинов, пользователей и ролей. `Catalog` и `Order` можно создать пустыми каркасами позже, когда начнется соответствующий этап, если Symfony skeleton проще держать минимальным.
+`Tenant` нужен первым, потому что он задает границу данных для арендаторов, магазинов, пользователей и ролей. `Catalog`, `Order`, `Billing` и другие модули не создаем заранее: они появятся только в своих задачах.
 
 ## Минимальный Docker Compose контур
 
