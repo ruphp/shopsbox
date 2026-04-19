@@ -19,6 +19,13 @@ final readonly class UpdateStoreSettingsForm
             (string) $request->request->get('contact_phone', ''),
             (string) $request->request->get('default_currency', ''),
             (string) $request->request->get('timezone', ''),
+            [
+                'primary_color' => (string) $request->request->get('primary_color', '#0077b6'),
+                'accent' => (string) $request->request->get('accent', 'blue'),
+                'hero_title' => (string) $request->request->get('hero_title', ''),
+                'hero_text' => (string) $request->request->get('hero_text', ''),
+                'sections' => (array) $request->request->all('sections'),
+            ],
         );
     }
 }
