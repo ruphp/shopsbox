@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Настройки магазина | ShopsBox{% endblock %}
+{% block meta_description %}Базовые настройки магазина ShopsBox.{% endblock %}
+
+{% block body %}
+    {% include 'site/_header.html.twig' %}
+
+    <main class="main">
+        <section class="section">
+            <div class="wrap">
+                <p class="eyebrow">Кабинет владельца</p>
+                <h1>Настройки магазина</h1>
+                <p class="muted">Здесь меняются базовые данные магазина. Slug и домен пока только показываются.</p>
+
+                {% if error is defined %}
+                    <p class="legal-note">{{ error }}</p>
+                {% endif %}
+
+                {% if saved is defined and saved %}
+                    <p class="legal-note">Настройки сохранены.</p>
+                {% endif %}
+
+                <div class="grid">
+                    <article class="product">
+                        <h2>{{ settings.name }}</h2>
+                        <p class="muted">Slug: {{ settings.slug }}</p>
+                        <p class="muted">Domain: {{ settings.domain }}</p>
+                        <p class="muted">Status: {{ settings.status }}</p>
+                    </article>
+                </div>
+
+                <form class="legal-note" method="post" action="{{ path('owner_store_settings_update') }}">
+                    <p>
+                        <label for="store-name">Название магазина</label><br>
+                        <input id="store-name" name="name" type="text" value="{{ settings.name }}" required>
+                    </p>
+                    <p>
+                        <label for="store-description">Описание</label><br>
+                        <textarea id="store-description" name="public_description" rows="5">{{ settings.publicDescription }}</textarea>
+                    </p>
+                    <p>
+                        <label for="store-email">Контактный email</label><br>
+                        <input id="store-email" name="contact_email" type="email" value="{{ settings.contactEmail }}">
+                    </p>
+                    <p>
+                        <label for="store-phone">Контактный телефон</label><br>
+                        <input id="store-phone" name="contact_phone" type="text" value="{{ settings.contactPhone }}">
+                    </p>
+                    <p>
+                        <label for="store-currency">Валюта</label><br>
+                        <input id="store-currency" name="default_currency" type="text" value="{{ settings.defaultCurrency }}" maxlength="3" required>
+                    </p>
+                    <p>
+                        <label for="store-timezone">Часовой пояс</label><br>
+                        <input id="store-timezone" name="timezone" type="text" value="{{ settings.timezone }}" required>
+                    </p>
+                    <button class="button" type="submit">Сохранить</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    {% include 'site/_footer.html.twig' %}
+{% endblock %}
