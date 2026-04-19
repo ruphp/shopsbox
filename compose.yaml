@@ -36,7 +36,7 @@ services:
       - shopsbox_app
     command: >
       sh -lc "if [ -f public/index.php ];
-      then php -S 0.0.0.0:8000 -t public public/index.php;
+      then php -S 0.0.0.0:8000 -t public public/router.php;
       else php -S 0.0.0.0:8000 -t .;
       fi"
 

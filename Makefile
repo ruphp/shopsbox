@@ -14,7 +14,7 @@ BACKUP_FILE=$(BACKUP_DIR)\shopsbox-dev.sql
 DOCKER_PROJECT=shopsbox
 COMPOSE=docker compose -p $(DOCKER_PROJECT)
 
-.PHONY: help docs-list docs-check github-auth-status github-pr-create-current github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell health-check db-dump db-restore composer-install migration-diff migrate fixtures-load backend-check backend-routes unit-test test
+.PHONY: help docs-list docs-check github-auth-status github-pr-create-current github-pr-merge-current git-status git-commit git-push-current git-push-master git-switch-master git-pull-master backend-create composer-require composer-require-dev composer-update composer-update-lock up down logs ps backend-shell health-check static-assets-check db-dump db-restore composer-install migration-diff migrate fixtures-load backend-check backend-routes unit-test test
 
 help:
 	@echo Make targets for ShopsBox:
@@ -44,6 +44,7 @@ help:
 	@echo   make ps
 	@echo   make backend-shell
 	@echo   make health-check
+	@echo   make static-assets-check
 	@echo   make db-dump
 	@echo   make db-restore BACKUP_FILE="var\backups\shopsbox-dev.sql"
 	@echo   make git-switch-master
@@ -140,6 +141,14 @@ backend-shell:
 
 health-check:
 	@curl -fsS http://localhost:8080/health
+
+static-assets-check:
+	@curl -fsSI http://localhost:8080/assets/brand/shopsbox-logo-header.png
+	@curl -fsSI http://localhost:8080/assets/brand/shopsbox-icon-square.svg
+	@curl -fsSI http://localhost:8080/assets/brand/shopsbox-icon-square-192.png
+	@curl -fsSI http://localhost:8080/assets/brand/apple-touch-icon.png
+	@curl -fsSI http://localhost:8080/assets/brand/favicon-square.ico
+	@curl -fsSI http://localhost:8080/site.webmanifest
 
 db-dump:
 	@if not exist $(BACKUP_DIR) mkdir $(BACKUP_DIR)
