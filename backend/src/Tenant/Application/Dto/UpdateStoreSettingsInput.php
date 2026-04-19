@@ -6,6 +6,9 @@ namespace App\Tenant\Application\Dto;
 
 final readonly class UpdateStoreSettingsInput
 {
+    /**
+     * @param array<string, mixed> $themeSettings
+     */
     public function __construct(
         public string $ownerEmail,
         public string $name,
@@ -14,6 +17,7 @@ final readonly class UpdateStoreSettingsInput
         public ?string $contactPhone,
         public string $defaultCurrency,
         public string $timezone,
+        public array $themeSettings = [],
     ) {
     }
 }

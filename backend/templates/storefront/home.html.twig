@@ -1,6 +1,11 @@
 {% extends 'storefront/_layout.html.twig' %}
 
 {% set store = view.store %}
+{% set theme = store.themeSettings %}
+{% set sections = theme.sections|default(['hero', 'featured']) %}
+{% set hero_title = theme.hero_title|default('') ?: store.name %}
+{% set hero_text = theme.hero_text|default('') ?: 'Витрина магазина открыта. Ниже первые опубликованные товары.' %}
+{% set accent = theme.accent|default('blue') %}
 
 {% block title %}{{ store.name }}{% endblock %}
 {% block og_title %}{{ store.name }}{% endblock %}
@@ -9,30 +14,52 @@
 {% block canonical_url %}{{ site_public_base_url ~ path('storefront_home', {storeSlug: store.slug}) }}{% endblock %}
 
 {% block storefront_content %}
-    <section class="hero">
-        <div class="wrap">
-            <h1>{{ store.name }}</h1>
-            <p>Витрина магазина открыта. Ниже первые опубликованные товары.</p>
-            <a class="button" href="{{ path('storefront_products', {storeSlug: store.slug}) }}">Смотреть товары</a>
-        </div>
-    </section>
+    {% if 'hero' in sections %}
+        <section class="hero storefront-hero storefront-accent-{{ accent }}">
+            <div class="wrap">
+                <h1>{{ hero_title }}</h1>
+                <p>{{ hero_text }}</p>
+                <a class="button" href="{{ path('storefront_products', {storeSlug: store.slug}) }}">Смотреть товары</a>
+            </div>
+        </section>
+    {% endif %}
 
-    <section class="section">
-        <div class="wrap">
-            <h2>Популярное</h2>
+    {% if 'featured' in sections %}
+        <section class="section">
+            <div class="wrap">
+                <h2>Популярное</h2>
 
-            {% if view.featuredProducts is empty %}
-                <p class="muted">Пока нет опубликованных товаров.</p>
-            {% else %}
-                <div class="grid">
-                    {% for product in view.featuredProducts %}
-                        <article class="product">
-                            <h3><a href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h3>
-                            <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
-                        </article>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-    </section>
+                {% if view.featuredProducts is empty %}
+                    <p class="muted">Пока нет опубликованных товаров.</p>
+                {% else %}
+                    <div class="product-grid">
+                        {% for product in view.featuredProducts %}
+                            <article class="product-card">
+                                <a class="product-media" href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">
+                                    {% if product.imageUrl %}
+                                        <img src="{{ product.imageUrl }}" alt="{{ product.name }}" loading="lazy">
+                                    {% else %}
+                                        <span>{{ product.name }}</span>
+                                    {% endif %}
+                                </a>
+                                <div class="product-card-body">
+                                    <h3><a href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h3>
+                                    <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if 'contacts' in sections %}
+        <section class="section storefront-contacts">
+            <div class="wrap">
+                <h2>Контакты магазина</h2>
+                <p class="muted">Домен: {{ store.domain }}</p>
+            </div>
+        </section>
+    {% endif %}
 {% endblock %}
