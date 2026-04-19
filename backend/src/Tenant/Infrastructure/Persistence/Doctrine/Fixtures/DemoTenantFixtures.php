@@ -28,35 +28,53 @@ final class DemoTenantFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $tenant = new Tenant(
-            self::DEMO_TENANT_ID,
-            'Demo Tenant',
-            'active',
-            'billing@demo.shopsbox.local',
-        );
+        $tenant = $manager->find(Tenant::class, self::DEMO_TENANT_ID);
+        if (!$tenant instanceof Tenant) {
+            $tenant = new Tenant(
+                self::DEMO_TENANT_ID,
+                'Demo Tenant',
+                'active',
+                'billing@demo.shopsbox.local',
+            );
 
-        $store = new Store(
-            self::DEMO_STORE_ID,
-            $tenant,
-            'Demo Store',
-            'demo-store',
-            'demo.shopsbox.local',
-            'active',
-            'RUB',
-            'Asia/Yekaterinburg',
-        );
+            $manager->persist($tenant);
+        }
 
-        $manager->persist($tenant);
-        $manager->persist($store);
+        $store = $manager->find(Store::class, self::DEMO_STORE_ID);
+        if (!$store instanceof Store) {
+            $store = new Store(
+                self::DEMO_STORE_ID,
+                $tenant,
+                'Demo Store',
+                'demo-store',
+                'demo.shopsbox.local',
+                'active',
+                'RUB',
+                'Asia/Yekaterinburg',
+            );
+
+            $manager->persist($store);
+        }
+
         $this->addReference(self::DEMO_TENANT_REFERENCE, $tenant);
         $this->addReference(self::DEMO_STORE_REFERENCE, $store);
 
         $roles = $this->createRoles();
-        foreach ($roles as $role) {
-            $manager->persist($role);
+        foreach ($roles as $code => $role) {
+            $existingRole = $manager->find(Role::class, $role->id());
+            if ($existingRole instanceof Role) {
+                $roles[$code] = $existingRole;
+                continue;
+            }
+
+            $manager->persist($roles[$code]);
         }
 
         foreach ($this->demoUsers() as $userData) {
+            if ($manager->find(User::class, $userData['id']) instanceof User) {
+                continue;
+            }
+
             $role = $roles[$userData['role']];
             $roleTenant = $userData['platform'] ? null : $tenant;
             $roleStore = $userData['store_role'] ? $store : null;
