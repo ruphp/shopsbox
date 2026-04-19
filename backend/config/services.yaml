@@ -24,6 +24,8 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Tenant\Application\Contracts\TenantRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineTenantRepository'
     App\Tenant\Application\Contracts\StoreRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineStoreRepository'
+    App\Tenant\Application\Contracts\AuthCodeRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineAuthCodeRepository'
+    App\Tenant\Application\Contracts\AuthCodeDelivery: '@App\Tenant\Infrastructure\Adapters\DevFileAuthCodeDelivery'
     App\Tenant\Application\Contracts\EntityFlusher: '@App\Tenant\Infrastructure\Adapters\DoctrineEntityFlusher'
     App\Tenant\Application\Contracts\UuidGenerator: '@App\Tenant\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\Catalog\Application\Contracts\CategoryRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineCategoryRepository'
@@ -52,3 +54,7 @@ services:
     App\FileStorage\Infrastructure\Url\ConfiguredFileUrlBuilder:
         arguments:
             $publicBaseUrl: '%env(FILE_STORAGE_PUBLIC_BASE_URL)%'
+
+    App\Tenant\Infrastructure\Adapters\DevFileAuthCodeDelivery:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
