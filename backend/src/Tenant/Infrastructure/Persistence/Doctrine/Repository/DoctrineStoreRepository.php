@@ -45,6 +45,7 @@ final class DoctrineStoreRepository implements StoreRepository
         ?string $contactPhone,
         string $defaultCurrency,
         string $timezone,
+        array $themeSettings,
     ): ?StoreSettingsView {
         $store = $this->findStoreByOwnerEmail($email);
         if (!$store instanceof Store) {
@@ -52,6 +53,7 @@ final class DoctrineStoreRepository implements StoreRepository
         }
 
         $store->updateSettings($name, $publicDescription, $contactEmail, $contactPhone, $defaultCurrency, $timezone);
+        $store->updateThemeSettings($themeSettings);
 
         return $this->toSettingsView($store);
     }
@@ -117,6 +119,7 @@ final class DoctrineStoreRepository implements StoreRepository
             $store->publicDescription(),
             $store->contactEmail(),
             $store->contactPhone(),
+            $store->themeSettings(),
         );
     }
 }

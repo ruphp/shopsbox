@@ -6,6 +6,9 @@ namespace App\Tenant\Application\Dto;
 
 final readonly class StoreSettingsView
 {
+    /**
+     * @param array<string, mixed> $themeSettings
+     */
     public function __construct(
         public string $tenantId,
         public string $storeId,
@@ -18,6 +21,7 @@ final readonly class StoreSettingsView
         public ?string $publicDescription,
         public ?string $contactEmail,
         public ?string $contactPhone,
+        public array $themeSettings = [],
     ) {
     }
 }

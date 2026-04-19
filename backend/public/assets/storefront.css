@@ -179,6 +179,30 @@
     margin: 0;
 }
 
+.storefront-hero {
+    border-bottom-color: var(--storefront-accent);
+}
+
+.storefront-accent-blue {
+    --storefront-accent: #0077b6;
+}
+
+.storefront-accent-green {
+    --storefront-accent: #16876b;
+}
+
+.storefront-accent-coral {
+    --storefront-accent: #ff5a3c;
+}
+
+.storefront-hero .button {
+    background: var(--storefront-accent);
+}
+
+.storefront-contacts {
+    background: var(--surface);
+}
+
 @media (max-width: 760px) {
     .storefront-catalog .catalog-head,
     .product-detail,

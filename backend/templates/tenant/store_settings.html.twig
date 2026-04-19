@@ -6,12 +6,15 @@
 {% block body %}
     {% include 'site/_header.html.twig' %}
 
+    {% set theme = settings.themeSettings %}
+    {% set sections = theme.sections|default(['hero', 'featured']) %}
+
     <main class="main">
         <section class="section">
             <div class="wrap">
                 <p class="eyebrow">Кабинет владельца</p>
                 <h1>Настройки магазина</h1>
-                <p class="muted">Здесь меняются базовые данные магазина. Slug и домен пока только показываются.</p>
+                <p class="muted">Здесь меняются базовые данные магазина и первый вид витрины.</p>
 
                 {% if error is defined %}
                     <p class="legal-note">{{ error }}</p>
@@ -27,10 +30,12 @@
                         <p class="muted">Slug: {{ settings.slug }}</p>
                         <p class="muted">Domain: {{ settings.domain }}</p>
                         <p class="muted">Status: {{ settings.status }}</p>
+                        <p><a class="button" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть витрину</a></p>
                     </article>
                 </div>
 
                 <form class="legal-note" method="post" action="{{ path('owner_store_settings_update') }}">
+                    <h2>Основное</h2>
                     <p>
                         <label for="store-name">Название магазина</label><br>
                         <input id="store-name" name="name" type="text" value="{{ settings.name }}" required>
@@ -55,6 +60,30 @@
                         <label for="store-timezone">Часовой пояс</label><br>
                         <input id="store-timezone" name="timezone" type="text" value="{{ settings.timezone }}" required>
                     </p>
+
+                    <h2>Витрина</h2>
+                    <p>
+                        <label for="theme-hero-title">Заголовок hero-блока</label><br>
+                        <input id="theme-hero-title" name="hero_title" type="text" value="{{ theme.hero_title|default('') }}">
+                    </p>
+                    <p>
+                        <label for="theme-hero-text">Текст hero-блока</label><br>
+                        <textarea id="theme-hero-text" name="hero_text" rows="4">{{ theme.hero_text|default('') }}</textarea>
+                    </p>
+                    <p>
+                        <label for="theme-accent">Акцент витрины</label><br>
+                        <select id="theme-accent" name="accent">
+                            <option value="blue" {{ theme.accent|default('blue') == 'blue' ? 'selected' : '' }}>Синий</option>
+                            <option value="green" {{ theme.accent|default('blue') == 'green' ? 'selected' : '' }}>Зеленый</option>
+                            <option value="coral" {{ theme.accent|default('blue') == 'coral' ? 'selected' : '' }}>Коралловый</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label><input type="checkbox" name="sections[]" value="hero" {{ 'hero' in sections ? 'checked' : '' }}> Hero-блок</label><br>
+                        <label><input type="checkbox" name="sections[]" value="featured" {{ 'featured' in sections ? 'checked' : '' }}> Популярные товары</label><br>
+                        <label><input type="checkbox" name="sections[]" value="contacts" {{ 'contacts' in sections ? 'checked' : '' }}> Контакты</label>
+                    </p>
+
                     <button class="button" type="submit">Сохранить</button>
                 </form>
             </div>
