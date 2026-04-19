@@ -28,6 +28,7 @@ services:
     App\Tenant\Application\Contracts\UuidGenerator: '@App\Tenant\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\Catalog\Application\Contracts\CategoryRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineCategoryRepository'
     App\Catalog\Application\Contracts\ProductRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductRepository'
+    App\Catalog\Application\Contracts\ProductImageRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductImageRepository'
     App\Catalog\Application\Contracts\EntityFlusher: '@App\Catalog\Infrastructure\Adapters\DoctrineEntityFlusher'
     App\Catalog\Application\Contracts\UuidGenerator: '@App\Catalog\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\Storefront\Application\Contracts\StorefrontStoreRepository: '@App\Storefront\Infrastructure\Persistence\Doctrine\Repository\DoctrineStorefrontStoreRepository'
