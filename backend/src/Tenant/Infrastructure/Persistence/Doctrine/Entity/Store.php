@@ -39,6 +39,15 @@ class Store
     #[ORM\Column(length: 64)]
     private string $timezone;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $publicDescription = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $contactEmail = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $contactPhone = null;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -97,5 +106,47 @@ class Store
     public function status(): string
     {
         return $this->status;
+    }
+
+    public function defaultCurrency(): string
+    {
+        return $this->defaultCurrency;
+    }
+
+    public function timezone(): string
+    {
+        return $this->timezone;
+    }
+
+    public function publicDescription(): ?string
+    {
+        return $this->publicDescription;
+    }
+
+    public function contactEmail(): ?string
+    {
+        return $this->contactEmail;
+    }
+
+    public function contactPhone(): ?string
+    {
+        return $this->contactPhone;
+    }
+
+    public function updateSettings(
+        string $name,
+        ?string $publicDescription,
+        ?string $contactEmail,
+        ?string $contactPhone,
+        string $defaultCurrency,
+        string $timezone,
+    ): void {
+        $this->name = $name;
+        $this->publicDescription = $publicDescription;
+        $this->contactEmail = $contactEmail;
+        $this->contactPhone = $contactPhone;
+        $this->defaultCurrency = $defaultCurrency;
+        $this->timezone = $timezone;
+        $this->updatedAt = new DateTimeImmutable();
     }
 }
