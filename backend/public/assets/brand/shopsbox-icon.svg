@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ShopsBox icon</title>
+  <desc id="desc">Large open box with confetti and the letter s.</desc>
+  <path d="M91 175L239 86L420 172L268 262L91 175Z" fill="#F4B544"/>
+  <path d="M239 86L363 58L486 146L420 172L239 86Z" fill="#FFD36D"/>
+  <path d="M91 175L22 252L202 324L268 262L91 175Z" fill="#FFC95B"/>
+  <path d="M420 172L486 146L512 236L331 323L268 262L420 172Z" fill="#ECA42F"/>
+  <path d="M202 324L268 262L331 323L330 479L199 478L202 324Z" fill="#D98C24"/>
+  <path d="M54 260L202 324L199 478L54 405V260Z" fill="#E7A13A"/>
+  <path d="M331 323L480 253L480 404L330 479L331 323Z" fill="#C97819"/>
+  <path d="M199 478L330 479L480 404L480 432L330 512L199 511L54 432V405L199 478Z" fill="#AA5E14" opacity=".45"/>
+  <path d="M203 323L267 264L330 323L268 365L203 323Z" fill="#B86B18" opacity=".34"/>
+  <path d="M244 343C244 316 267 300 299 300C327 300 349 313 362 333L331 357C325 347 314 339 299 339C289 339 283 343 283 351C283 378 368 365 368 423C368 452 343 472 306 472C271 472 245 456 232 433L265 410C273 425 287 433 307 433C320 433 328 428 328 419C328 393 244 405 244 343Z" fill="#FFFFFF"/>
+  <path d="M108 80L151 139" stroke="#05A6B3" stroke-width="26" stroke-linecap="round"/>
+  <path d="M222 24L238 96" stroke="#FFCB32" stroke-width="26" stroke-linecap="round"/>
+  <path d="M352 34L318 101" stroke="#FF5A3C" stroke-width="26" stroke-linecap="round"/>
+  <path d="M424 95L363 129" stroke="#05A6B3" stroke-width="26" stroke-linecap="round"/>
+  <circle cx="159" cy="54" r="18" fill="#FF5A3C"/>
+  <circle cx="421" cy="47" r="16" fill="#FFCB32"/>
+  <circle cx="295" cy="19" r="14" fill="#05A6B3"/>
+  <path d="M55 122L86 107L112 131L83 153L55 122Z" fill="#FFCB32"/>
+  <path d="M428 166L463 148L488 174L448 195L428 166Z" fill="#FF5A3C"/>
+</svg>
