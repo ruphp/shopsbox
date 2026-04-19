@@ -74,4 +74,34 @@ class ProductVariant
         $this->createdAt = $now;
         $this->updatedAt = $now;
     }
+
+    public function id(): string
+    {
+        return $this->id;
+    }
+
+    public function product(): Product
+    {
+        return $this->product;
+    }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function sku(): string
+    {
+        return $this->sku;
+    }
+
+    public function priceAdjustment(): ?string
+    {
+        return $this->priceAdjustment;
+    }
+
+    public function active(): bool
+    {
+        return $this->active;
+    }
 }

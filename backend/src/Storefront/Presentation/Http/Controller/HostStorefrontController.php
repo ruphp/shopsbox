@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Storefront\Presentation\Http\Controller;
 
+use App\Storefront\Application\Exception\StorefrontCategoryNotFound;
 use App\Storefront\Application\Exception\StorefrontProductNotFound;
 use App\Storefront\Application\Exception\StorefrontStoreNotFound;
 use App\Storefront\Application\UseCase\ListStorefrontProductsUseCase;
@@ -46,6 +47,21 @@ final readonly class HostStorefrontController
         try {
             $view = $this->listProducts->execute($storeSlug);
         } catch (StorefrontStoreNotFound $exception) {
+            throw new NotFoundHttpException($exception->getMessage(), $exception);
+        }
+
+        return new Response($this->twig->render('storefront/products.html.twig', [
+            'view' => $view,
+        ]));
+    }
+
+    #[Route('/categories/{categorySlug}', name: 'host_storefront_category', host: '{storeSlug}.shopsbox.ru', methods: ['GET'])]
+    #[Route('/categories/{categorySlug}', name: 'local_host_storefront_category', host: '{storeSlug}.shopsbox.local', methods: ['GET'])]
+    public function category(string $storeSlug, string $categorySlug): Response
+    {
+        try {
+            $view = $this->listProducts->byCategory($storeSlug, $categorySlug);
+        } catch (StorefrontStoreNotFound|StorefrontCategoryNotFound $exception) {
             throw new NotFoundHttpException($exception->getMessage(), $exception);
         }
 
