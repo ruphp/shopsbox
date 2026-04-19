@@ -43,6 +43,7 @@ Evirox оставляем для будущих идей или более ши�
 - [Demo seed data](development/02-demo-seed-data.md)
 - [Admin Catalog CRUD](development/08-admin-catalog-crud.md)
 - [Storefront foundation](development/09-storefront-foundation.md)
+- [Product image upload](development/10-product-image-upload.md)
 - [Brand assets](development/10-brand-assets.md)
 
 ## Принятые стартовые направления
