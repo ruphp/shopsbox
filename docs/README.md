@@ -17,6 +17,7 @@ Evirox оставляем для будущих идей или более ши�
 - [Текстовые прототипы экранов админки](product/06-admin-screen-text-prototypes.md)
 - [Бизнес-модель и взаимовыгода](product/07-business-model-and-monetization.md)
 - [Стратегия настройки витрины](product/08-storefront-customization-strategy.md)
+- [SEO-позиционирование главной ShopsBox](product/09-seo-positioning.md)
 - [Решения, которые берем в основу](product/02-reference-decisions.md)
 - [Архитектура](architecture/00-architecture-overview.md)
 - [Доменная стратегия](architecture/02-domain-strategy.md)
@@ -34,11 +35,15 @@ Evirox оставляем для будущих идей или более ши�
 - [Backend foundation: план первого технического шага](tz/07-backend-foundation-plan.md)
 - [Карта прогресса ТЗ](tz/08-tz-progress-map.md)
 - [Роли и права: черновик MVP](tz/09-roles-and-permissions.md)
+- [Auth code delivery: SMS/email и dev-заглушки](tz/10-auth-code-delivery.md)
 - [Анализ схем БД аналогов](research/01-ecommerce-schema-analysis.md)
+- [1C-compatible catalog model](research/02-1c-catalog-compatibility.md)
 - [Локальная разработка](development/00-local-development.md)
 - [Перенос проекта в папку shopsbox](development/01-move-to-shopsbox.md)
 - [Demo seed data](development/02-demo-seed-data.md)
 - [Admin Catalog CRUD](development/08-admin-catalog-crud.md)
+- [Storefront foundation](development/09-storefront-foundation.md)
+- [Brand assets](development/10-brand-assets.md)
 
 ## Принятые стартовые направления
 

@@ -4,6 +4,8 @@
 
 Модель обновлена после анализа Shopify, WooCommerce HPOS, Medusa, Saleor и Sylius. Главная идея: товар и склад не смешиваем. `products` описывает товар, `product_variants` описывает продаваемую версию товара, `inventory_items` и `inventory_levels` отвечают за склад.
 
+Дополнительное правило для будущей интеграции с 1С: каталог не должен становиться плоской таблицей товаров. 1С-совместимый подход описан отдельно: [1C-compatible catalog model](../research/02-1c-catalog-compatibility.md).
+
 ## Основные сущности
 
 Русские объяснения терминов лежат в [глоссарии](06-glossary.md). В коде и БД оставляем английские имена, потому что так проще работать с Symfony, Doctrine, API и документацией.
@@ -133,9 +135,13 @@
 
 - id
 - store_id
+- product_type_id
+- base_unit_id
 - name
+- full_name
 - slug
 - description
+- has_variants
 - status
 - is_active
 - created_at
@@ -156,9 +162,7 @@
 - barcode
 - name
 - slug
-- price
-- compare_at_price
-- currency
+- attributes
 - weight
 - requires_shipping
 - manage_inventory
@@ -167,6 +171,65 @@
 - status
 - created_at
 - updated_at
+
+### product_types
+
+- id
+- store_id
+- code
+- name
+- is_active
+
+### measurement_units
+
+- id
+- store_id
+- code
+- name
+- short_name
+- is_active
+
+### price_types
+
+- id
+- store_id
+- code
+- name
+- currency
+- is_default
+- is_active
+
+### prices
+
+- id
+- store_id
+- product_id
+- variant_id
+- price_type_id
+- value
+- currency
+- starts_at
+- updated_at
+
+### product_specifications
+
+- id
+- store_id
+- product_id
+- variant_id
+- name
+- is_active
+- created_at
+- updated_at
+
+### product_specification_items
+
+- id
+- specification_id
+- material_product_id
+- material_variant_id
+- quantity
+- unit_id
 
 ### product_options
 
@@ -400,6 +463,56 @@
 - created_at
 - updated_at
 
+### integration_sources
+
+- id
+- store_id
+- code
+- name
+- type
+- status
+- settings
+- created_at
+- updated_at
+
+### external_entity_links
+
+- id
+- store_id
+- source_id
+- entity_type
+- entity_id
+- external_id
+- external_payload_hash
+- synced_at
+- created_at
+- updated_at
+
+### integration_exchange_runs
+
+- id
+- store_id
+- source_id
+- status
+- started_at
+- finished_at
+- created_count
+- updated_count
+- skipped_count
+- failed_count
+- error_message
+
+### integration_exchange_items
+
+- id
+- exchange_run_id
+- entity_type
+- entity_id
+- external_id
+- status
+- message
+- created_at
+
 ## ER-диаграмма
 
 ```mermaid
@@ -451,4 +564,8 @@ erDiagram
     stores ||--o{ backups : creates
     stores ||--o{ resource_usage_daily : consumes
     stores ||--o{ store_usage_limits : limits
+    stores ||--o{ integration_sources : integrates
+    integration_sources ||--o{ external_entity_links : maps
+    integration_sources ||--o{ integration_exchange_runs : runs
+    integration_exchange_runs ||--o{ integration_exchange_items : logs
 ```

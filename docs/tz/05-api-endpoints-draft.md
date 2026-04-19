@@ -5,9 +5,13 @@ API проектируется так, чтобы web-админка, mobile own
 ## Auth
 
 - `POST /api/auth/login`
+- `POST /api/auth/code/request`
+- `POST /api/auth/code/verify`
 - `POST /api/auth/logout`
 - `POST /api/auth/refresh`
 - `GET /api/auth/me`
+
+Для входа по одноразовому коду backend должен поддержать SMS/email delivery через application-интерфейс и infrastructure-адаптеры. В dev-режиме SMS/email можно имитировать и показывать код во flash-сообщении, но истекший или уже использованный код всегда должен отклоняться. Подробности: [Auth code delivery](10-auth-code-delivery.md).
 
 ## Platform admin
 
