@@ -7,14 +7,81 @@
 {% block og_title %}{{ product.name }} - {{ store.name }}{% endblock %}
 {% block meta_description %}{{ product.description ?: product.name ~ ' в магазине ' ~ store.name ~ ' на ShopsBox.' }}{% endblock %}
 {% block og_description %}{{ product.description ?: product.name ~ ' в магазине ' ~ store.name ~ '.' }}{% endblock %}
-{% block canonical_url %}{{ site_public_base_url ~ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}{% endblock %}
+{% block og_image %}{{ product.imageUrl ?: parent() }}{% endblock %}
+{% block canonical_url %}{{ site_public_base_url ~ app.request.pathInfo }}{% endblock %}
 
 {% block storefront_content %}
-    <section class="section">
+    <section class="section product-page">
         <div class="wrap">
             <p><a href="{{ path('storefront_products', {storeSlug: store.slug}) }}">Назад к товарам</a></p>
-            <h1>{{ product.name }}</h1>
-            <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+
+            <div class="product-detail">
+                <div class="product-detail-media">
+                    {% if product.imageUrl %}
+                        <img src="{{ product.imageUrl }}" alt="{{ product.name }}">
+                    {% else %}
+                        <span>{{ product.name }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="product-detail-body">
+                    {% if product.category %}
+                        <a class="product-category" href="{{ path('storefront_category', {storeSlug: store.slug, categorySlug: product.category.slug}) }}">{{ product.category.name }}</a>
+                    {% endif %}
+                    <h1>{{ product.name }}</h1>
+                    <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+
+                    {% if product.optionGroups is not empty %}
+                        <div class="product-panel">
+                            <h2>Опции</h2>
+                            {% for group in product.optionGroups %}
+                                <div class="option-group">
+                                    <strong>{{ group.name }}</strong>
+                                    <div class="option-values">
+                                        {% for value in group.values %}
+                                            <span>{{ value.value }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if product.variants is not empty %}
+                        <div class="product-panel">
+                            <h2>Вариации</h2>
+                            <div class="variant-list">
+                                {% for variant in product.variants %}
+                                    <article class="variant-row">
+                                        <div>
+                                            <strong>{{ variant.name }}</strong>
+                                            <span>{{ variant.optionValues|join(' / ') }}</span>
+                                        </div>
+                                        <small>SKU: {{ variant.sku }}</small>
+                                        {% if variant.priceAdjustment %}
+                                            <small>Доплата: {{ variant.priceAdjustment }}</small>
+                                        {% endif %}
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if product.attributes is not empty %}
+                        <div class="product-panel">
+                            <h2>Характеристики</h2>
+                            <dl class="attribute-list">
+                                {% for attribute in product.attributes %}
+                                    <div>
+                                        <dt>{{ attribute.name }}</dt>
+                                        <dd>{{ attribute.value }}</dd>
+                                    </div>
+                                {% endfor %}
+                            </dl>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </section>
 {% endblock %}

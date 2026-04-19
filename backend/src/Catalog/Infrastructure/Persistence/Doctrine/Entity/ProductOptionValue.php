@@ -56,4 +56,29 @@ class ProductOptionValue
         $this->position = $position;
         $this->createdAt = new DateTimeImmutable();
     }
+
+    public function id(): string
+    {
+        return $this->id;
+    }
+
+    public function optionGroup(): ProductOptionGroup
+    {
+        return $this->optionGroup;
+    }
+
+    public function code(): string
+    {
+        return $this->code;
+    }
+
+    public function value(): string
+    {
+        return $this->value;
+    }
+
+    public function position(): int
+    {
+        return $this->position;
+    }
 }

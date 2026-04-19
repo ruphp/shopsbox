@@ -36,4 +36,14 @@ class ProductVariantOptionValue
         $this->optionValue = $optionValue;
         $this->createdAt = new DateTimeImmutable();
     }
+
+    public function variant(): ProductVariant
+    {
+        return $this->variant;
+    }
+
+    public function optionValue(): ProductOptionValue
+    {
+        return $this->optionValue;
+    }
 }

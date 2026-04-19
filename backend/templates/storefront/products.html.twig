@@ -1,26 +1,57 @@
 {% extends 'storefront/_layout.html.twig' %}
 
 {% set store = view.store %}
+{% set page_title = view.selectedCategory ? view.selectedCategory.name : 'Товары' %}
 
-{% block title %}Товары - {{ store.name }}{% endblock %}
-{% block og_title %}Товары - {{ store.name }}{% endblock %}
+{% block title %}{{ page_title }} - {{ store.name }}{% endblock %}
+{% block og_title %}{{ page_title }} - {{ store.name }}{% endblock %}
 {% block meta_description %}Каталог опубликованных товаров магазина {{ store.name }} на ShopsBox.{% endblock %}
 {% block og_description %}Каталог товаров магазина {{ store.name }}.{% endblock %}
-{% block canonical_url %}{{ site_public_base_url ~ path('storefront_products', {storeSlug: store.slug}) }}{% endblock %}
+{% block canonical_url %}{{ site_public_base_url ~ app.request.pathInfo }}{% endblock %}
 
 {% block storefront_content %}
-    <section class="section">
+    <section class="section storefront-catalog">
         <div class="wrap">
-            <h1>Товары</h1>
+            <div class="catalog-head">
+                <div>
+                    <p class="eyebrow">{{ store.name }}</p>
+                    <h1>{{ page_title }}</h1>
+                    <p class="muted">Выберите категорию или откройте карточку товара.</p>
+                </div>
+                <a class="button" href="{{ path('storefront_products', {storeSlug: store.slug}) }}">Все товары</a>
+            </div>
+
+            {% if view.categories is not empty %}
+                <nav class="category-nav" aria-label="Категории">
+                    {% for category in view.categories %}
+                        <a class="{{ view.selectedCategory and view.selectedCategory.slug == category.slug ? 'is-active' : '' }}" href="{{ path('storefront_category', {storeSlug: store.slug, categorySlug: category.slug}) }}">{{ category.name }}</a>
+                    {% endfor %}
+                </nav>
+            {% endif %}
 
             {% if view.products is empty %}
-                <p class="muted">Пока нет опубликованных товаров.</p>
+                <p class="muted">В этой категории пока нет опубликованных товаров.</p>
             {% else %}
-                <div class="grid">
+                <div class="product-grid">
                     {% for product in view.products %}
-                        <article class="product">
-                            <h2><a href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h2>
-                            <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+                        <article class="product-card">
+                            <a class="product-media" href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">
+                                {% if product.imageUrl %}
+                                    <img src="{{ product.imageUrl }}" alt="{{ product.name }}" loading="lazy">
+                                {% else %}
+                                    <span>{{ product.name }}</span>
+                                {% endif %}
+                            </a>
+                            <div class="product-card-body">
+                                {% if product.category %}
+                                    <a class="product-category" href="{{ path('storefront_category', {storeSlug: store.slug, categorySlug: product.category.slug}) }}">{{ product.category.name }}</a>
+                                {% endif %}
+                                <h2><a href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h2>
+                                <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+                                {% if product.variants is not empty %}
+                                    <p class="product-note">Вариантов: {{ product.variants|length }}</p>
+                                {% endif %}
+                            </div>
                         </article>
                     {% endfor %}
                 </div>
