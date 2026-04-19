@@ -1,87 +1,180 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Интернет-Магазин из коробки - ShopsBox{% endblock %}
-{% block og_title %}Интернет-Магазин из коробки - ShopsBox{% endblock %}
-{% block meta_description %}ShopsBox - интернет-магазин из коробки: витрина, каталог, управление товарами, подготовка к интеграции с 1С и масштабирование под 100+ магазинов.{% endblock %}
-{% block og_description %}Запустите интернет-магазин быстрее: витрина, каталог, админка и основа для роста в одной платформе.{% endblock %}
+{% block title %}Создать интернет-магазин | Конструктор интернет-магазина ShopsBox{% endblock %}
+{% block og_title %}Создать интернет-магазин | Конструктор интернет-магазина ShopsBox{% endblock %}
+{% block meta_description %}ShopsBox - интернет-магазин из коробки: конструктор страниц, каталог, админка, свой домен, SSL, перенос старого магазина и сопровождение.{% endblock %}
+{% block og_description %}Создайте интернет-магазин быстрее: готовая основа магазина, каталог, админка, блоки страниц и техническое сопровождение в одной платформе.{% endblock %}
 {% block canonical_url %}{{ site_public_base_url ~ '/' }}{% endblock %}
 
 {% block body %}
-    <header class="header">
-        <div class="wrap nav">
-            <a class="brand" href="{{ path('site_home') }}">ShopsBox</a>
-            <nav class="links" aria-label="Навигация">
-                <a href="#launch">Запуск</a>
-                <a href="#catalog">Каталог</a>
-                <a href="#growth">Рост</a>
-                <a href="{{ path('storefront_home', {storeSlug: 'demo-store'}) }}">Demo Store</a>
-            </nav>
-        </div>
-    </header>
+    {% include 'site/_header.html.twig' %}
 
     <main class="main">
         <section class="site-hero">
             <div class="wrap">
-                <h1>Интернет-Магазин из коробки</h1>
-                <p>ShopsBox помогает быстро запустить витрину, каталог и управление товарами без долгой сборки ecommerce-платформы с нуля.</p>
-                <a class="button" href="{{ path('storefront_home', {storeSlug: 'demo-store'}) }}">Открыть demo-витрину</a>
+                <h1>Создать <span class="nowrap">интернет-магазин</span></h1>
+                <p>Интернет-магазин из коробки: конструктор страниц, каталог, админка, свой домен, SSL и сопровождение для спокойного запуска продаж. Для товаров можно развивать варианты, характеристики, комплектации и дополнительные поля без хаоса в карточках.</p>
+                <a class="button" href="{{ path('storefront_products', {storeSlug: 'demo-store'}) }}">Посмотреть пример товаров</a>
             </div>
         </section>
 
         <section id="launch" class="site-band">
             <div class="wrap split">
                 <div>
-                    <h2>Запуск без технической трясины</h2>
-                    <p class="muted">Магазин получает рабочую основу: публичную витрину, каталог, админские сценарии и подготовку к безопасному росту.</p>
+                    <h2>Интернет-магазин из коробки, который можно настроить</h2>
+                    <p class="muted">Собирайте главную и промо-страницы из готовых блоков: первый экран, подборки товаров, категории, текстовые секции, изображения, контакты, вопросы и ответы.</p>
+                    <p class="muted">Блоки можно включать, выключать, менять местами и наполнять контентом без ручной верстки. Каталог, админка и техническая основа уже встроены в ShopsBox.</p>
                     <div class="feature-list">
                         <div class="metric">
-                            <strong>1 день</strong>
-                            <span>на первый демонстрационный запуск магазина</span>
+                            <strong>Перетаскивание</strong>
+                            <span>перетаскивание и порядок секций на странице</span>
                         </div>
                         <div class="metric">
-                            <strong>100+</strong>
-                            <span>магазинов в целевой архитектуре без переписывания ядра</span>
+                            <strong>Готовые блоки</strong>
+                            <span>готовые блоки для товаров, категорий и промо-зон</span>
                         </div>
                         <div class="metric">
-                            <strong>24/7</strong>
-                            <span>ориентир на проверки здоровья, бэкапы и операционный контур</span>
+                            <strong>Без кода</strong>
+                            <span>легкое управление страницами без правки шаблонов</span>
                         </div>
                     </div>
                 </div>
-                <img class="photo" src="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80" alt="Команда готовит запуск интернет-магазина">
+                <div class="builder-preview" role="img" aria-label="Конструктор интернет-магазина с блоками, секциями и перетаскиваемыми элементами">
+                    <div class="builder-toolbar">
+                        <span>Страница магазина</span>
+                        <strong>Главная</strong>
+                    </div>
+                    <div class="builder-workspace">
+                        <div class="builder-sidebar">
+                            <span>Блоки</span>
+                            <div class="builder-block">Первый экран</div>
+                            <div class="builder-block">Товары</div>
+                            <div class="builder-block">Категории</div>
+                            <div class="builder-block">Вопросы</div>
+                        </div>
+                        <div class="builder-canvas">
+                            <div class="builder-section hero-section">
+                                <span>Главный экран</span>
+                                <strong>Создать интернет-магазин</strong>
+                            </div>
+                            <div class="builder-section products-section">
+                                <span>Популярные товары</span>
+                                <div class="builder-product-grid">
+                                    <i></i>
+                                    <i></i>
+                                    <i></i>
+                                </div>
+                            </div>
+                            <div class="drag-card">Перетащить блок</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section id="catalog" class="site-band alt">
+        <section id="builder" class="site-band alt">
             <div class="wrap">
-                <h2>Каталог, который можно объяснить и развивать</h2>
+                <h2>Конструктор интернет-магазина с готовой основой</h2>
                 <div class="grid">
                     <article class="product">
-                        <h3>Товары и категории</h3>
-                        <p class="muted">Базовая модель каталога уже отделена от витрины и админки.</p>
+                        <h3>Блоки и секции</h3>
+                        <p class="muted">Главную, категории и промо-зоны можно развивать через настраиваемые блоки: текст, изображения, подборки товаров и контакты.</p>
                     </article>
                     <article class="product">
-                        <h3>Публикация и скрытие</h3>
-                        <p class="muted">Товар может быть черновиком, опубликованным или архивным.</p>
+                        <h3>Готовая логика магазина</h3>
+                        <p class="muted">Товары, заказы, клиенты, роли и настройки остаются готовыми рабочими сценариями, а не набором пустых страниц.</p>
                     </article>
                     <article class="product">
-                        <h3>Границы магазина</h3>
-                        <p class="muted">Данные читаются внутри выбранного store, без смешивания витрин.</p>
+                        <h3>Не только дизайн</h3>
+                        <p class="muted">Конструктор управляет внешним видом и контентом, а ShopsBox держит данные, безопасность, обновления и инфраструктуру.</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section id="growth" class="site-band">
+        <section id="demo" class="site-band">
+            <div class="wrap">
+                <h2>Начать прямо сейчас и бесплатно</h2>
+                <p class="muted">Основной функционал доступен бесплатно: каталог, страницы, конструктор блоков, админка, юридические данные, способы доставки и проверка пути покупателя.</p>
+                <p class="muted">Можно собрать полноценную основу магазина, показать каталог клиентам и подготовиться к продажам без оплаты за отдельные функции.</p>
+                <div class="grid">
+                    <article class="product">
+                        <h3>Весь основной функционал</h3>
+                        <p class="muted">Товары, категории, страницы, блоки, настройки магазина и админка доступны сразу.</p>
+                    </article>
+                    <article class="product">
+                        <h3>Каталог без онлайн-оплаты</h3>
+                        <p class="muted">Можно использовать магазин как каталог на поддомене ShopsBox и принимать заявки удобным способом.</p>
+                    </article>
+                    <article class="product">
+                        <h3>Подключение своего домена</h3>
+                        <p class="muted">Когда магазин готов, его можно открыть на домене клиента с SSL, юридическими страницами и платежами продавца.</p>
+                    </article>
+                    <article class="product">
+                        <h3>Обмен с 1С</h3>
+                        <p class="muted">Синхронизацию с 1С и другими учетными системами можно развивать отдельно от базового каталога и статистики.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="operations" class="site-band">
             <div class="wrap split">
                 <div>
-                    <h2>Готовность к 1С и росту</h2>
-                    <p class="muted">Интеграция с 1С заложена как направление развития: обмен товарами, остатками, заказами и статусами без ломки публичной витрины.</p>
-                    <p class="muted">Платформа проектируется как модульный монолит: быстрее стартовать сейчас и спокойнее выносить тяжелые части позже.</p>
-                    <a class="button" href="{{ path('storefront_products', {storeSlug: 'demo-store'}) }}">Посмотреть каталог</a>
+                    <h2>Техническая часть на стороне сервиса</h2>
+                    <p class="muted">Магазин должен продавать, а не превращаться в бесконечную настройку хостинга. ShopsBox помогает держать техническую основу, проверки здоровья и обновления в понятном состоянии.</p>
+                    <div class="support-list">
+                        <div>
+                            <strong>Свой домен</strong>
+                            <span>Помогаем подключить домен клиента к магазину и настроить SSL, чтобы магазин открывался на привычном адресе.</span>
+                        </div>
+                        <div>
+                            <strong>Статистика и диаграммы</strong>
+                            <span>Готовим понятные отчеты, диаграммы и выгрузки, чтобы владелец видел заказы, товары и ключевые показатели магазина.</span>
+                        </div>
+                        <div>
+                            <strong>Сопровождение после запуска</strong>
+                            <span>Следим за техническим состоянием и обновлениями, чтобы владелец магазина занимался продажами.</span>
+                        </div>
+                    </div>
+                    <a class="button" href="{{ path('storefront_products', {storeSlug: 'demo-store'}) }}">Посмотреть пример каталога</a>
                 </div>
                 <img class="photo" src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80" alt="Операционные процессы интернет-магазина">
             </div>
         </section>
+
+        <section id="migration" class="site-band alt">
+            <div class="wrap">
+                <h2>Перенос старого интернет-магазина</h2>
+                <p class="muted">Если магазин уже работает на другой системе, поможем перенести структуру без хаотичного пересоздания вручную: категории, товары, базовые страницы, изображения и ключевые настройки. Историю заказов, сложные интеграции и нестандартные сценарии оцениваем отдельно.</p>
+                <p class="muted">Перенесенный каталог можно сначала разместить на бесплатном поддомене вроде mymarket.shopsbox.ru, проверить страницы и путь покупателя, а затем открыть магазин на домене клиента.</p>
+                <div class="grid">
+                    <article class="product">
+                        <h3>Структура каталога</h3>
+                        <p class="muted">Сохраняем логику категорий, названия, описания и базовые SEO-поля там, где это возможно.</p>
+                    </article>
+                    <article class="product">
+                        <h3>Товары и изображения</h3>
+                        <p class="muted">Переносим товарные карточки, цены, описания и изображения в новую управляемую основу.</p>
+                    </article>
+                    <article class="product">
+                        <h3>Дальнейшее развитие</h3>
+                        <p class="muted">После переноса магазин можно развивать через блоки, настройки, домен, SSL, аналитику и интеграции.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="site-ad-band" aria-label="Партнерский блок">
+            <div class="wrap">
+                <div class="site-ad-slot">
+                    <span>Партнерский блок</span>
+                    <strong>Место для аккуратного баннера</strong>
+                    <small>Позже здесь можно подключить рекламную сеть или показать полезное предложение для владельцев магазинов.</small>
+                </div>
+            </div>
+        </section>
     </main>
+
+    {% include 'site/_footer.html.twig' %}
 {% endblock %}
