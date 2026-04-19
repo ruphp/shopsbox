@@ -27,6 +27,7 @@ final readonly class UpdateStoreSettingsUseCase
         $contactPhone = $this->emptyToNull($input->contactPhone);
         $currency = strtoupper(trim($input->defaultCurrency));
         $timezone = trim($input->timezone);
+        $themeSettings = $this->normalizeThemeSettings($input->themeSettings);
 
         if ($name === '' || strlen($name) > 160) {
             throw InvalidTenantInput::forField('name', 'Store name must be from 1 to 160 characters.');
@@ -56,6 +57,7 @@ final readonly class UpdateStoreSettingsUseCase
             $contactPhone,
             $currency,
             $timezone,
+            $themeSettings,
         );
 
         if (!$view instanceof StoreSettingsView) {
@@ -72,5 +74,45 @@ final readonly class UpdateStoreSettingsUseCase
         $value = trim((string) $value);
 
         return $value === '' ? null : $value;
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeThemeSettings(array $settings): array
+    {
+        $primaryColor = trim((string) ($settings['primary_color'] ?? '#0077b6'));
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $primaryColor)) {
+            throw InvalidTenantInput::forField('primary_color', 'Primary color must be HEX color.');
+        }
+
+        $heroTitle = trim((string) ($settings['hero_title'] ?? ''));
+        $heroText = trim((string) ($settings['hero_text'] ?? ''));
+        if (strlen($heroTitle) > 120) {
+            throw InvalidTenantInput::forField('hero_title', 'Hero title must be up to 120 characters.');
+        }
+
+        if (strlen($heroText) > 500) {
+            throw InvalidTenantInput::forField('hero_text', 'Hero text must be up to 500 characters.');
+        }
+
+        $sections = array_values(array_intersect(
+            (array) ($settings['sections'] ?? []),
+            ['hero', 'featured', 'contacts'],
+        ));
+        $accent = (string) ($settings['accent'] ?? 'blue');
+        if (!in_array($accent, ['blue', 'green', 'coral'], true)) {
+            $accent = 'blue';
+        }
+
+        return [
+            'primary_color' => $primaryColor,
+            'accent' => $accent,
+            'hero_title' => $heroTitle,
+            'hero_text' => $heroText,
+            'sections' => $sections === [] ? ['hero', 'featured'] : $sections,
+        ];
     }
 }

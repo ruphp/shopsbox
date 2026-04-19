@@ -48,6 +48,12 @@ class Store
     #[ORM\Column(length: 40, nullable: true)]
     private ?string $contactPhone = null;
 
+    /**
+     * @var array<string, mixed>
+     */
+    #[ORM\Column(type: 'json')]
+    private array $themeSettings = [];
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -133,6 +139,14 @@ class Store
         return $this->contactPhone;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function themeSettings(): array
+    {
+        return $this->themeSettings;
+    }
+
     public function updateSettings(
         string $name,
         ?string $publicDescription,
@@ -147,6 +161,15 @@ class Store
         $this->contactPhone = $contactPhone;
         $this->defaultCurrency = $defaultCurrency;
         $this->timezone = $timezone;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    /**
+     * @param array<string, mixed> $themeSettings
+     */
+    public function updateThemeSettings(array $themeSettings): void
+    {
+        $this->themeSettings = $themeSettings;
         $this->updatedAt = new DateTimeImmutable();
     }
 }

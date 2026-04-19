@@ -20,6 +20,7 @@ interface StoreRepository
         ?string $contactPhone,
         string $defaultCurrency,
         string $timezone,
+        array $themeSettings,
     ): ?StoreSettingsView;
 
     public function persist(
