@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Регистрация владельца магазина | ShopsBox{% endblock %}
+{% block meta_description %}Регистрация владельца и создание первого магазина ShopsBox.{% endblock %}
+
+{% block body %}
+    {% include 'site/_header.html.twig' %}
+
+    <main class="main">
+        <section class="section">
+            <div class="wrap">
+                <p class="eyebrow">Первый магазин</p>
+                <h1>Зарегистрировать владельца</h1>
+                <p class="muted">Телефон подтвержден: {{ phone }}. Заполните данные владельца и первого магазина.</p>
+
+                {% if error is defined %}
+                    <p class="legal-note">{{ error }}</p>
+                {% endif %}
+
+                <form class="legal-note" method="post" action="{{ path('owner_register_submit') }}">
+                    <p>
+                        <label for="owner-name">ФИО владельца</label><br>
+                        <input id="owner-name" name="owner_name" type="text" value="{{ ownerName|default('') }}" required>
+                    </p>
+                    <p>
+                        <label for="owner-email">Email</label><br>
+                        <input id="owner-email" name="email" type="email" value="{{ email|default('') }}" required>
+                    </p>
+                    <p>
+                        <label for="store-name">Название магазина</label><br>
+                        <input id="store-name" name="store_name" type="text" value="{{ storeName|default('') }}" required>
+                    </p>
+                    <p>
+                        <label for="store-slug">Короткое имя магазина</label><br>
+                        <input id="store-slug" name="store_slug" type="text" value="{{ storeSlug|default('') }}" placeholder="my-market" required>
+                    </p>
+                    <p>
+                        <label for="timezone">Часовой пояс</label><br>
+                        <input id="timezone" name="timezone" type="text" value="Asia/Yekaterinburg" required>
+                    </p>
+                    <p>
+                        <label>
+                            <input type="checkbox" name="terms" value="1" required>
+                            Я согласен с условиями <a href="{{ path('site_static', {page: 'terms'}) }}">Пользовательского соглашения</a> и <a href="{{ path('site_static', {page: 'privacy'}) }}">Политикой конфиденциальности</a>.
+                        </label>
+                    </p>
+                    <button class="button" type="submit">Создать магазин</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    {% include 'site/_footer.html.twig' %}
+{% endblock %}
