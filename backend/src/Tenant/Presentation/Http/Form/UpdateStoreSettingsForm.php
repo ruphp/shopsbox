@@ -17,6 +17,13 @@ final readonly class UpdateStoreSettingsForm
             (string) $request->request->get('public_description', ''),
             (string) $request->request->get('contact_email', ''),
             (string) $request->request->get('contact_phone', ''),
+            (string) $request->request->get('contact_city', ''),
+            (string) $request->request->get('contact_address', ''),
+            (string) $request->request->get('seller_legal_name', ''),
+            (string) $request->request->get('seller_inn', ''),
+            (string) $request->request->get('seller_legal_text', ''),
+            (string) $request->request->get('delivery_text', ''),
+            (string) $request->request->get('payment_text', ''),
             (string) $request->request->get('default_currency', ''),
             (string) $request->request->get('timezone', ''),
             [

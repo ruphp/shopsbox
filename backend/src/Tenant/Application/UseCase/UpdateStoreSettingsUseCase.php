@@ -25,6 +25,13 @@ final readonly class UpdateStoreSettingsUseCase
         $description = $this->emptyToNull($input->publicDescription);
         $contactEmail = $this->emptyToNull($input->contactEmail);
         $contactPhone = $this->emptyToNull($input->contactPhone);
+        $contactCity = $this->emptyToNull($input->contactCity);
+        $contactAddress = $this->emptyToNull($input->contactAddress);
+        $sellerLegalName = $this->emptyToNull($input->sellerLegalName);
+        $sellerInn = $this->emptyToNull($input->sellerInn);
+        $sellerLegalText = $this->emptyToNull($input->sellerLegalText);
+        $deliveryText = $this->emptyToNull($input->deliveryText);
+        $paymentText = $this->emptyToNull($input->paymentText);
         $currency = strtoupper(trim($input->defaultCurrency));
         $timezone = trim($input->timezone);
         $themeSettings = $this->normalizeThemeSettings($input->themeSettings);
@@ -39,6 +46,9 @@ final readonly class UpdateStoreSettingsUseCase
 
         if ($contactEmail !== null && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
             throw InvalidTenantInput::forField('contact_email', 'Contact email must be valid.');
+        }
+        if ($sellerInn !== null && !preg_match('/^(?:\d{10}|\d{12})$/', $sellerInn)) {
+            throw InvalidTenantInput::forField('seller_inn', 'Seller INN must contain 10 or 12 digits.');
         }
 
         if (!preg_match('/^[A-Z]{3}$/', $currency)) {
@@ -55,6 +65,13 @@ final readonly class UpdateStoreSettingsUseCase
             $description,
             $contactEmail,
             $contactPhone,
+            $contactCity,
+            $contactAddress,
+            $sellerLegalName,
+            $sellerInn,
+            $sellerLegalText,
+            $deliveryText,
+            $paymentText,
             $currency,
             $timezone,
             $themeSettings,
