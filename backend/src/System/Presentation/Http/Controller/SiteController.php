@@ -88,7 +88,6 @@ final readonly class SiteController
                 'paragraphs' => [
                     'Разработчик платформы: Александр Викторович Смирнов.',
                     'ИНН: 590612372849, самозанятый.',
-                    'Сайт: shopsbox.ru.',
                     'Для связи: email ruphp@mail.ru, телефон 8 929 203-04-99.',
                 ],
             ],
