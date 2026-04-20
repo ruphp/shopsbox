@@ -6,6 +6,7 @@ namespace App\Tenant\Infrastructure\Persistence\Doctrine\Repository;
 
 use App\Tenant\Application\Contracts\AuthCodeRepository;
 use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\AuthCode;
+use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -39,6 +40,17 @@ final readonly class DoctrineAuthCodeRepository implements AuthCodeRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function registeredRecipientExists(string $channel, string $recipient): bool
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('COUNT(user.id)')
+            ->from(User::class, 'user')
+            ->where($channel === 'phone' ? 'user.verifiedPhone = :recipient' : 'user.email = :recipient')
+            ->setParameter('recipient', $recipient)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
     }
 
     public function countRecentRequestsByRecipient(string $channel, string $recipient, DateTimeImmutable $since): int

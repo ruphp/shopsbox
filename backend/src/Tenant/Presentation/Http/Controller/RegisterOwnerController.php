@@ -20,6 +20,23 @@ use Twig\Environment;
 #[Route('/register')]
 final readonly class RegisterOwnerController
 {
+    private const RESERVED_STORE_SLUGS = [
+        'demo',
+        'www',
+        'api',
+        'admin',
+        'app',
+        'static',
+        'assets',
+        'cdn',
+        'mail',
+        'support',
+        'help',
+        'billing',
+        'status',
+        'shopsbox',
+    ];
+
     public function __construct(
         private Environment $twig,
         private RegisterOwnerUseCase $registerOwner,
@@ -107,6 +124,13 @@ final readonly class RegisterOwnerController
             return new JsonResponse([
                 'available' => false,
                 'message' => 'Используйте латинские буквы, цифры и дефисы.',
+            ]);
+        }
+
+        if (in_array($slug, self::RESERVED_STORE_SLUGS, true)) {
+            return new JsonResponse([
+                'available' => false,
+                'message' => 'Этот логин зарезервирован.',
             ]);
         }
 
