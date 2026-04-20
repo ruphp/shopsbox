@@ -14,6 +14,8 @@ use App\Catalog\Application\Dto\UploadProductImageInput;
 use App\Catalog\Application\Exception\InvalidProductImageInput;
 use App\Catalog\Application\Exception\ProductNotFound;
 use App\FileStorage\Application\Contracts\FileStorage;
+use App\FileStorage\Application\UseCase\StoreFileUsagePolicy;
+use RuntimeException;
 
 final readonly class UploadProductImageUseCase
 {
@@ -32,6 +34,7 @@ final readonly class UploadProductImageUseCase
         private FileStorage $fileStorage,
         private EntityFlusher $entityFlusher,
         private UuidGenerator $uuidGenerator,
+        private StoreFileUsagePolicy $fileUsagePolicy,
     ) {
     }
 
@@ -42,6 +45,12 @@ final readonly class UploadProductImageUseCase
         $product = $this->productRepository->findByStore($input->storeId, $input->productId);
         if (!$product instanceof ProductView) {
             throw ProductNotFound::byId($input->productId);
+        }
+
+        try {
+            $this->fileUsagePolicy->assertCanAdd($input->storeId, $input->size);
+        } catch (RuntimeException) {
+            throw InvalidProductImageInput::forField('image', 'Store file storage limit exceeded.');
         }
 
         $imageId = $this->uuidGenerator->generate();
