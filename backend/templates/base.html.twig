@@ -87,40 +87,23 @@
             }
 
             .site-footer {
-                padding: 34px 0;
+                padding: 22px 0;
                 background: #0d2236;
                 color: rgba(255, 255, 255, 0.78);
             }
 
-            .footer-grid {
-                display: grid;
-                grid-template-columns: minmax(240px, 1.4fr) repeat(3, minmax(150px, 1fr));
-                gap: 28px;
+            .footer-minimal {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 18px;
             }
 
-            .footer-about p {
-                max-width: 360px;
-                margin: 10px 0;
-            }
-
-            .footer-about strong,
-            .footer-links strong {
-                display: block;
-                color: #ffffff;
-                margin-bottom: 10px;
-            }
-
-            .footer-links {
-                display: grid;
-                align-content: start;
-                gap: 8px;
-            }
-
-            .footer-links a {
+            .footer-minimal a {
                 color: rgba(255, 255, 255, 0.78);
             }
 
-            .footer-links a:hover {
+            .footer-minimal a:hover {
                 color: #ffffff;
             }
 
@@ -569,8 +552,9 @@
                     border-bottom: 1px solid var(--line);
                 }
 
-                .footer-grid {
-                    grid-template-columns: 1fr;
+                .footer-minimal {
+                    align-items: flex-start;
+                    flex-direction: column;
                 }
 
                 .cookie-banner {
