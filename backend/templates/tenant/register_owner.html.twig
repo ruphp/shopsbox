@@ -18,20 +18,25 @@
                 {% endif %}
 
                 <form class="legal-note" method="post" action="{{ path('owner_register_submit') }}">
-                    <p>
-                        <label for="owner-name">ФИО владельца</label><br>
+                    <p class="form-field">
+                        <label for="owner-name">ФИО владельца</label>
                         <input id="owner-name" name="owner_name" type="text" value="{{ ownerName|default('') }}" required>
                     </p>
-                    <p>
-                        <label for="store-name">Название магазина</label><br>
+                    <p class="form-field">
+                        <label for="owner-email">Email</label>
+                        <input id="owner-email" name="email" type="email" value="{{ email|default('') }}" required>
+                    </p>
+                    <p class="form-field">
+                        <label for="store-name">Название магазина</label>
                         <input id="store-name" name="store_name" type="text" value="{{ storeName|default('') }}" required>
                     </p>
-                    <p>
-                        <label for="store-slug">Короткое имя магазина</label><br>
+                    <p class="form-field">
+                        <label for="store-slug">Логин для поддомена</label>
                         <input id="store-slug" name="store_slug" type="text" value="{{ storeSlug|default('') }}" placeholder="my-market" required>
+                        <small class="field-hint">Этот логин будет использоваться в адресе магазина: my-market.shopsbox.ru.</small>
                     </p>
-                    <p>
-                        <label for="timezone">Часовой пояс</label><br>
+                    <p class="form-field">
+                        <label for="timezone">Часовой пояс</label>
                         <input id="timezone" name="timezone" type="text" value="Asia/Yekaterinburg" required>
                     </p>
                     <p>
