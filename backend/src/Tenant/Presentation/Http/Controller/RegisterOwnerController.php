@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Throwable;
 use Twig\Environment;
 
 #[Route('/register')]
@@ -70,6 +71,15 @@ final readonly class RegisterOwnerController
             ]);
 
             return $this->renderError($request, $phone, $exception->getMessage());
+        } catch (Throwable $exception) {
+            $this->logger->error('Owner registration failed unexpectedly.', [
+                'phone' => $phone,
+                'email' => (string) $request->request->get('email', ''),
+                'exception' => $exception::class,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return $this->renderError($request, $phone, 'Не удалось завершить регистрацию. Проверьте данные или попробуйте позже.');
         }
 
         $request->getSession()->set('shopsbox_auth_email', $result->email);
@@ -94,6 +104,7 @@ final readonly class RegisterOwnerController
             'ownerName' => (string) $request->request->get('owner_name', ''),
             'storeName' => (string) $request->request->get('store_name', ''),
             'storeSlug' => (string) $request->request->get('store_slug', ''),
+            'timezone' => (string) $request->request->get('timezone', '+05:00'),
         ]), Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 

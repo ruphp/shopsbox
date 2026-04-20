@@ -37,7 +37,20 @@
                     </p>
                     <p class="form-field">
                         <label for="timezone">Часовой пояс</label>
-                        <input id="timezone" name="timezone" type="text" value="Asia/Yekaterinburg" required>
+                        {% set selectedTimezone = timezone|default('+05:00') %}
+                        <select id="timezone" name="timezone" required>
+                            <option value="+02:00" {{ selectedTimezone == '+02:00' ? 'selected' : '' }}>UTC+2</option>
+                            <option value="+03:00" {{ selectedTimezone == '+03:00' ? 'selected' : '' }}>UTC+3</option>
+                            <option value="+04:00" {{ selectedTimezone == '+04:00' ? 'selected' : '' }}>UTC+4</option>
+                            <option value="+05:00" {{ selectedTimezone == '+05:00' ? 'selected' : '' }}>UTC+5</option>
+                            <option value="+06:00" {{ selectedTimezone == '+06:00' ? 'selected' : '' }}>UTC+6</option>
+                            <option value="+07:00" {{ selectedTimezone == '+07:00' ? 'selected' : '' }}>UTC+7</option>
+                            <option value="+08:00" {{ selectedTimezone == '+08:00' ? 'selected' : '' }}>UTC+8</option>
+                            <option value="+09:00" {{ selectedTimezone == '+09:00' ? 'selected' : '' }}>UTC+9</option>
+                            <option value="+10:00" {{ selectedTimezone == '+10:00' ? 'selected' : '' }}>UTC+10</option>
+                            <option value="+11:00" {{ selectedTimezone == '+11:00' ? 'selected' : '' }}>UTC+11</option>
+                            <option value="+12:00" {{ selectedTimezone == '+12:00' ? 'selected' : '' }}>UTC+12</option>
+                        </select>
                     </p>
                     <p>
                         <label>
