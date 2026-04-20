@@ -1,20 +1,17 @@
-{% extends 'base.html.twig' %}
+{% extends 'tenant/_owner_layout.html.twig' %}
 
 {% block title %}Настройки магазина | ShopsBox{% endblock %}
 {% block meta_description %}Базовые настройки магазина ShopsBox.{% endblock %}
 
-{% block body %}
-    {% include 'site/_header.html.twig' %}
-
+{% block owner_content %}
     {% set theme = settings.themeSettings %}
     {% set sections = theme.sections|default(['hero', 'featured']) %}
 
-    <main class="main">
-        <section class="section">
-            <div class="wrap">
-                <p class="eyebrow">Кабинет владельца</p>
-                <h1>Настройки магазина</h1>
-                <p class="muted">Здесь меняются базовые данные магазина и первый вид витрины.</p>
+    <section class="section">
+        <div class="wrap">
+            <p class="eyebrow">Кабинет владельца</p>
+            <h1>Настройки магазина</h1>
+            <p class="muted">Здесь меняются базовые данные магазина и первый вид витрины.</p>
 
                 {% if error is defined %}
                     <p class="legal-note">{{ error }}</p>
@@ -86,9 +83,6 @@
 
                     <button class="button" type="submit">Сохранить</button>
                 </form>
-            </div>
-        </section>
-    </main>
-
-    {% include 'site/_footer.html.twig' %}
+        </div>
+    </section>
 {% endblock %}
