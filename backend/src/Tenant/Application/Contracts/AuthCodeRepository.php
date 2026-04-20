@@ -15,5 +15,7 @@ interface AuthCodeRepository
 
     public function findLatestOpenByRecipient(string $channel, string $recipient): ?AuthCode;
 
+    public function registeredRecipientExists(string $channel, string $recipient): bool;
+
     public function countRecentRequestsByRecipient(string $channel, string $recipient, DateTimeImmutable $since): int;
 }

@@ -14,6 +14,23 @@ use DateTimeZone;
 
 final readonly class RegisterOwnerUseCase
 {
+    private const RESERVED_STORE_SLUGS = [
+        'demo',
+        'www',
+        'api',
+        'admin',
+        'app',
+        'static',
+        'assets',
+        'cdn',
+        'mail',
+        'support',
+        'help',
+        'billing',
+        'status',
+        'shopsbox',
+    ];
+
     public function __construct(
         private OwnerRegistrationRepository $registrationRepository,
         private EntityFlusher $entityFlusher,
@@ -45,6 +62,9 @@ final readonly class RegisterOwnerUseCase
         }
         if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $storeSlug)) {
             throw InvalidTenantInput::forField('store_slug', 'Store slug must contain lowercase letters, digits and hyphens.');
+        }
+        if (in_array($storeSlug, self::RESERVED_STORE_SLUGS, true)) {
+            throw InvalidTenantInput::forField('store_slug', 'Store subdomain is reserved.');
         }
         if ($timezone === null || !in_array($timezone, DateTimeZone::listIdentifiers(), true)) {
             throw InvalidTenantInput::forField('timezone', 'Timezone must be a valid IANA identifier.');
