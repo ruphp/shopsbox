@@ -14,6 +14,7 @@ final readonly class ListStoreMediaLibraryUseCase
     public function __construct(
         private ShowStoreSettingsUseCase $showStoreSettings,
         private StoreMediaLibraryRepository $mediaLibraryRepository,
+        private StoreFileUsagePolicy $fileUsagePolicy,
     ) {
     }
 
@@ -29,6 +30,7 @@ final readonly class ListStoreMediaLibraryUseCase
         return new StoreMediaLibraryView(
             $files,
             array_sum(array_map(static fn ($file): int => $file->size, $files)),
+            $this->fileUsagePolicy->current($settings->storeId),
         );
     }
 }

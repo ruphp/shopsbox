@@ -12,4 +12,8 @@ interface StoreMediaLibraryRepository
      * @return list<StoreMediaFileView>
      */
     public function listByStore(string $storeId, ?string $mediaType = null): array;
+
+    public function totalSizeByStore(string $storeId): int;
+
+    public function countByStore(string $storeId): int;
 }

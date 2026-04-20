@@ -40,6 +40,30 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
         ));
     }
 
+    public function totalSizeByStore(string $storeId): int
+    {
+        return (int) $this->entityManager->createQueryBuilder()
+            ->select('COALESCE(SUM(image.size), 0)')
+            ->from(ProductImage::class, 'image')
+            ->join('image.product', 'product')
+            ->where('IDENTITY(product.store) = :storeId')
+            ->setParameter('storeId', $storeId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countByStore(string $storeId): int
+    {
+        return (int) $this->entityManager->createQueryBuilder()
+            ->select('COUNT(image.id)')
+            ->from(ProductImage::class, 'image')
+            ->join('image.product', 'product')
+            ->where('IDENTITY(product.store) = :storeId')
+            ->setParameter('storeId', $storeId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     private function mapImage(ProductImage $image): StoreMediaFileView
     {
         return new StoreMediaFileView(
