@@ -12,6 +12,8 @@ interface OwnerRegistrationRepository
 
     public function storeSlugExists(string $slug): bool;
 
+    public function storeDomainExists(string $domain): bool;
+
     public function register(
         string $tenantId,
         string $storeId,

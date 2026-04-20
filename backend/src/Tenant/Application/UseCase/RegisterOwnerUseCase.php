@@ -28,6 +28,7 @@ final readonly class RegisterOwnerUseCase
         $phone = trim($input->phone);
         $storeName = trim($input->storeName);
         $storeSlug = strtolower(trim($input->storeSlug));
+        $storeDomain = $storeSlug . '.shopsbox.ru';
         $timezone = $this->normalizeTimezone(trim($input->timezone));
 
         if ($ownerName === '' || mb_strlen($ownerName) > 120) {
@@ -54,6 +55,9 @@ final readonly class RegisterOwnerUseCase
         if ($this->registrationRepository->storeSlugExists($storeSlug)) {
             throw InvalidTenantInput::forField('store_slug', 'Store slug is already used.');
         }
+        if ($this->registrationRepository->storeDomainExists($storeDomain)) {
+            throw InvalidTenantInput::forField('store_slug', 'Store subdomain is already used.');
+        }
 
         $result = $this->registrationRepository->register(
             $this->uuidGenerator->generate(),
@@ -64,7 +68,7 @@ final readonly class RegisterOwnerUseCase
             $phone,
             $storeName,
             $storeSlug,
-            $storeSlug . '.shopsbox.local',
+            $storeDomain,
             $timezone,
         );
         $this->entityFlusher->flush();

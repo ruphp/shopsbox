@@ -31,6 +31,11 @@ final readonly class DoctrineOwnerRegistrationRepository implements OwnerRegistr
         return $this->entityManager->getRepository(Store::class)->findOneBy(['slug' => $slug]) instanceof Store;
     }
 
+    public function storeDomainExists(string $domain): bool
+    {
+        return $this->entityManager->getRepository(Store::class)->findOneBy(['domain' => $domain]) instanceof Store;
+    }
+
     public function register(
         string $tenantId,
         string $storeId,
