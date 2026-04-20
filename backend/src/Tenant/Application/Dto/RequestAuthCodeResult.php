@@ -11,6 +11,9 @@ final readonly class RequestAuthCodeResult
     public function __construct(
         public string $email,
         public DateTimeImmutable $expiresAt,
+        public string $channel = 'email',
+        public string $recipient = '',
+        public string $phone = '',
     ) {
     }
 }

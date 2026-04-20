@@ -6,6 +6,7 @@ namespace App\Tenant\Infrastructure\Persistence\Doctrine\Repository;
 
 use App\Tenant\Application\Contracts\AuthCodeRepository;
 use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\AuthCode;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class DoctrineAuthCodeRepository implements AuthCodeRepository
@@ -21,15 +22,37 @@ final readonly class DoctrineAuthCodeRepository implements AuthCodeRepository
 
     public function findLatestOpenByEmail(string $email): ?AuthCode
     {
+        return $this->findLatestOpenByRecipient('email', $email);
+    }
+
+    public function findLatestOpenByRecipient(string $channel, string $recipient): ?AuthCode
+    {
         return $this->entityManager->createQueryBuilder()
             ->select('auth_code')
             ->from(AuthCode::class, 'auth_code')
-            ->where('auth_code.email = :email')
+            ->where($channel === 'phone' ? 'auth_code.phone = :recipient' : 'auth_code.email = :recipient')
+            ->andWhere('auth_code.channel = :channel')
             ->andWhere('auth_code.consumedAt IS NULL')
-            ->setParameter('email', $email)
+            ->setParameter('recipient', $recipient)
+            ->setParameter('channel', $channel)
             ->orderBy('auth_code.createdAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function countRecentRequestsByRecipient(string $channel, string $recipient, DateTimeImmutable $since): int
+    {
+        return (int) $this->entityManager->createQueryBuilder()
+            ->select('COUNT(auth_code.id)')
+            ->from(AuthCode::class, 'auth_code')
+            ->where($channel === 'phone' ? 'auth_code.phone = :recipient' : 'auth_code.email = :recipient')
+            ->andWhere('auth_code.channel = :channel')
+            ->andWhere('auth_code.createdAt >= :since')
+            ->setParameter('recipient', $recipient)
+            ->setParameter('channel', $channel)
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

@@ -41,11 +41,16 @@ final readonly class AuthCodeController
             return new Response($this->twig->render('tenant/auth_code.html.twig', [
                 'error' => $exception->getMessage(),
                 'email' => (string) $request->request->get('email', ''),
+                'phone' => (string) $request->request->get('phone', ''),
+                'channel' => (string) $request->request->get('channel', 'email'),
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return new Response($this->twig->render('tenant/auth_code.html.twig', [
             'email' => $result->email,
+            'phone' => $result->phone,
+            'channel' => $result->channel,
+            'recipient' => $result->recipient,
             'requested' => true,
             'expiresAt' => $result->expiresAt,
         ]));
@@ -60,14 +65,25 @@ final readonly class AuthCodeController
             return new Response($this->twig->render('tenant/auth_code.html.twig', [
                 'error' => $exception->getMessage(),
                 'email' => (string) $request->request->get('email', ''),
+                'phone' => (string) $request->request->get('phone', ''),
+                'channel' => (string) $request->request->get('channel', 'email'),
                 'requested' => true,
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $request->getSession()->set('shopsbox_auth_email', $result->email);
+        if ($result->email !== '') {
+            $request->getSession()->set('shopsbox_auth_email', $result->email);
+        }
+        if ($result->phone !== '') {
+            $request->getSession()->set('shopsbox_auth_phone', $result->phone);
+        }
+        $request->getSession()->set('shopsbox_auth_channel', $result->channel);
 
         return new Response($this->twig->render('tenant/auth_code.html.twig', [
             'email' => $result->email,
+            'phone' => $result->phone,
+            'channel' => $result->channel,
+            'recipient' => $result->recipient,
             'verified' => $result->verified,
         ]));
     }
