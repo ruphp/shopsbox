@@ -13,8 +13,7 @@ final readonly class DevFileAuthCodeDelivery implements AuthCodeDelivery
     public function __construct(
         private string $projectDir,
         private RequestStack $requestStack,
-    )
-    {
+    ) {
     }
 
     public function deliver(string $channel, string $recipient, string $code, DateTimeImmutable $expiresAt): void
@@ -33,7 +32,7 @@ final readonly class DevFileAuthCodeDelivery implements AuthCodeDelivery
 
         $this->requestStack->getCurrentRequest()?->getSession()->getFlashBag()->add(
             'auth_code',
-            sprintf('Dev-code для %s: %s', $recipient, $code),
+            sprintf('Dev-code for %s: %s', $recipient, $code),
         );
     }
 }
