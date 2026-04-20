@@ -24,6 +24,7 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Tenant\Application\Contracts\TenantRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineTenantRepository'
     App\Tenant\Application\Contracts\StoreRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineStoreRepository'
+    App\Tenant\Application\Contracts\OwnerRegistrationRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineOwnerRegistrationRepository'
     App\Tenant\Application\Contracts\AuthCodeRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineAuthCodeRepository'
     App\Tenant\Application\Contracts\AuthCodeDelivery: '@App\Tenant\Infrastructure\Adapters\DevFileAuthCodeDelivery'
     App\Tenant\Application\Contracts\EntityFlusher: '@App\Tenant\Infrastructure\Adapters\DoctrineEntityFlusher'
