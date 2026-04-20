@@ -11,10 +11,13 @@ final readonly class RequestAuthCodeForm
 {
     public function fromRequest(Request $request): RequestAuthCodeInput
     {
+        $channel = (string) $request->request->get('channel', 'email');
+        $recipient = (string) $request->request->get('recipient', '');
+
         return new RequestAuthCodeInput(
-            (string) $request->request->get('email', ''),
-            (string) $request->request->get('phone', ''),
-            (string) $request->request->get('channel', 'email'),
+            $channel === 'phone' ? (string) $request->request->get('email', '') : $recipient,
+            $channel === 'phone' ? $recipient : (string) $request->request->get('phone', ''),
+            $channel,
         );
     }
 }
