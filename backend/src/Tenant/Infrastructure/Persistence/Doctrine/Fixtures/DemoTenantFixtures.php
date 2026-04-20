@@ -111,6 +111,7 @@ final class DemoTenantFixtures extends Fixture
         $roles = [
             ['33333333-0001-4333-8333-333333333333', 'platform_admin', 'Platform Admin', 'platform', ['platform.tenants.manage', 'platform.stores.manage', 'platform.ops.manage']],
             ['33333333-0002-4333-8333-333333333333', 'platform_operator', 'Platform Operator', 'platform', ['platform.stores.manage', 'platform.ops.manage']],
+            ['33333333-0010-4333-8333-333333333333', 'platform_moderator', 'Platform Moderator', 'platform', ['platform.moderation.view', 'platform.moderation.review']],
             ['33333333-0003-4333-8333-333333333333', 'store_owner', 'Store Owner', 'store', ['store.settings.manage', 'store.users.manage', 'store.products.manage', 'store.inventory.manage', 'store.orders.manage', 'store.customers.manage', 'store.storefront.manage', 'store.files.manage', 'store.backups.request', 'store.billing.manage', 'store.audit.view']],
             ['33333333-0004-4333-8333-333333333333', 'store_manager', 'Store Manager', 'store', ['store.settings.manage', 'store.products.manage', 'store.inventory.manage', 'store.orders.manage', 'store.customers.manage', 'store.storefront.manage', 'store.files.manage', 'store.audit.view']],
             ['33333333-0005-4333-8333-333333333333', 'order_manager', 'Order Manager', 'store', ['store.orders.manage', 'store.customers.manage']],
