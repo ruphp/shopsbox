@@ -54,6 +54,24 @@ class Store
     #[ORM\Column(type: 'json')]
     private array $themeSettings = [];
 
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $publicationOwnerName = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $publicationEmail = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $publicationPhone = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $publicSubdomain = null;
+
+    #[ORM\Column(length: 32)]
+    private string $publicationStatus = 'draft';
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $publicationTermsAcceptedAt = null;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -147,6 +165,36 @@ class Store
         return $this->themeSettings;
     }
 
+    public function publicationOwnerName(): ?string
+    {
+        return $this->publicationOwnerName;
+    }
+
+    public function publicationEmail(): ?string
+    {
+        return $this->publicationEmail;
+    }
+
+    public function publicationPhone(): ?string
+    {
+        return $this->publicationPhone;
+    }
+
+    public function publicSubdomain(): ?string
+    {
+        return $this->publicSubdomain;
+    }
+
+    public function publicationStatus(): string
+    {
+        return $this->publicationStatus;
+    }
+
+    public function publicationTermsAcceptedAt(): ?DateTimeImmutable
+    {
+        return $this->publicationTermsAcceptedAt;
+    }
+
     public function updateSettings(
         string $name,
         ?string $publicDescription,
@@ -170,6 +218,22 @@ class Store
     public function updateThemeSettings(array $themeSettings): void
     {
         $this->themeSettings = $themeSettings;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function updatePublicationRequest(
+        string $ownerName,
+        string $email,
+        string $phone,
+        string $publicSubdomain,
+        bool $termsAccepted,
+    ): void {
+        $this->publicationOwnerName = $ownerName;
+        $this->publicationEmail = $email;
+        $this->publicationPhone = $phone;
+        $this->publicSubdomain = $publicSubdomain;
+        $this->publicationStatus = 'pending_review';
+        $this->publicationTermsAcceptedAt = $termsAccepted ? new DateTimeImmutable() : $this->publicationTermsAcceptedAt;
         $this->updatedAt = new DateTimeImmutable();
     }
 }
