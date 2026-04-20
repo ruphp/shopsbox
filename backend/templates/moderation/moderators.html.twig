@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Модераторы ShopsBox{% endblock %}
+{% block meta_description %}Управление модераторами платформы ShopsBox.{% endblock %}
+
+{% block body %}
+    {% include 'site/_header.html.twig' %}
+
+    <main class="main">
+        <section class="section">
+            <div class="wrap">
+                <p class="eyebrow">Платформа</p>
+                <h1>Модераторы</h1>
+                <p class="muted">Роль дает доступ только к задачам проверки товаров и магазинов.</p>
+
+                {% if error %}
+                    <p class="legal-note">{{ error }}</p>
+                {% endif %}
+
+                <form class="legal-note" method="post" action="{{ path('platform_moderator_assign') }}">
+                    <p>
+                        <label for="moderator-email">Email пользователя</label><br>
+                        <input id="moderator-email" name="email" type="email" required>
+                    </p>
+                    <button class="button" type="submit">Назначить модератором</button>
+                </form>
+
+                {% for moderator in moderators %}
+                    <article class="legal-note">
+                        <h2>{{ moderator.name }}</h2>
+                        <p>{{ moderator.email }}</p>
+                        <p>Назначен: {{ moderator.assignedAt }}</p>
+                        <form method="post" action="{{ path('platform_moderator_remove') }}">
+                            <input name="email" type="hidden" value="{{ moderator.email }}">
+                            <button class="button" type="submit">Снять роль</button>
+                        </form>
+                    </article>
+                {% else %}
+                    <p class="legal-note">Модераторов пока нет.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    {% include 'site/_footer.html.twig' %}
+{% endblock %}

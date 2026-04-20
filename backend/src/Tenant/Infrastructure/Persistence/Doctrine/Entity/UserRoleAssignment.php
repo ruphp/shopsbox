@@ -47,4 +47,19 @@ class UserRoleAssignment
         $this->store = $store;
         $this->assignedAt = new DateTimeImmutable();
     }
+
+    public function user(): User
+    {
+        return $this->user;
+    }
+
+    public function role(): Role
+    {
+        return $this->role;
+    }
+
+    public function assignedAt(): DateTimeImmutable
+    {
+        return $this->assignedAt;
+    }
 }

@@ -36,6 +36,7 @@ final readonly class ReviewModerationItemUseCase
             throw new RuntimeException('Moderation item not found.');
         }
 
+        $this->repository->logAction($type, $id, $decision, trim($reason), $reviewedBy);
         $this->flusher->flush();
     }
 }

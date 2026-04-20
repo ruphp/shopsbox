@@ -39,6 +39,7 @@ services:
     App\FileStorage\Application\Contracts\FileUrlBuilder: '@App\FileStorage\Infrastructure\Url\ConfiguredFileUrlBuilder'
     App\Moderation\Application\Contracts\ModerationQueueRepository: '@App\Moderation\Infrastructure\Persistence\Doctrine\Repository\DoctrineModerationQueueRepository'
     App\Moderation\Application\Contracts\ModerationNotificationRepository: '@App\Moderation\Infrastructure\Persistence\Doctrine\Repository\DoctrineModerationNotificationRepository'
+    App\Moderation\Application\Contracts\ModeratorRepository: '@App\Moderation\Infrastructure\Persistence\Doctrine\Repository\DoctrineModeratorRepository'
     App\Moderation\Application\Contracts\EntityFlusher: '@App\Moderation\Infrastructure\Adapters\DoctrineEntityFlusher'
     League\Flysystem\FilesystemOperator:
         factory: ['@App\FileStorage\Infrastructure\Storage\FlysystemFactory', 'create']

@@ -22,4 +22,6 @@ interface ModerationQueueRepository
     public function reviewProduct(string $productId, string $decision, string $reason, ?string $reviewedBy): bool;
 
     public function reviewStore(string $storeId, string $decision, string $reason, ?string $reviewedBy): bool;
+
+    public function logAction(string $itemType, string $itemId, string $decision, string $reason, ?string $moderatorId): void;
 }

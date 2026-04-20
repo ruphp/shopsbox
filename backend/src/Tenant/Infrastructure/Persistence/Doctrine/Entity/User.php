@@ -82,6 +82,16 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
+    public function email(): string
+    {
+        return $this->email;
+    }
+
+    public function displayName(): string
+    {
+        return $this->displayName;
+    }
+
     public function getPassword(): ?string
     {
         return $this->passwordHash;
