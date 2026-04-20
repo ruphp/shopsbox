@@ -248,6 +248,77 @@
                 background: var(--accent);
             }
 
+            .auth-card {
+                max-width: 520px;
+            }
+
+            .auth-switch {
+                display: inline-flex;
+                gap: 4px;
+                padding: 4px;
+                margin: 0 0 18px;
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                background: #f5f9fc;
+            }
+
+            .auth-switch label {
+                cursor: pointer;
+            }
+
+            .auth-switch input {
+                position: absolute;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .auth-switch span {
+                display: inline-flex;
+                min-height: 36px;
+                align-items: center;
+                padding: 7px 14px;
+                border-radius: 6px;
+                color: var(--muted);
+                font-weight: 700;
+            }
+
+            .auth-switch input:checked + span {
+                color: #ffffff;
+                background: var(--accent);
+            }
+
+            .form-field {
+                display: grid;
+                gap: 7px;
+                margin: 0 0 18px;
+            }
+
+            .form-field label {
+                font-weight: 700;
+            }
+
+            .form-field input,
+            .legal-note input[type="text"],
+            .legal-note input[type="email"],
+            .legal-note input[type="tel"] {
+                width: 100%;
+                box-sizing: border-box;
+                min-height: 44px;
+                padding: 10px 12px;
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                font: inherit;
+                background: #ffffff;
+            }
+
+            .form-field input:focus,
+            .legal-note input[type="text"]:focus,
+            .legal-note input[type="email"]:focus,
+            .legal-note input[type="tel"]:focus {
+                outline: 2px solid rgba(0, 115, 230, 0.18);
+                border-color: var(--accent);
+            }
+
             .nowrap {
                 white-space: nowrap;
             }
