@@ -27,9 +27,12 @@ final readonly class AuthCodeController
     }
 
     #[Route('', name: 'auth_code_form', methods: ['GET'])]
-    public function form(): Response
+    public function form(Request $request): Response
     {
-        return new Response($this->twig->render('tenant/auth_code.html.twig'));
+        return new Response($this->twig->render('tenant/auth_code.html.twig', [
+            'phoneRequired' => $request->query->getBoolean('phone_required'),
+            'channel' => $request->query->getBoolean('phone_required') ? 'phone' : 'email',
+        ]));
     }
 
     #[Route('/request', name: 'auth_code_request', methods: ['POST'])]
