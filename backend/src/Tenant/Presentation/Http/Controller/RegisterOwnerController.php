@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Tenant\Presentation\Http\Controller;
 
 use App\Tenant\Application\Exception\InvalidTenantInput;
+use App\Tenant\Application\Contracts\OwnerRegistrationRepository;
 use App\Tenant\Application\UseCase\RegisterOwnerUseCase;
 use App\Tenant\Presentation\Http\Form\RegisterOwnerForm;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Throwable;
 use Twig\Environment;
@@ -23,6 +25,7 @@ final readonly class RegisterOwnerController
         private RegisterOwnerUseCase $registerOwner,
         private RegisterOwnerForm $form,
         private LoggerInterface $logger,
+        private OwnerRegistrationRepository $registrationRepository,
     ) {
     }
 
@@ -93,6 +96,32 @@ final readonly class RegisterOwnerController
         ]);
 
         return new RedirectResponse('/owner');
+    }
+
+    #[Route('/slug/check', name: 'owner_register_slug_check', methods: ['GET'])]
+    public function checkSlug(Request $request): JsonResponse
+    {
+        $slug = strtolower(trim((string) $request->query->get('slug', '')));
+
+        if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
+            return new JsonResponse([
+                'available' => false,
+                'message' => 'Используйте латинские буквы, цифры и дефисы.',
+            ]);
+        }
+
+        $domain = $slug . '.shopsbox.ru';
+        if ($this->registrationRepository->storeSlugExists($slug) || $this->registrationRepository->storeDomainExists($domain)) {
+            return new JsonResponse([
+                'available' => false,
+                'message' => 'Этот логин уже занят.',
+            ]);
+        }
+
+        return new JsonResponse([
+            'available' => true,
+            'message' => sprintf('Свободно: %s', $domain),
+        ]);
     }
 
     private function renderError(Request $request, string $phone, string $error): Response
