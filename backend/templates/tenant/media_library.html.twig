@@ -1,0 +1,51 @@
+{% extends 'tenant/_owner_layout.html.twig' %}
+
+{% block title %}Медиатека магазина | ShopsBox{% endblock %}
+{% block meta_description %}Медиатека магазина ShopsBox.{% endblock %}
+
+{% block owner_content %}
+    <section class="section">
+        <div class="wrap">
+            <p class="eyebrow">Кабинет владельца</p>
+            <h1>Медиатека</h1>
+            <p class="muted">Файлы магазина, которые уже связаны с товарами и будущими разделами витрины.</p>
+
+            <div class="grid">
+                <article class="product">
+                    <h2>{{ library.files|length }}</h2>
+                    <p class="muted">Файлов в списке</p>
+                </article>
+                <article class="product">
+                    <h2>{{ (library.totalSize / 1024 / 1024)|number_format(2, '.', ' ') }} МБ</h2>
+                    <p class="muted">Занято в выбранном фильтре</p>
+                </article>
+            </div>
+
+            <nav class="category-nav" aria-label="Фильтр медиатеки">
+                <a class="{{ currentType == '' ? 'is-active' : '' }}" href="{{ path('owner_media_library') }}">Все</a>
+                <a class="{{ currentType == 'image' ? 'is-active' : '' }}" href="{{ path('owner_media_library', {type: 'image'}) }}">Изображения</a>
+                <a class="{{ currentType == 'document' ? 'is-active' : '' }}" href="{{ path('owner_media_library', {type: 'document'}) }}">Документы</a>
+                <a class="{{ currentType == 'video' ? 'is-active' : '' }}" href="{{ path('owner_media_library', {type: 'video'}) }}">Видео</a>
+            </nav>
+
+            {% if library.files is empty %}
+                <p class="legal-note">Файлы пока не найдены.</p>
+            {% else %}
+                <div class="legal-note">
+                    {% for file in library.files %}
+                        <article class="media-row">
+                            <div>
+                                <strong>{{ file.key }}</strong>
+                                <p class="muted">{{ file.usage }}</p>
+                            </div>
+                            <span>{{ file.mediaType }}</span>
+                            <span>{{ (file.size / 1024)|number_format(1, '.', ' ') }} КБ</span>
+                            <span>{{ file.createdAt }}</span>
+                            <a href="{{ file.publicUrl }}" target="_blank" rel="noopener">Открыть</a>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
