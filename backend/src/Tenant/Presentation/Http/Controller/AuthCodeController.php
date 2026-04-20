@@ -9,6 +9,7 @@ use App\Tenant\Application\UseCase\RequestAuthCodeUseCase;
 use App\Tenant\Application\UseCase\VerifyAuthCodeUseCase;
 use App\Tenant\Presentation\Http\Form\RequestAuthCodeForm;
 use App\Tenant\Presentation\Http\Form\VerifyAuthCodeForm;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -46,6 +47,7 @@ final readonly class AuthCodeController
                 'email' => (string) $request->request->get('email', ''),
                 'phone' => (string) $request->request->get('phone', ''),
                 'channel' => (string) $request->request->get('channel', 'email'),
+                'phoneRequired' => $request->request->getBoolean('phone_required'),
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -56,6 +58,7 @@ final readonly class AuthCodeController
             'recipient' => $result->recipient,
             'requested' => true,
             'expiresAt' => $result->expiresAt,
+            'phoneRequired' => $request->request->getBoolean('phone_required'),
         ]));
     }
 
@@ -71,6 +74,7 @@ final readonly class AuthCodeController
                 'phone' => (string) $request->request->get('phone', ''),
                 'channel' => (string) $request->request->get('channel', 'email'),
                 'requested' => true,
+                'phoneRequired' => $request->request->getBoolean('phone_required'),
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -81,6 +85,10 @@ final readonly class AuthCodeController
             $request->getSession()->set('shopsbox_auth_phone', $result->phone);
         }
         $request->getSession()->set('shopsbox_auth_channel', $result->channel);
+
+        if ($request->request->getBoolean('phone_required')) {
+            return new RedirectResponse('/register');
+        }
 
         return new Response($this->twig->render('tenant/auth_code.html.twig', [
             'email' => $result->email,

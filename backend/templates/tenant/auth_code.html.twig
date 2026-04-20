@@ -9,13 +9,10 @@
     <main class="main">
         <section class="section">
             <div class="wrap">
-                <p class="eyebrow">Вход в кабинет</p>
-                <h1>Войти по одноразовому коду</h1>
-                <p class="muted">Выберите, куда отправить код. По умолчанию используется email.</p>
-
-                {% if phoneRequired is defined and phoneRequired %}
-                    <p class="legal-note">Для создания или публикации магазина сначала подтвердите телефон.</p>
-                {% endif %}
+                {% set phoneRequiredMode = phoneRequired is defined and phoneRequired %}
+                <p class="eyebrow">{{ phoneRequiredMode ? 'Регистрация магазина' : 'Вход в кабинет' }}</p>
+                <h1>{{ phoneRequiredMode ? 'Подтвердить телефон' : 'Войти по одноразовому коду' }}</h1>
+                <p class="muted">{{ phoneRequiredMode ? 'Введите номер телефона, чтобы продолжить создание магазина.' : 'Выберите способ входа и получите одноразовый код.' }}</p>
 
                 {% for message in app.flashes('auth_code') %}
                     <p class="legal-note">{{ message }}</p>
@@ -31,24 +28,35 @@
                     </div>
                 {% else %}
                     {% set currentChannel = channel|default('email') %}
-                    <form class="legal-note" method="post" action="{{ path('auth_code_request') }}">
-                        <p>
-                            <label>
-                                <input name="channel" type="radio" value="email" {{ currentChannel == 'email' ? 'checked' : '' }}>
-                                Email
-                            </label>
-                            <label>
-                                <input name="channel" type="radio" value="phone" {{ currentChannel == 'phone' ? 'checked' : '' }}>
-                                Телефон
-                            </label>
-                        </p>
-                        <p>
-                            <label for="auth-email">Email</label><br>
-                            <input id="auth-email" name="email" type="email" value="{{ email|default('') }}">
-                        </p>
-                        <p>
-                            <label for="auth-phone">Телефон</label><br>
-                            <input id="auth-phone" name="phone" type="tel" value="{{ phone|default('') }}" placeholder="+79XXXXXXXXX">
+                    {% set currentRecipient = currentChannel == 'phone' ? phone|default('') : email|default('') %}
+                    <form class="legal-note auth-card" method="post" action="{{ path('auth_code_request') }}" data-auth-code-form>
+                        {% if phoneRequiredMode %}
+                            <input name="channel" type="hidden" value="phone">
+                            <input name="phone_required" type="hidden" value="1">
+                        {% else %}
+                            <div class="auth-switch" role="radiogroup" aria-label="Способ входа">
+                                <label>
+                                    <input name="channel" type="radio" value="email" {{ currentChannel == 'email' ? 'checked' : '' }}>
+                                    <span>Email</span>
+                                </label>
+                                <label>
+                                    <input name="channel" type="radio" value="phone" {{ currentChannel == 'phone' ? 'checked' : '' }}>
+                                    <span>Телефон</span>
+                                </label>
+                            </div>
+                        {% endif %}
+                        <p class="form-field">
+                            <label for="auth-recipient" data-auth-recipient-label>{{ currentChannel == 'phone' ? 'Телефон' : 'Email' }}</label>
+                            <input
+                                id="auth-recipient"
+                                name="recipient"
+                                type="{{ currentChannel == 'phone' ? 'tel' : 'email' }}"
+                                value="{{ currentRecipient }}"
+                                placeholder="{{ currentChannel == 'phone' ? '+79XXXXXXXXX' : 'name@example.ru' }}"
+                                autocomplete="{{ currentChannel == 'phone' ? 'tel' : 'email' }}"
+                                data-auth-recipient-input
+                                required
+                            >
                         </p>
                         <button class="button" type="submit">Получить код</button>
                     </form>
@@ -58,6 +66,9 @@
                             <input name="email" type="hidden" value="{{ email }}">
                             <input name="phone" type="hidden" value="{{ phone|default('') }}">
                             <input name="channel" type="hidden" value="{{ currentChannel }}">
+                            {% if phoneRequiredMode %}
+                                <input name="phone_required" type="hidden" value="1">
+                            {% endif %}
                             <p>Код выпущен для {{ recipient|default(email) }}{% if expiresAt is defined %}. Действует до {{ expiresAt|date('H:i') }}{% endif %}.</p>
                             <p>
                                 <label for="auth-code">Код</label><br>
@@ -72,4 +83,27 @@
     </main>
 
     {% include 'site/_footer.html.twig' %}
+
+    <script>
+        document.querySelectorAll('[data-auth-code-form]').forEach((form) => {
+            const input = form.querySelector('[data-auth-recipient-input]');
+            const label = form.querySelector('[data-auth-recipient-label]');
+            const radios = form.querySelectorAll('input[name="channel"]');
+
+            radios.forEach((radio) => {
+                radio.addEventListener('change', () => {
+                    const isPhone = radio.value === 'phone' && radio.checked;
+                    if (!isPhone && !radio.checked) {
+                        return;
+                    }
+
+                    input.value = '';
+                    input.type = isPhone ? 'tel' : 'email';
+                    input.placeholder = isPhone ? '+79XXXXXXXXX' : 'name@example.ru';
+                    input.autocomplete = isPhone ? 'tel' : 'email';
+                    label.textContent = isPhone ? 'Телефон' : 'Email';
+                });
+            });
+        });
+    </script>
 {% endblock %}
