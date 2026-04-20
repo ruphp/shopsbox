@@ -203,11 +203,25 @@
     background: var(--surface);
 }
 
+.media-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 90px 100px 140px auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.media-row:last-child {
+    border-bottom: 0;
+}
+
 @media (max-width: 760px) {
     .storefront-catalog .catalog-head,
     .product-detail,
     .variant-row,
-    .attribute-list div {
+    .attribute-list div,
+    .media-row {
         grid-template-columns: 1fr;
     }
 
