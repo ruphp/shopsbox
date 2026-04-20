@@ -58,3 +58,4 @@ services:
     App\Tenant\Infrastructure\Adapters\DevFileAuthCodeDelivery:
         arguments:
             $projectDir: '%kernel.project_dir%'
+            $requestStack: '@request_stack'
