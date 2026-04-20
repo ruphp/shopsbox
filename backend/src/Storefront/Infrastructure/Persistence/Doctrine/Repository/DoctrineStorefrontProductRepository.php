@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Storefront\Infrastructure\Persistence\Doctrine\Repository;
 
 use App\Catalog\Domain\ProductStatus;
+use App\Catalog\Domain\ProductPublicationStatus;
 use App\Catalog\Infrastructure\Persistence\Doctrine\Entity\Category;
 use App\Catalog\Infrastructure\Persistence\Doctrine\Entity\Product;
 use App\Catalog\Infrastructure\Persistence\Doctrine\Entity\ProductAttribute;
@@ -49,8 +50,10 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             ->from(Product::class, 'product')
             ->where('IDENTITY(product.store) = :storeId')
             ->andWhere('product.status = :status')
+            ->andWhere('product.publicationStatus = :publicationStatus')
             ->setParameter('storeId', $storeId)
             ->setParameter('status', ProductStatus::ACTIVE)
+            ->setParameter('publicationStatus', ProductPublicationStatus::PUBLISHED)
             ->orderBy('product.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
@@ -67,9 +70,11 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             ->where('IDENTITY(product.store) = :storeId')
             ->andWhere('category.slug = :categorySlug')
             ->andWhere('product.status = :status')
+            ->andWhere('product.publicationStatus = :publicationStatus')
             ->setParameter('storeId', $storeId)
             ->setParameter('categorySlug', $categorySlug)
             ->setParameter('status', ProductStatus::ACTIVE)
+            ->setParameter('publicationStatus', ProductPublicationStatus::PUBLISHED)
             ->orderBy('product.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
@@ -100,9 +105,11 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             ->where('IDENTITY(product.store) = :storeId')
             ->andWhere('product.slug = :productSlug')
             ->andWhere('product.status = :status')
+            ->andWhere('product.publicationStatus = :publicationStatus')
             ->setParameter('storeId', $storeId)
             ->setParameter('productSlug', $productSlug)
             ->setParameter('status', ProductStatus::ACTIVE)
+            ->setParameter('publicationStatus', ProductPublicationStatus::PUBLISHED)
             ->getQuery()
             ->getOneOrNullResult();
 
