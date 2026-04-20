@@ -58,6 +58,37 @@ final class DoctrineStoreRepository implements StoreRepository
         return $this->toSettingsView($store);
     }
 
+    public function existsByPublicSubdomain(string $publicSubdomain, string $exceptStoreId): bool
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('COUNT(store.id)')
+            ->from(Store::class, 'store')
+            ->where('store.publicSubdomain = :publicSubdomain')
+            ->andWhere('store.id != :exceptStoreId')
+            ->setParameter('publicSubdomain', $publicSubdomain)
+            ->setParameter('exceptStoreId', $exceptStoreId)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
+
+    public function updatePublicationForOwnerEmail(
+        string $email,
+        string $ownerName,
+        string $publicationEmail,
+        string $phone,
+        string $publicSubdomain,
+        bool $termsAccepted,
+    ): ?StoreSettingsView {
+        $store = $this->findStoreByOwnerEmail($email);
+        if (!$store instanceof Store) {
+            return null;
+        }
+
+        $store->updatePublicationRequest($ownerName, $publicationEmail, $phone, $publicSubdomain, $termsAccepted);
+
+        return $this->toSettingsView($store);
+    }
+
     public function persist(
         string $id,
         string $tenantId,
@@ -120,6 +151,12 @@ final class DoctrineStoreRepository implements StoreRepository
             $store->contactEmail(),
             $store->contactPhone(),
             $store->themeSettings(),
+            $store->publicationOwnerName(),
+            $store->publicationEmail(),
+            $store->publicationPhone(),
+            $store->publicSubdomain(),
+            $store->publicationStatus(),
+            $store->publicationTermsAcceptedAt()?->format('Y-m-d H:i'),
         );
     }
 }
