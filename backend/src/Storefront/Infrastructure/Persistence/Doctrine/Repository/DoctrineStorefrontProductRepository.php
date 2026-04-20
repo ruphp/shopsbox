@@ -143,8 +143,10 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             ->select('image')
             ->from(ProductImage::class, 'image')
             ->where('image.product = :product')
+            ->andWhere('image.deletedAt IS NULL')
             ->setParameter('product', $product)
-            ->orderBy('image.createdAt', 'ASC')
+            ->orderBy('image.primaryImage', 'DESC')
+            ->addOrderBy('image.position', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

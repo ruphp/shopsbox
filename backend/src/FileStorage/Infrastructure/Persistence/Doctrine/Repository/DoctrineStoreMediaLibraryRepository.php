@@ -22,6 +22,7 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
             ->from(ProductImage::class, 'image')
             ->join('image.product', 'product')
             ->where('IDENTITY(product.store) = :storeId')
+            ->andWhere('image.deletedAt IS NULL')
             ->setParameter('storeId', $storeId)
             ->orderBy('image.createdAt', 'DESC');
 
@@ -47,6 +48,7 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
             ->from(ProductImage::class, 'image')
             ->join('image.product', 'product')
             ->where('IDENTITY(product.store) = :storeId')
+            ->andWhere('image.deletedAt IS NULL')
             ->setParameter('storeId', $storeId)
             ->getQuery()
             ->getSingleScalarResult();
@@ -59,6 +61,7 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
             ->from(ProductImage::class, 'image')
             ->join('image.product', 'product')
             ->where('IDENTITY(product.store) = :storeId')
+            ->andWhere('image.deletedAt IS NULL')
             ->setParameter('storeId', $storeId)
             ->getQuery()
             ->getSingleScalarResult();

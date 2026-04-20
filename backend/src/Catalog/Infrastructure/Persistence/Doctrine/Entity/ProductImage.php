@@ -34,7 +34,16 @@ class ProductImage
     private int $size;
 
     #[ORM\Column]
+    private bool $primaryImage = false;
+
+    #[ORM\Column]
+    private int $position = 0;
+
+    #[ORM\Column]
     private DateTimeImmutable $createdAt;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
     public function __construct(
         string $id,
@@ -86,5 +95,41 @@ class ProductImage
     public function createdAt(): DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function primaryImage(): bool
+    {
+        return $this->primaryImage;
+    }
+
+    public function position(): int
+    {
+        return $this->position;
+    }
+
+    public function deletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function makePrimary(): void
+    {
+        $this->primaryImage = true;
+    }
+
+    public function makeSecondary(): void
+    {
+        $this->primaryImage = false;
+    }
+
+    public function changePosition(int $position): void
+    {
+        $this->position = $position;
+    }
+
+    public function delete(): void
+    {
+        $this->deletedAt = new DateTimeImmutable();
+        $this->primaryImage = false;
     }
 }

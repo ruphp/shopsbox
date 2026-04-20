@@ -14,6 +14,8 @@ final readonly class ProductImageView
         public string $mimeType,
         public int $size,
         public string $createdAt,
+        public bool $primaryImage = false,
+        public int $position = 0,
     ) {
     }
 }
