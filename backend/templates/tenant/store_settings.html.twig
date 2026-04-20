@@ -50,12 +50,44 @@
                         <input id="store-phone" name="contact_phone" type="text" value="{{ settings.contactPhone }}">
                     </p>
                     <p>
+                        <label for="store-city">Город</label><br>
+                        <input id="store-city" name="contact_city" type="text" value="{{ settings.contactCity }}">
+                    </p>
+                    <p>
+                        <label for="store-address">Адрес магазина или пункта выдачи</label><br>
+                        <textarea id="store-address" name="contact_address" rows="3">{{ settings.contactAddress }}</textarea>
+                    </p>
+                    <p>
                         <label for="store-currency">Валюта</label><br>
                         <input id="store-currency" name="default_currency" type="text" value="{{ settings.defaultCurrency }}" maxlength="3" required>
                     </p>
                     <p>
                         <label for="store-timezone">Часовой пояс</label><br>
                         <input id="store-timezone" name="timezone" type="text" value="{{ settings.timezone }}" required>
+                    </p>
+
+                    <h2>Публичные данные продавца</h2>
+                    <p>
+                        <label for="seller-legal-name">Юридическое имя продавца</label><br>
+                        <input id="seller-legal-name" name="seller_legal_name" type="text" value="{{ settings.sellerLegalName }}">
+                    </p>
+                    <p>
+                        <label for="seller-inn">ИНН</label><br>
+                        <input id="seller-inn" name="seller_inn" type="text" value="{{ settings.sellerInn }}">
+                    </p>
+                    <p>
+                        <label for="seller-legal-text">Юридическая информация для витрины</label><br>
+                        <textarea id="seller-legal-text" name="seller_legal_text" rows="4">{{ settings.sellerLegalText }}</textarea>
+                    </p>
+
+                    <h2>Доставка и оплата</h2>
+                    <p>
+                        <label for="delivery-text">Условия доставки</label><br>
+                        <textarea id="delivery-text" name="delivery_text" rows="4">{{ settings.deliveryText }}</textarea>
+                    </p>
+                    <p>
+                        <label for="payment-text">Условия оплаты</label><br>
+                        <textarea id="payment-text" name="payment_text" rows="4">{{ settings.paymentText }}</textarea>
                     </p>
 
                     <h2>Витрина</h2>
