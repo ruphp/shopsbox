@@ -72,6 +72,15 @@ class Store
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $publicationTermsAcceptedAt = null;
 
+    #[ORM\Column(length: 36, nullable: true)]
+    private ?string $publicationReviewedBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $publicationReviewedAt = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $publicationReviewReason = null;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -195,6 +204,11 @@ class Store
         return $this->publicationTermsAcceptedAt;
     }
 
+    public function publicationReviewReason(): ?string
+    {
+        return $this->publicationReviewReason;
+    }
+
     public function updateSettings(
         string $name,
         ?string $publicDescription,
@@ -233,7 +247,37 @@ class Store
         $this->publicationPhone = $phone;
         $this->publicSubdomain = $publicSubdomain;
         $this->publicationStatus = 'pending_review';
+        $this->publicationReviewedBy = null;
+        $this->publicationReviewedAt = null;
+        $this->publicationReviewReason = null;
         $this->publicationTermsAcceptedAt = $termsAccepted ? new DateTimeImmutable() : $this->publicationTermsAcceptedAt;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function approvePublication(?string $reviewedBy): void
+    {
+        $this->publicationStatus = 'published';
+        $this->publicationReviewedBy = $reviewedBy;
+        $this->publicationReviewedAt = new DateTimeImmutable();
+        $this->publicationReviewReason = null;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function rejectPublication(?string $reviewedBy, string $reason): void
+    {
+        $this->publicationStatus = 'rejected';
+        $this->publicationReviewedBy = $reviewedBy;
+        $this->publicationReviewedAt = new DateTimeImmutable();
+        $this->publicationReviewReason = $reason;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function blockPublication(?string $reviewedBy, string $reason): void
+    {
+        $this->publicationStatus = 'blocked';
+        $this->publicationReviewedBy = $reviewedBy;
+        $this->publicationReviewedAt = new DateTimeImmutable();
+        $this->publicationReviewReason = $reason;
         $this->updatedAt = new DateTimeImmutable();
     }
 }

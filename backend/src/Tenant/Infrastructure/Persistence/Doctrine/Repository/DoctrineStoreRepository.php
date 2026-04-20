@@ -157,6 +157,7 @@ final class DoctrineStoreRepository implements StoreRepository
             $store->publicSubdomain(),
             $store->publicationStatus(),
             $store->publicationTermsAcceptedAt()?->format('Y-m-d H:i'),
+            $store->publicationReviewReason(),
         );
     }
 }
