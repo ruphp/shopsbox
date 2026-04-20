@@ -1,0 +1,31 @@
+{% extends 'tenant/_owner_layout.html.twig' %}
+
+{% block title %}Кабинет магазина | ShopsBox{% endblock %}
+{% block meta_description %}Скрытый кабинет владельца магазина ShopsBox.{% endblock %}
+
+{% block owner_content %}
+    <section class="section">
+        <div class="wrap">
+            <p class="eyebrow">Кабинет владельца</p>
+            <h1>{{ settings.name }}</h1>
+            <p class="muted">Здесь будет управление публикацией, поддоменом, подтверждением телефона и модерацией.</p>
+
+            <div class="grid">
+                <article class="product">
+                    <h2>Витрина</h2>
+                    <p class="muted">Технический preview доступен владельцу через кабинет.</p>
+                    <p><a class="button" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть preview</a></p>
+                </article>
+                <article class="product">
+                    <h2>Публикация</h2>
+                    <p class="muted">Публичный поддомен будет включаться отдельным действием после юридического подтверждения.</p>
+                </article>
+                <article class="product">
+                    <h2>Настройки</h2>
+                    <p class="muted">Название, контакты и базовый вид витрины.</p>
+                    <p><a class="button" href="{{ path('owner_store_settings') }}">Перейти</a></p>
+                </article>
+            </div>
+        </div>
+    </section>
+{% endblock %}
