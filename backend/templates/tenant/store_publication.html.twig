@@ -29,6 +29,10 @@
                 </article>
             </div>
 
+            {% if settings.publicationReviewReason %}
+                <p class="legal-note">Причина решения модерации: {{ settings.publicationReviewReason }}</p>
+            {% endif %}
+
             <form class="legal-note" method="post" action="{{ path('owner_store_publication_update') }}">
                 <p>
                     <label for="owner-name">ФИО владельца</label><br>

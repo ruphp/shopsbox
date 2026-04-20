@@ -142,6 +142,16 @@ class Product
         return $this->publicationStatus;
     }
 
+    public function publicationSubmittedAt(): ?DateTimeImmutable
+    {
+        return $this->publicationSubmittedAt;
+    }
+
+    public function publicationReviewReason(): ?string
+    {
+        return $this->publicationReviewReason;
+    }
+
     public function createdAt(): DateTimeImmutable
     {
         return $this->createdAt;
