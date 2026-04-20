@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tenant\Application\UseCase;
 
+use App\Moderation\Application\Contracts\ModerationNotificationRepository;
 use App\Tenant\Application\Contracts\EntityFlusher;
 use App\Tenant\Application\Contracts\StoreRepository;
 use App\Tenant\Application\Dto\StoreSettingsView;
@@ -20,6 +21,7 @@ final readonly class UpdateStorePublicationUseCase
 
     public function __construct(
         private StoreRepository $storeRepository,
+        private ModerationNotificationRepository $moderationNotifications,
         private EntityFlusher $entityFlusher,
     ) {
     }
@@ -77,6 +79,11 @@ final readonly class UpdateStorePublicationUseCase
             throw new StoreSettingsAccessDenied('Store settings are not available for this user.');
         }
 
+        $this->moderationNotifications->createIfMissing(
+            'store',
+            $updated->storeId,
+            'store_publication',
+        );
         $this->entityFlusher->flush();
 
         return $updated;
