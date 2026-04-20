@@ -1,0 +1,60 @@
+{% extends 'tenant/_owner_layout.html.twig' %}
+
+{% block title %}Публикация магазина | ShopsBox{% endblock %}
+{% block meta_description %}Публикация магазина на поддомене ShopsBox.{% endblock %}
+
+{% block owner_content %}
+    <section class="section">
+        <div class="wrap">
+            <p class="eyebrow">Кабинет владельца</p>
+            <h1>Публикация магазина</h1>
+            <p class="muted">Публичный поддомен включается только после заполнения обязательных данных и принятия ответственности.</p>
+
+            {% if error is defined %}
+                <p class="legal-note">{{ error }}</p>
+            {% endif %}
+
+            {% if saved is defined and saved %}
+                <p class="legal-note">Заявка на публикацию сохранена.</p>
+            {% endif %}
+
+            <div class="grid">
+                <article class="product">
+                    <h2>{{ settings.publicationStatus }}</h2>
+                    <p class="muted">Текущий статус публикации</p>
+                </article>
+                <article class="product">
+                    <h2>{{ settings.publicSubdomain ?: 'Не выбран' }}</h2>
+                    <p class="muted">Будущий поддомен: {{ settings.publicSubdomain ? settings.publicSubdomain ~ '.shopsbox.ru' : 'укажите ниже' }}</p>
+                </article>
+            </div>
+
+            <form class="legal-note" method="post" action="{{ path('owner_store_publication_update') }}">
+                <p>
+                    <label for="owner-name">ФИО владельца</label><br>
+                    <input id="owner-name" name="owner_name" type="text" value="{{ settings.publicationOwnerName ?: '' }}" required>
+                </p>
+                <p>
+                    <label for="publication-email">Email для связи</label><br>
+                    <input id="publication-email" name="publication_email" type="email" value="{{ settings.publicationEmail ?: settings.contactEmail }}" required>
+                </p>
+                <p>
+                    <label for="publication-phone">Телефон</label><br>
+                    <input id="publication-phone" name="publication_phone" type="text" value="{{ settings.publicationPhone ?: settings.contactPhone }}" required>
+                </p>
+                <p>
+                    <label for="public-subdomain">Имя поддомена</label><br>
+                    <input id="public-subdomain" name="public_subdomain" type="text" value="{{ settings.publicSubdomain ?: settings.slug }}" required>
+                </p>
+                <p class="muted">Разрешены латинские буквы, цифры и дефис. Длина от 3 до 40 символов.</p>
+                <p>
+                    <label>
+                        <input type="checkbox" name="terms" value="1" required>
+                        Я подтверждаю ответственность за товары, изображения и тексты магазина.
+                    </label>
+                </p>
+                <button class="button" type="submit">Отправить на публикацию</button>
+            </form>
+        </div>
+    </section>
+{% endblock %}

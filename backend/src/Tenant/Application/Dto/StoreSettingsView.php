@@ -22,6 +22,12 @@ final readonly class StoreSettingsView
         public ?string $contactEmail,
         public ?string $contactPhone,
         public array $themeSettings = [],
+        public ?string $publicationOwnerName = null,
+        public ?string $publicationEmail = null,
+        public ?string $publicationPhone = null,
+        public ?string $publicSubdomain = null,
+        public string $publicationStatus = 'draft',
+        public ?string $publicationTermsAcceptedAt = null,
     ) {
     }
 }

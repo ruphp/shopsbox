@@ -23,6 +23,17 @@ interface StoreRepository
         array $themeSettings,
     ): ?StoreSettingsView;
 
+    public function existsByPublicSubdomain(string $publicSubdomain, string $exceptStoreId): bool;
+
+    public function updatePublicationForOwnerEmail(
+        string $email,
+        string $ownerName,
+        string $publicationEmail,
+        string $phone,
+        string $publicSubdomain,
+        bool $termsAccepted,
+    ): ?StoreSettingsView;
+
     public function persist(
         string $id,
         string $tenantId,
