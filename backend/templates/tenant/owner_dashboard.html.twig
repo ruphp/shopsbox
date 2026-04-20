@@ -1,29 +1,74 @@
 {% extends 'tenant/_owner_layout.html.twig' %}
 
 {% block title %}Кабинет магазина | ShopsBox{% endblock %}
-{% block meta_description %}Скрытый кабинет владельца магазина ShopsBox.{% endblock %}
+{% block meta_description %}Обзор магазина, публикации, товаров, медиа и быстрых действий ShopsBox.{% endblock %}
 
 {% block owner_content %}
     <section class="section">
         <div class="wrap">
             <p class="eyebrow">Кабинет владельца</p>
             <h1>{{ settings.name }}</h1>
-            <p class="muted">Здесь будет управление публикацией, поддоменом, подтверждением телефона и модерацией.</p>
+            <p class="muted">Главное состояние магазина и быстрые переходы к разделам MVP.</p>
 
             <div class="grid">
                 <article class="product">
-                    <h2>Витрина</h2>
-                    <p class="muted">Технический preview доступен владельцу через кабинет.</p>
+                    <h2>{{ settings.status }}</h2>
+                    <p class="muted">Статус магазина</p>
+                </article>
+                <article class="product">
+                    <h2>{{ settings.publicationStatus }}</h2>
+                    <p class="muted">Статус публикации</p>
+                </article>
+                <article class="product">
+                    <h2>{{ settings.publicSubdomain ?: 'Не выбран' }}</h2>
+                    <p class="muted">Публичный поддомен</p>
+                </article>
+            </div>
+
+            <div class="legal-note">
+                <h2>Что требует внимания</h2>
+                {% if not phoneVerified %}
+                    <p>Телефон не подтвержден. Подтвердите телефон, чтобы продолжить настройку и публикацию магазина.</p>
+                {% endif %}
+                {% if settings.publicationStatus != 'published' %}
+                    <p>Магазин еще не опубликован. Заполните данные публикации и отправьте заявку на проверку.</p>
+                {% endif %}
+                {% if settings.publicationReviewReason %}
+                    <p>Причина решения модерации: {{ settings.publicationReviewReason }}</p>
+                {% endif %}
+                <p>Если место в медиатеке подойдет к лимиту или товары будут отклонены модерацией, предупреждения появятся в этом блоке.</p>
+            </div>
+
+            <h2>Быстрые действия</h2>
+            <div class="grid">
+                <article class="product">
+                    <h3>Товары</h3>
+                    <p class="muted">Каталог, карточки, публикация и изображения товаров.</p>
+                    <p><a class="button" href="{{ path('admin_catalog_products_list', {tenantId: settings.tenantId, storeId: settings.storeId}) }}">Открыть товары</a></p>
+                </article>
+                <article class="product">
+                    <h3>Медиатека</h3>
+                    <p class="muted">Файлы магазина, изображения товаров и контроль лимитов.</p>
+                    <p><a class="button" href="{{ path('owner_media_library') }}">Открыть медиатеку</a></p>
+                </article>
+                <article class="product">
+                    <h3>Публикация</h3>
+                    <p class="muted">Поддомен, контактные данные, юридическое подтверждение и заявка на модерацию.</p>
+                    <p><a class="button" href="{{ path('owner_store_publication') }}">Настроить публикацию</a></p>
+                </article>
+                <article class="product">
+                    <h3>Настройки</h3>
+                    <p class="muted">Название, описание, контакты, валюта, часовой пояс и базовый вид витрины.</p>
+                    <p><a class="button" href="{{ path('owner_store_settings') }}">Открыть настройки</a></p>
+                </article>
+                <article class="product" id="orders">
+                    <h3>Заказы</h3>
+                    <p class="muted">Раздел заказов будет подключен после корзины и оформления заказа.</p>
+                </article>
+                <article class="product">
+                    <h3>Preview</h3>
+                    <p class="muted">Проверка витрины до публичной публикации.</p>
                     <p><a class="button" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть preview</a></p>
-                </article>
-                <article class="product">
-                    <h2>Публикация</h2>
-                    <p class="muted">Публичный поддомен будет включаться отдельным действием после юридического подтверждения.</p>
-                </article>
-                <article class="product">
-                    <h2>Настройки</h2>
-                    <p class="muted">Название, контакты и базовый вид витрины.</p>
-                    <p><a class="button" href="{{ path('owner_store_settings') }}">Перейти</a></p>
                 </article>
             </div>
         </div>

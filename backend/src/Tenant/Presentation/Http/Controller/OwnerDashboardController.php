@@ -37,6 +37,7 @@ final readonly class OwnerDashboardController
 
         return new Response($this->twig->render('tenant/owner_dashboard.html.twig', [
             'settings' => $settings,
+            'phoneVerified' => $this->phoneVerified($request),
         ]));
     }
 
@@ -45,5 +46,12 @@ final readonly class OwnerDashboardController
         $email = $request->getSession()->get('shopsbox_auth_email');
 
         return is_string($email) && $email !== '' ? $email : null;
+    }
+
+    private function phoneVerified(Request $request): bool
+    {
+        $phone = $request->getSession()->get('shopsbox_auth_phone');
+
+        return is_string($phone) && preg_match('/^\+79\d{9}$/', $phone) === 1;
     }
 }
