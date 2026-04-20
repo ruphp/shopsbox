@@ -33,6 +33,21 @@ class User implements PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 32)]
     private string $status;
 
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $verifiedPhone = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $phoneVerifiedAt = null;
+
+    #[ORM\Column(length: 45, nullable: true)]
+    private ?string $phoneVerifiedIp = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $phoneVerifiedUserAgent = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $phoneVerificationProvider = null;
+
     #[ORM\Column]
     private bool $demo;
 
@@ -75,6 +90,16 @@ class User implements PasswordAuthenticatedUserInterface
     public function setPasswordHash(string $passwordHash): void
     {
         $this->passwordHash = $passwordHash;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function confirmPhone(string $phone, ?string $ip, ?string $userAgent, string $provider): void
+    {
+        $this->verifiedPhone = $phone;
+        $this->phoneVerifiedAt = new DateTimeImmutable();
+        $this->phoneVerifiedIp = $ip;
+        $this->phoneVerifiedUserAgent = $userAgent !== null ? mb_substr($userAgent, 0, 255) : null;
+        $this->phoneVerificationProvider = $provider;
         $this->updatedAt = new DateTimeImmutable();
     }
 }

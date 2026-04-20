@@ -33,6 +33,9 @@ final readonly class StorePublicationController
         if ($ownerEmail === null) {
             return new RedirectResponse('/auth/code');
         }
+        if (!$this->hasVerifiedPhone($request)) {
+            return new RedirectResponse('/auth/code?phone_required=1');
+        }
 
         try {
             $settings = $this->showStoreSettings->execute($ownerEmail);
@@ -51,6 +54,9 @@ final readonly class StorePublicationController
         $ownerEmail = $this->ownerEmail($request);
         if ($ownerEmail === null) {
             return new RedirectResponse('/auth/code');
+        }
+        if (!$this->hasVerifiedPhone($request)) {
+            return new RedirectResponse('/auth/code?phone_required=1');
         }
 
         try {
@@ -77,5 +83,12 @@ final readonly class StorePublicationController
         $email = $request->getSession()->get('shopsbox_auth_email');
 
         return is_string($email) && $email !== '' ? $email : null;
+    }
+
+    private function hasVerifiedPhone(Request $request): bool
+    {
+        $phone = $request->getSession()->get('shopsbox_auth_phone');
+
+        return is_string($phone) && preg_match('/^\+79\d{9}$/', $phone) === 1;
     }
 }
