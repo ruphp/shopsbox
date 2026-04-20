@@ -12,6 +12,7 @@ final readonly class StoreMediaLibraryView
     public function __construct(
         public array $files,
         public int $totalSize,
+        public StoreFileUsageLimitView $limit,
     ) {
     }
 }

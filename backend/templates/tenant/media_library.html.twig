@@ -19,7 +19,17 @@
                     <h2>{{ (library.totalSize / 1024 / 1024)|number_format(2, '.', ' ') }} МБ</h2>
                     <p class="muted">Занято в выбранном фильтре</p>
                 </article>
+                <article class="product">
+                    <h2>{{ library.limit.sizePercent }}%</h2>
+                    <p class="muted">Использовано тарифа: {{ (library.limit.usedSize / 1024 / 1024)|number_format(2, '.', ' ') }} из {{ (library.limit.maxSize / 1024 / 1024)|number_format(0, '.', ' ') }} МБ</p>
+                </article>
             </div>
+
+            {% if library.limit.exceeded %}
+                <p class="legal-note">Лимит файлов превышен. Новые загрузки будут отклоняться, опубликованная витрина продолжит работать.</p>
+            {% elseif library.limit.nearLimit %}
+                <p class="legal-note">Вы приближаетесь к лимиту файлов. Удалите лишнее или подготовьте расширение тарифа.</p>
+            {% endif %}
 
             <nav class="category-nav" aria-label="Фильтр медиатеки">
                 <a class="{{ currentType == '' ? 'is-active' : '' }}" href="{{ path('owner_media_library') }}">Все</a>
