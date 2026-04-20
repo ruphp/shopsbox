@@ -8,9 +8,11 @@
             <a class="brand" href="{{ path('owner_dashboard') }}">Кабинет ShopsBox</a>
             <nav class="links" aria-label="Навигация кабинета">
                 <a href="{{ path('owner_dashboard') }}">Обзор</a>
+                <a href="{{ path('admin_catalog_products_list', {tenantId: settings.tenantId, storeId: settings.storeId}) }}">Товары</a>
                 <a href="{{ path('owner_media_library') }}">Медиатека</a>
                 <a href="{{ path('owner_store_publication') }}">Публикация</a>
                 <a href="{{ path('owner_store_settings') }}">Настройки</a>
+                <a href="{{ path('owner_dashboard') }}#orders">Заказы</a>
                 <a href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Preview</a>
             </nav>
         </div>
