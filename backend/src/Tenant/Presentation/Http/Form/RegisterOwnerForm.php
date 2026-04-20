@@ -13,18 +13,11 @@ final readonly class RegisterOwnerForm
     {
         return new RegisterOwnerInput(
             (string) $request->request->get('owner_name', ''),
-            $this->technicalEmailFromPhone($verifiedPhone),
+            (string) $request->request->get('email', ''),
             $verifiedPhone,
             (string) $request->request->get('store_name', ''),
             (string) $request->request->get('store_slug', ''),
             (string) $request->request->get('timezone', 'Asia/Yekaterinburg'),
         );
-    }
-
-    private function technicalEmailFromPhone(string $phone): string
-    {
-        $digits = preg_replace('/\D+/', '', $phone) ?? '';
-
-        return sprintf('phone-%s@shopsbox.local', $digits);
     }
 }
