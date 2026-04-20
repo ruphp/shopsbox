@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Catalog\Infrastructure\Persistence\Doctrine\Entity;
 
 use App\Catalog\Domain\ProductStatus;
+use App\Catalog\Domain\ProductPublicationStatus;
 use App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductRepository;
 use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\Store;
 use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\Tenant;
@@ -47,6 +48,24 @@ class Product
 
     #[ORM\Column(length: 32, enumType: ProductStatus::class)]
     private ProductStatus $status;
+
+    #[ORM\Column(length: 32, enumType: ProductPublicationStatus::class)]
+    private ProductPublicationStatus $publicationStatus = ProductPublicationStatus::DRAFT;
+
+    #[ORM\Column(length: 36, nullable: true)]
+    private ?string $publicationSubmittedBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $publicationSubmittedAt = null;
+
+    #[ORM\Column(length: 36, nullable: true)]
+    private ?string $publicationReviewedBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $publicationReviewedAt = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $publicationReviewReason = null;
 
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
@@ -118,6 +137,11 @@ class Product
         return $this->status;
     }
 
+    public function publicationStatus(): ProductPublicationStatus
+    {
+        return $this->publicationStatus;
+    }
+
     public function createdAt(): DateTimeImmutable
     {
         return $this->createdAt;
@@ -140,6 +164,44 @@ class Product
     public function changeStatus(ProductStatus $status): void
     {
         $this->status = $status;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function submitForPublicationReview(?string $submittedBy): void
+    {
+        $this->publicationStatus = ProductPublicationStatus::PENDING_REVIEW;
+        $this->publicationSubmittedBy = $submittedBy;
+        $this->publicationSubmittedAt = new DateTimeImmutable();
+        $this->publicationReviewedBy = null;
+        $this->publicationReviewedAt = null;
+        $this->publicationReviewReason = null;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function approvePublication(?string $reviewedBy): void
+    {
+        $this->publicationStatus = ProductPublicationStatus::PUBLISHED;
+        $this->publicationReviewedBy = $reviewedBy;
+        $this->publicationReviewedAt = new DateTimeImmutable();
+        $this->publicationReviewReason = null;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function rejectPublication(?string $reviewedBy, string $reason): void
+    {
+        $this->publicationStatus = ProductPublicationStatus::REJECTED;
+        $this->publicationReviewedBy = $reviewedBy;
+        $this->publicationReviewedAt = new DateTimeImmutable();
+        $this->publicationReviewReason = $reason;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function blockPublication(?string $reviewedBy, string $reason): void
+    {
+        $this->publicationStatus = ProductPublicationStatus::BLOCKED;
+        $this->publicationReviewedBy = $reviewedBy;
+        $this->publicationReviewedAt = new DateTimeImmutable();
+        $this->publicationReviewReason = $reason;
         $this->updatedAt = new DateTimeImmutable();
     }
 }
