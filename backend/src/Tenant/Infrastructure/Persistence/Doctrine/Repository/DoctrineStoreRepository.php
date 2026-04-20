@@ -43,6 +43,13 @@ final class DoctrineStoreRepository implements StoreRepository
         ?string $publicDescription,
         ?string $contactEmail,
         ?string $contactPhone,
+        ?string $contactCity,
+        ?string $contactAddress,
+        ?string $sellerLegalName,
+        ?string $sellerInn,
+        ?string $sellerLegalText,
+        ?string $deliveryText,
+        ?string $paymentText,
         string $defaultCurrency,
         string $timezone,
         array $themeSettings,
@@ -53,6 +60,15 @@ final class DoctrineStoreRepository implements StoreRepository
         }
 
         $store->updateSettings($name, $publicDescription, $contactEmail, $contactPhone, $defaultCurrency, $timezone);
+        $store->updatePublicBusinessData(
+            $contactCity,
+            $contactAddress,
+            $sellerLegalName,
+            $sellerInn,
+            $sellerLegalText,
+            $deliveryText,
+            $paymentText,
+        );
         $store->updateThemeSettings($themeSettings);
 
         return $this->toSettingsView($store);
@@ -148,6 +164,13 @@ final class DoctrineStoreRepository implements StoreRepository
             $store->publicDescription(),
             $store->contactEmail(),
             $store->contactPhone(),
+            $store->contactCity(),
+            $store->contactAddress(),
+            $store->sellerLegalName(),
+            $store->sellerInn(),
+            $store->sellerLegalText(),
+            $store->deliveryText(),
+            $store->paymentText(),
             $store->themeSettings(),
             $store->publicationOwnerName(),
             $store->publicationEmail(),

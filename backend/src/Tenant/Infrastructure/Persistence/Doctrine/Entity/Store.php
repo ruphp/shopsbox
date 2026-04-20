@@ -48,6 +48,27 @@ class Store
     #[ORM\Column(length: 40, nullable: true)]
     private ?string $contactPhone = null;
 
+    #[ORM\Column(length: 160, nullable: true)]
+    private ?string $contactCity = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $contactAddress = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $sellerLegalName = null;
+
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $sellerInn = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $sellerLegalText = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $deliveryText = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $paymentText = null;
+
     /**
      * @var array<string, mixed>
      */
@@ -166,6 +187,41 @@ class Store
         return $this->contactPhone;
     }
 
+    public function contactCity(): ?string
+    {
+        return $this->contactCity;
+    }
+
+    public function contactAddress(): ?string
+    {
+        return $this->contactAddress;
+    }
+
+    public function sellerLegalName(): ?string
+    {
+        return $this->sellerLegalName;
+    }
+
+    public function sellerInn(): ?string
+    {
+        return $this->sellerInn;
+    }
+
+    public function sellerLegalText(): ?string
+    {
+        return $this->sellerLegalText;
+    }
+
+    public function deliveryText(): ?string
+    {
+        return $this->deliveryText;
+    }
+
+    public function paymentText(): ?string
+    {
+        return $this->paymentText;
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -223,6 +279,25 @@ class Store
         $this->contactPhone = $contactPhone;
         $this->defaultCurrency = $defaultCurrency;
         $this->timezone = $timezone;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function updatePublicBusinessData(
+        ?string $contactCity,
+        ?string $contactAddress,
+        ?string $sellerLegalName,
+        ?string $sellerInn,
+        ?string $sellerLegalText,
+        ?string $deliveryText,
+        ?string $paymentText,
+    ): void {
+        $this->contactCity = $contactCity;
+        $this->contactAddress = $contactAddress;
+        $this->sellerLegalName = $sellerLegalName;
+        $this->sellerInn = $sellerInn;
+        $this->sellerLegalText = $sellerLegalText;
+        $this->deliveryText = $deliveryText;
+        $this->paymentText = $paymentText;
         $this->updatedAt = new DateTimeImmutable();
     }
 
