@@ -47,7 +47,7 @@ final class DemoTenantFixtures extends Fixture
                 $tenant,
                 'Demo Store',
                 'demo-store',
-                'demo.shopsbox.local',
+                'demo.shopsbox.ru',
                 'active',
                 'RUB',
                 'Asia/Yekaterinburg',

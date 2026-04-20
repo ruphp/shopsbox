@@ -43,6 +43,10 @@ final readonly class RequestAuthCodeUseCase
         }
 
         $recipient = $channel === 'phone' ? $phone : $email;
+        if (!$input->allowNewRecipient && !$this->authCodeRepository->registeredRecipientExists($channel, $recipient)) {
+            throw InvalidAuthCodeInput::forField($channel, 'Account was not found.');
+        }
+
         $openCode = $this->authCodeRepository->findLatestOpenByRecipient($channel, $recipient);
         if ($openCode instanceof AuthCode && !$openCode->isExpired() && $openCode->hasAttemptsLeft()) {
             throw InvalidAuthCodeInput::forField($channel, 'Confirm the active code before requesting another one.');
