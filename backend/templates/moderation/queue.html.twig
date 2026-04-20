@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Модерация ShopsBox{% endblock %}
+{% block meta_description %}Очередь модерации товаров и магазинов ShopsBox.{% endblock %}
+
+{% block body %}
+    {% include 'site/_header.html.twig' %}
+
+    <main class="main">
+        <section class="section">
+            <div class="wrap">
+                <p class="eyebrow">Модерация</p>
+                <h1>Очередь проверки</h1>
+                <p class="muted">Товары и магазины, которые ждут решения перед публикацией.</p>
+
+                {% if error %}
+                    <p class="legal-note">{{ error }}</p>
+                {% endif %}
+
+                <h2>Товары</h2>
+                {% for product in queue.products %}
+                    <article class="legal-note">
+                        <h3>{{ product.name }}</h3>
+                        <p>{{ product.storeName }} / {{ product.slug }}</p>
+                        <p>Причина: {{ product.reason }}</p>
+                        {% if product.reviewReason %}
+                            <p>Последняя причина: {{ product.reviewReason }}</p>
+                        {% endif %}
+                        <form method="post" action="{{ path('moderator_review', {type: 'product', id: product.id}) }}">
+                            <p>
+                                <input name="reason" type="text" placeholder="Причина отказа или блокировки">
+                            </p>
+                            <button class="button" name="decision" value="approve" type="submit">Одобрить</button>
+                            <button class="button" name="decision" value="reject" type="submit">Отклонить</button>
+                            <button class="button" name="decision" value="block" type="submit">Заблокировать</button>
+                        </form>
+                    </article>
+                {% else %}
+                    <p class="legal-note">Товаров на проверке нет.</p>
+                {% endfor %}
+
+                <h2>Магазины</h2>
+                {% for store in queue.stores %}
+                    <article class="legal-note">
+                        <h3>{{ store.name }}</h3>
+                        <p>Поддомен: {{ store.publicSubdomain ?: 'не указан' }}</p>
+                        <p>Причина: {{ store.reason }}</p>
+                        {% if store.reviewReason %}
+                            <p>Последняя причина: {{ store.reviewReason }}</p>
+                        {% endif %}
+                        <form method="post" action="{{ path('moderator_review', {type: 'store', id: store.id}) }}">
+                            <p>
+                                <input name="reason" type="text" placeholder="Причина отказа или блокировки">
+                            </p>
+                            <button class="button" name="decision" value="approve" type="submit">Одобрить</button>
+                            <button class="button" name="decision" value="reject" type="submit">Отклонить</button>
+                            <button class="button" name="decision" value="block" type="submit">Заблокировать</button>
+                        </form>
+                    </article>
+                {% else %}
+                    <p class="legal-note">Магазинов на проверке нет.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    {% include 'site/_footer.html.twig' %}
+{% endblock %}

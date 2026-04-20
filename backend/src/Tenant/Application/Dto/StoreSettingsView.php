@@ -28,6 +28,7 @@ final readonly class StoreSettingsView
         public ?string $publicSubdomain = null,
         public string $publicationStatus = 'draft',
         public ?string $publicationTermsAcceptedAt = null,
+        public ?string $publicationReviewReason = null,
     ) {
     }
 }
