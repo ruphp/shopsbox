@@ -13,6 +13,10 @@
                 <h1>Войти по одноразовому коду</h1>
                 <p class="muted">Выберите, куда отправить код. По умолчанию используется email. В dev-режиме телефонный код показывается временным flash-сообщением.</p>
 
+                {% if phoneRequired is defined and phoneRequired %}
+                    <p class="legal-note">Для создания или публикации магазина сначала подтвердите телефон.</p>
+                {% endif %}
+
                 {% for message in app.flashes('auth_code') %}
                     <p class="legal-note">{{ message }}</p>
                 {% endfor %}
