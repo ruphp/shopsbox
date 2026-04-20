@@ -7,6 +7,7 @@ namespace App\Tenant\Presentation\Http\Controller;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use App\Tenant\Application\UseCase\RegisterOwnerUseCase;
 use App\Tenant\Presentation\Http\Form\RegisterOwnerForm;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +21,7 @@ final readonly class RegisterOwnerController
         private Environment $twig,
         private RegisterOwnerUseCase $registerOwner,
         private RegisterOwnerForm $form,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -46,16 +48,36 @@ final readonly class RegisterOwnerController
         }
 
         if ($request->request->get('terms') !== '1') {
+            $this->logger->notice('Owner registration rejected: legal terms not accepted.', [
+                'phone' => $phone,
+                'email' => (string) $request->request->get('email', ''),
+            ]);
+
             return $this->renderError($request, $phone, 'Нужно принять пользовательское соглашение и политику конфиденциальности.');
         }
 
         try {
             $result = $this->registerOwner->execute($this->form->fromRequest($request, $phone));
         } catch (InvalidTenantInput $exception) {
+            $this->logger->notice('Owner registration rejected: invalid input.', [
+                'phone' => $phone,
+                'email' => (string) $request->request->get('email', ''),
+                'field' => $exception->field,
+                'message' => $exception->getMessage(),
+            ]);
+
             return $this->renderError($request, $phone, $exception->getMessage());
         }
 
         $request->getSession()->set('shopsbox_auth_email', $result->email);
+        $this->logger->info('Owner registration completed.', [
+            'phone' => $phone,
+            'email' => $result->email,
+            'tenant_id' => $result->tenantId,
+            'store_id' => $result->storeId,
+            'user_id' => $result->userId,
+            'terms_accepted' => true,
+        ]);
 
         return new RedirectResponse('/owner');
     }
