@@ -30,10 +30,11 @@
                         <label for="store-name">Название магазина</label>
                         <input id="store-name" name="store_name" type="text" value="{{ storeName|default('') }}" required>
                     </p>
-                    <p class="form-field">
+                    <p class="form-field" data-store-slug-check data-check-url="{{ path('owner_register_slug_check') }}">
                         <label for="store-slug">Логин для поддомена</label>
-                        <input id="store-slug" name="store_slug" type="text" value="{{ storeSlug|default('') }}" placeholder="my-market" required>
+                        <input id="store-slug" name="store_slug" type="text" value="{{ storeSlug|default('') }}" placeholder="my-market" autocomplete="off" data-store-slug-input required>
                         <small class="field-hint">Этот логин будет использоваться в адресе магазина: my-market.shopsbox.ru.</small>
+                        <small class="field-hint" data-store-slug-status aria-live="polite"></small>
                     </p>
                     <p class="form-field">
                         <label for="timezone">Часовой пояс</label>
@@ -65,4 +66,44 @@
     </main>
 
     {% include 'site/_footer.html.twig' %}
+
+    <script>
+        document.querySelectorAll('[data-store-slug-check]').forEach((field) => {
+            const input = field.querySelector('[data-store-slug-input]');
+            const status = field.querySelector('[data-store-slug-status]');
+            const checkUrl = field.dataset.checkUrl;
+            let timer = null;
+
+            const updateStatus = (message, state) => {
+                status.textContent = message;
+                status.dataset.state = state;
+            };
+
+            const checkSlug = () => {
+                const slug = input.value.trim().toLowerCase();
+                input.value = slug;
+
+                if (slug.length < 3) {
+                    updateStatus('Минимум 3 символа.', 'neutral');
+                    return;
+                }
+
+                fetch(`${checkUrl}?slug=${encodeURIComponent(slug)}`, {
+                    headers: {'Accept': 'application/json'},
+                })
+                    .then((response) => response.json())
+                    .then((data) => updateStatus(data.message || '', data.available ? 'success' : 'error'))
+                    .catch(() => updateStatus('Не удалось проверить логин.', 'error'));
+            };
+
+            input.addEventListener('input', () => {
+                clearTimeout(timer);
+                timer = setTimeout(checkSlug, 350);
+            });
+
+            if (input.value.trim() !== '') {
+                checkSlug();
+            }
+        });
+    </script>
 {% endblock %}
