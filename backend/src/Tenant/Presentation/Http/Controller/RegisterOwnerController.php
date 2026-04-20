@@ -30,7 +30,10 @@ final readonly class RegisterOwnerController
     {
         $phone = $this->verifiedPhone($request);
         if ($phone === null) {
-            return new RedirectResponse('/auth/code?phone_required=1');
+            return new Response($this->twig->render('tenant/auth_code.html.twig', [
+                'phoneRequired' => true,
+                'channel' => 'phone',
+            ]));
         }
 
         return new Response($this->twig->render('tenant/register_owner.html.twig', [
