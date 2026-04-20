@@ -9,8 +9,10 @@ use App\Catalog\Infrastructure\Persistence\Doctrine\Entity\Product;
 use App\Moderation\Application\Contracts\ModerationQueueRepository;
 use App\Moderation\Application\Dto\ModerationProductView;
 use App\Moderation\Application\Dto\ModerationStoreView;
+use App\Moderation\Infrastructure\Persistence\Doctrine\Entity\ModeratorActionLog;
 use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\Store;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Uid\Uuid;
 
 final readonly class DoctrineModerationQueueRepository implements ModerationQueueRepository
 {
@@ -97,5 +99,17 @@ final readonly class DoctrineModerationQueueRepository implements ModerationQueu
         };
 
         return true;
+    }
+
+    public function logAction(string $itemType, string $itemId, string $decision, string $reason, ?string $moderatorId): void
+    {
+        $this->entityManager->persist(new ModeratorActionLog(
+            Uuid::v7()->toRfc4122(),
+            $moderatorId ?? 'dev-moderator',
+            $itemType,
+            $itemId,
+            $decision,
+            $reason !== '' ? $reason : null,
+        ));
     }
 }
