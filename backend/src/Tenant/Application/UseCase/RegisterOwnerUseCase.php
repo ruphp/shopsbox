@@ -1,0 +1,74 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tenant\Application\UseCase;
+
+use App\Tenant\Application\Contracts\EntityFlusher;
+use App\Tenant\Application\Contracts\OwnerRegistrationRepository;
+use App\Tenant\Application\Contracts\UuidGenerator;
+use App\Tenant\Application\Dto\RegisterOwnerInput;
+use App\Tenant\Application\Dto\RegisterOwnerResult;
+use App\Tenant\Application\Exception\InvalidTenantInput;
+use DateTimeZone;
+
+final readonly class RegisterOwnerUseCase
+{
+    public function __construct(
+        private OwnerRegistrationRepository $registrationRepository,
+        private EntityFlusher $entityFlusher,
+        private UuidGenerator $uuidGenerator,
+    ) {
+    }
+
+    public function execute(RegisterOwnerInput $input): RegisterOwnerResult
+    {
+        $ownerName = trim($input->ownerName);
+        $email = strtolower(trim($input->email));
+        $phone = trim($input->phone);
+        $storeName = trim($input->storeName);
+        $storeSlug = strtolower(trim($input->storeSlug));
+        $timezone = trim($input->timezone);
+
+        if ($ownerName === '' || mb_strlen($ownerName) > 120) {
+            throw InvalidTenantInput::forField('owner_name', 'Owner name must be from 1 to 120 characters.');
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw InvalidTenantInput::forField('email', 'Email must be valid.');
+        }
+        if (!preg_match('/^\+79\d{9}$/', $phone)) {
+            throw InvalidTenantInput::forField('phone', 'Phone must use +79XXXXXXXXX format.');
+        }
+        if ($storeName === '' || mb_strlen($storeName) > 160) {
+            throw InvalidTenantInput::forField('store_name', 'Store name must be from 1 to 160 characters.');
+        }
+        if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $storeSlug)) {
+            throw InvalidTenantInput::forField('store_slug', 'Store slug must contain lowercase letters, digits and hyphens.');
+        }
+        if (!in_array($timezone, DateTimeZone::listIdentifiers(), true)) {
+            throw InvalidTenantInput::forField('timezone', 'Timezone must be a valid IANA identifier.');
+        }
+        if ($this->registrationRepository->emailExists($email)) {
+            throw InvalidTenantInput::forField('email', 'Email is already registered.');
+        }
+        if ($this->registrationRepository->storeSlugExists($storeSlug)) {
+            throw InvalidTenantInput::forField('store_slug', 'Store slug is already used.');
+        }
+
+        $result = $this->registrationRepository->register(
+            $this->uuidGenerator->generate(),
+            $this->uuidGenerator->generate(),
+            $this->uuidGenerator->generate(),
+            $ownerName,
+            $email,
+            $phone,
+            $storeName,
+            $storeSlug,
+            $storeSlug . '.shopsbox.local',
+            $timezone,
+        );
+        $this->entityFlusher->flush();
+
+        return $result;
+    }
+}
