@@ -9,9 +9,12 @@ services:
     working_dir: /app/backend
     volumes:
       - ./backend:/app/backend
+      - shopsbox_backend_vendor:/app/backend/vendor
     environment:
       APP_ENV: dev
+      APP_DEBUG: "0"
       APP_SECRET: shopsbox-local-dev-secret
+      APP_CACHE_DIR: /tmp/shopsbox-cache
       APP_SHARE_DIR: var/share
       DEFAULT_URI: http://localhost:8080
       SITE_PUBLIC_BASE_URL: https://shopsbox.ru
@@ -36,7 +39,8 @@ services:
       - shopsbox_app
     command: >
       sh -lc "if [ -f public/index.php ];
-      then php -S 0.0.0.0:8000 -t public public/router.php;
+      then php bin/console cache:warmup --no-interaction >/dev/null 2>&1 || true;
+      php -S 0.0.0.0:8000 -t public public/router.php;
       else php -S 0.0.0.0:8000 -t .;
       fi"
 
@@ -84,6 +88,8 @@ networks:
     name: shopsbox_app
 
 volumes:
+  shopsbox_backend_vendor:
+    name: shopsbox_backend_vendor
   shopsbox_postgres_data:
     name: shopsbox_postgres_data
   shopsbox_redis_data:

@@ -5,6 +5,7 @@ backend/.env.*
 
 backend/var/
 backend/vendor/
+backend/config/reference.php
 
 var/backups/
 
