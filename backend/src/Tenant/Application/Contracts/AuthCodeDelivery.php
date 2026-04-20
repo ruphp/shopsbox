@@ -8,5 +8,5 @@ use DateTimeImmutable;
 
 interface AuthCodeDelivery
 {
-    public function deliver(string $email, string $code, DateTimeImmutable $expiresAt): void;
+    public function deliver(string $channel, string $recipient, string $code, DateTimeImmutable $expiresAt): void;
 }

@@ -11,7 +11,11 @@
             <div class="wrap">
                 <p class="eyebrow">Вход в кабинет</p>
                 <h1>Войти по одноразовому коду</h1>
-                <p class="muted">Введите email, получите код и подтвердите вход. В закрытой мини-бете код записывается в dev-журнал доставки.</p>
+                <p class="muted">Выберите, куда отправить код. По умолчанию используется email. В dev-режиме телефонный код показывается временным flash-сообщением.</p>
+
+                {% for message in app.flashes('auth_code') %}
+                    <p class="legal-note">{{ message }}</p>
+                {% endfor %}
 
                 {% if error is defined %}
                     <p class="legal-note">{{ error }}</p>
@@ -19,13 +23,28 @@
 
                 {% if verified is defined and verified %}
                     <div class="legal-note">
-                        <p>Вход подтвержден для {{ email }}.</p>
+                        <p>Вход подтвержден для {{ recipient|default(email) }}.</p>
                     </div>
                 {% else %}
+                    {% set currentChannel = channel|default('email') %}
                     <form class="legal-note" method="post" action="{{ path('auth_code_request') }}">
                         <p>
+                            <label>
+                                <input name="channel" type="radio" value="email" {{ currentChannel == 'email' ? 'checked' : '' }}>
+                                Email
+                            </label>
+                            <label>
+                                <input name="channel" type="radio" value="phone" {{ currentChannel == 'phone' ? 'checked' : '' }}>
+                                Телефон
+                            </label>
+                        </p>
+                        <p>
                             <label for="auth-email">Email</label><br>
-                            <input id="auth-email" name="email" type="email" value="{{ email|default('') }}" required>
+                            <input id="auth-email" name="email" type="email" value="{{ email|default('') }}">
+                        </p>
+                        <p>
+                            <label for="auth-phone">Телефон</label><br>
+                            <input id="auth-phone" name="phone" type="tel" value="{{ phone|default('') }}" placeholder="+79XXXXXXXXX">
                         </p>
                         <button class="button" type="submit">Получить код</button>
                     </form>
@@ -33,7 +52,9 @@
                     {% if requested is defined and requested %}
                         <form class="legal-note" method="post" action="{{ path('auth_code_verify') }}">
                             <input name="email" type="hidden" value="{{ email }}">
-                            <p>Код отправлен для {{ email }}{% if expiresAt is defined %}. Действует до {{ expiresAt|date('H:i') }}{% endif %}.</p>
+                            <input name="phone" type="hidden" value="{{ phone|default('') }}">
+                            <input name="channel" type="hidden" value="{{ currentChannel }}">
+                            <p>Код выпущен для {{ recipient|default(email) }}{% if expiresAt is defined %}. Действует до {{ expiresAt|date('H:i') }}{% endif %}.</p>
                             <p>
                                 <label for="auth-code">Код</label><br>
                                 <input id="auth-code" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" required>

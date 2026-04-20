@@ -8,6 +8,8 @@ final readonly class RequestAuthCodeInput
 {
     public function __construct(
         public string $email,
+        public string $phone = '',
+        public string $channel = 'email',
     ) {
     }
 }

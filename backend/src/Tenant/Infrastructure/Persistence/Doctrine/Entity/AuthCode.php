@@ -19,6 +19,12 @@ class AuthCode
     #[ORM\Column(length: 180)]
     private string $email;
 
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $phone = null;
+
+    #[ORM\Column(length: 16)]
+    private string $channel = 'email';
+
     #[ORM\Column(length: 64)]
     private string $codeHash;
 
@@ -27,6 +33,18 @@ class AuthCode
 
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $consumedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $verifiedAt = null;
+
+    #[ORM\Column(length: 45, nullable: true)]
+    private ?string $verifiedIp = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $verifiedUserAgent = null;
+
+    #[ORM\Column(length: 40)]
+    private string $provider = 'flash_dev';
 
     #[ORM\Column]
     private int $attempts = 0;
@@ -43,13 +61,39 @@ class AuthCode
         string $codeHash,
         DateTimeImmutable $expiresAt,
         int $maxAttempts,
+        ?string $phone = null,
+        string $channel = 'email',
+        string $provider = 'flash_dev',
     ) {
         $this->id = $id;
         $this->email = $email;
+        $this->phone = $phone;
+        $this->channel = $channel;
         $this->codeHash = $codeHash;
         $this->expiresAt = $expiresAt;
         $this->maxAttempts = $maxAttempts;
+        $this->provider = $provider;
         $this->createdAt = new DateTimeImmutable();
+    }
+
+    public function email(): string
+    {
+        return $this->email;
+    }
+
+    public function phone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function channel(): string
+    {
+        return $this->channel;
+    }
+
+    public function recipient(): string
+    {
+        return $this->channel === 'phone' ? (string) $this->phone : $this->email;
     }
 
     public function matches(string $code): bool
@@ -72,8 +116,13 @@ class AuthCode
         ++$this->attempts;
     }
 
-    public function consume(): void
+    public function consume(?string $ip = null, ?string $userAgent = null): void
     {
-        $this->consumedAt = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
+
+        $this->consumedAt = $now;
+        $this->verifiedAt = $now;
+        $this->verifiedIp = $ip;
+        $this->verifiedUserAgent = $userAgent !== null ? mb_substr($userAgent, 0, 255) : null;
     }
 }

@@ -11,6 +11,10 @@ final readonly class RequestAuthCodeForm
 {
     public function fromRequest(Request $request): RequestAuthCodeInput
     {
-        return new RequestAuthCodeInput((string) $request->request->get('email', ''));
+        return new RequestAuthCodeInput(
+            (string) $request->request->get('email', ''),
+            (string) $request->request->get('phone', ''),
+            (string) $request->request->get('channel', 'email'),
+        );
     }
 }

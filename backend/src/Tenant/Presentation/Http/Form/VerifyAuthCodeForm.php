@@ -14,6 +14,10 @@ final readonly class VerifyAuthCodeForm
         return new VerifyAuthCodeInput(
             (string) $request->request->get('email', ''),
             (string) $request->request->get('code', ''),
+            (string) $request->request->get('phone', ''),
+            (string) $request->request->get('channel', 'email'),
+            $request->getClientIp(),
+            $request->headers->get('User-Agent'),
         );
     }
 }

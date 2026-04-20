@@ -21,18 +21,25 @@ final readonly class VerifyAuthCodeUseCase
 
     public function execute(VerifyAuthCodeInput $input): VerifyAuthCodeResult
     {
+        $channel = $input->channel === 'phone' ? 'phone' : 'email';
         $email = strtolower(trim($input->email));
+        $phone = preg_replace('/[\s()-]/', '', trim($input->phone)) ?? '';
         $code = trim($input->code);
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($channel === 'email' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw InvalidAuthCodeInput::forField('email', 'Email must be valid.');
+        }
+
+        if ($channel === 'phone' && !preg_match('/^\+79\d{9}$/', $phone)) {
+            throw InvalidAuthCodeInput::forField('phone', 'Phone must use +79XXXXXXXXX format.');
         }
 
         if (!preg_match('/^\d{6}$/', $code)) {
             throw InvalidAuthCodeInput::forField('code', 'Code must contain 6 digits.');
         }
 
-        $authCode = $this->authCodeRepository->findLatestOpenByEmail($email);
+        $recipient = $channel === 'phone' ? $phone : $email;
+        $authCode = $this->authCodeRepository->findLatestOpenByRecipient($channel, $recipient);
         if (!$authCode instanceof AuthCode) {
             throw InvalidAuthCodeInput::forField('code', 'Code is expired or not found.');
         }
@@ -52,9 +59,9 @@ final readonly class VerifyAuthCodeUseCase
             throw InvalidAuthCodeInput::forField('code', 'Code is invalid.');
         }
 
-        $authCode->consume();
+        $authCode->consume($input->ip, $input->userAgent);
         $this->entityFlusher->flush();
 
-        return new VerifyAuthCodeResult($email, true);
+        return new VerifyAuthCodeResult($authCode->email(), true, $channel, $recipient, (string) $authCode->phone());
     }
 }
