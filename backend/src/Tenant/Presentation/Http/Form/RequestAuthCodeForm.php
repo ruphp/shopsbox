@@ -18,6 +18,7 @@ final readonly class RequestAuthCodeForm
             $channel === 'phone' ? (string) $request->request->get('email', '') : $recipient,
             $channel === 'phone' ? $recipient : (string) $request->request->get('phone', ''),
             $channel,
+            $request->request->getBoolean('phone_required'),
         );
     }
 }
