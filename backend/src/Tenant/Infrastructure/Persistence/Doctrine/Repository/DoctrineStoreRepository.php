@@ -152,6 +152,8 @@ final class DoctrineStoreRepository implements StoreRepository
 
     private function toSettingsView(Store $store): StoreSettingsView
     {
+        $owner = $this->findOwnerByStore($store);
+
         return new StoreSettingsView(
             $store->tenant()->id(),
             $store->id(),
@@ -172,13 +174,27 @@ final class DoctrineStoreRepository implements StoreRepository
             $store->deliveryText(),
             $store->paymentText(),
             $store->themeSettings(),
-            $store->publicationOwnerName(),
-            $store->publicationEmail(),
-            $store->publicationPhone(),
+            $store->publicationOwnerName() ?: $owner?->displayName(),
+            $store->publicationEmail() ?: $owner?->email(),
+            $store->publicationPhone() ?: $store->contactPhone(),
             $store->publicSubdomain(),
             $store->publicationStatus(),
             $store->publicationTermsAcceptedAt()?->format('Y-m-d H:i'),
             $store->publicationReviewReason(),
         );
+    }
+
+    private function findOwnerByStore(Store $store): ?User
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('user')
+            ->from(User::class, 'user')
+            ->innerJoin(UserRoleAssignment::class, 'assignment', 'WITH', 'assignment.user = user')
+            ->where('assignment.store = :store')
+            ->setParameter('store', $store)
+            ->orderBy('user.createdAt', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }
