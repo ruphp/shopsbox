@@ -71,10 +71,12 @@ final readonly class RegisterOwnerController
             return new RedirectResponse('/auth/code?phone_required=1');
         }
 
-        if ($request->request->get('terms') !== '1') {
+        if ($request->request->get('terms') !== '1' || $request->request->get('privacy') !== '1') {
             $this->logger->notice('Owner registration rejected: legal terms not accepted.', [
                 'phone' => $phone,
                 'email' => (string) $request->request->get('email', ''),
+                'terms_accepted' => $request->request->get('terms') === '1',
+                'privacy_accepted' => $request->request->get('privacy') === '1',
             ]);
 
             return $this->renderError($request, $phone, 'Нужно принять пользовательское соглашение и политику конфиденциальности.');
@@ -110,6 +112,7 @@ final readonly class RegisterOwnerController
             'store_id' => $result->storeId,
             'user_id' => $result->userId,
             'terms_accepted' => true,
+            'privacy_accepted' => true,
         ]);
 
         return new RedirectResponse('/owner');
