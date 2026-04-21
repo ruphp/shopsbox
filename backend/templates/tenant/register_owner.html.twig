@@ -56,7 +56,13 @@
                     <p>
                         <label>
                             <input type="checkbox" name="terms" value="1" required>
-                            Я согласен с условиями <a href="{{ path('site_static', {page: 'terms'}) }}" target="_blank" rel="noopener">Пользовательского соглашения</a> и <a href="{{ path('site_static', {page: 'privacy'}) }}" target="_blank" rel="noopener">Политикой конфиденциальности</a>.
+                            Я согласен с условиями <a href="{{ path('site_static', {page: 'terms'}) }}" target="_blank" rel="noopener">Пользовательского соглашения</a>.
+                        </label>
+                    </p>
+                    <p>
+                        <label>
+                            <input type="checkbox" name="privacy" value="1" required>
+                            Я согласен с <a href="{{ path('site_static', {page: 'privacy'}) }}" target="_blank" rel="noopener">Политикой конфиденциальности</a>.
                         </label>
                     </p>
                     <button class="button" type="submit">Создать магазин</button>
