@@ -20,12 +20,105 @@ final readonly class SiteController
         return new Response($this->twig->render('site/home.html.twig'));
     }
 
+    #[Route('/pricing', name: 'site_pricing', methods: ['GET'])]
+    public function pricing(): Response
+    {
+        return new Response($this->twig->render('site/pricing.html.twig', [
+            'plans' => $this->pricingPlans(),
+        ]));
+    }
+
+    #[Route('/pricing/{plan}', name: 'site_pricing_plan', requirements: ['plan' => 'free|start|business'], methods: ['GET'])]
+    public function pricingPlan(string $plan): Response
+    {
+        return new Response($this->twig->render('site/pricing_plan.html.twig', [
+            'plan' => $this->pricingPlans()[$plan],
+        ]));
+    }
+
+    #[Route('/pricing/{plan}/checkout', name: 'site_pricing_checkout', requirements: ['plan' => 'start|business'], methods: ['GET'])]
+    public function pricingCheckout(string $plan): Response
+    {
+        return new Response($this->twig->render('site/pricing_checkout.html.twig', [
+            'plan' => $this->pricingPlans()[$plan],
+        ]));
+    }
+
     #[Route('/{page}', name: 'site_static', requirements: ['page' => 'privacy|terms|cookies|payments|contacts'], methods: ['GET'])]
     public function staticPage(string $page): Response
     {
         return new Response($this->twig->render('site/static.html.twig', [
             'page' => $this->staticPages()[$page],
         ]));
+    }
+
+    /**
+     * @return array<string, array{slug: string, title: string, subtitle: string, price: string, period: string, description: string, features: list<string>, limits: list<string>, checkout: bool}>
+     */
+    private function pricingPlans(): array
+    {
+        return [
+            'free' => [
+                'slug' => 'free',
+                'title' => 'Бесплатный старт',
+                'subtitle' => 'Для проверки идеи, каталога и первых настроек магазина',
+                'price' => '0 ₽',
+                'period' => 'в месяц',
+                'description' => 'Можно собрать витрину, добавить товары, страницы, юридические данные и проверить путь покупателя на поддомене ShopsBox.',
+                'features' => [
+                    'магазин на техническом адресе и публичном поддомене после модерации',
+                    'каталог, категории, товары, варианты и изображения',
+                    'страницы магазина, базовые настройки и демо-платежи',
+                    'рекламные места ShopsBox на витрине и в кабинете',
+                ],
+                'limits' => [
+                    'ограничения по товарам, файлам, трафику и нагрузке',
+                    'боевые платежи и свой домен подключаются после проверки магазина',
+                    'при изменении публичного контента может потребоваться повторная модерация',
+                ],
+                'checkout' => false,
+            ],
+            'start' => [
+                'slug' => 'start',
+                'title' => 'Старт',
+                'subtitle' => 'Для запуска продаж на своем домене',
+                'price' => '990 ₽',
+                'period' => 'в месяц',
+                'description' => 'Подходит магазину, которому нужен свой домен, SSL, больше места под файлы и спокойный запуск продаж.',
+                'features' => [
+                    'подключение своего домена и SSL',
+                    'увеличенные лимиты товаров, файлов и заказов',
+                    'подготовка к подключению онлайн-оплаты',
+                    'базовое сопровождение по запуску',
+                ],
+                'limits' => [
+                    'точные лимиты тарифа фиксируются в личном кабинете',
+                    'дополнительная нагрузка и хранение оплачиваются отдельно',
+                    'платежные модули подключаются после проверки банка или платежного провайдера',
+                ],
+                'checkout' => true,
+            ],
+            'business' => [
+                'slug' => 'business',
+                'title' => 'Бизнес',
+                'subtitle' => 'Для растущего магазина с большим каталогом',
+                'price' => '2 990 ₽',
+                'period' => 'в месяц',
+                'description' => 'Для магазинов с большим каталогом, активной загрузкой медиа, расширенной статистикой и повышенной нагрузкой.',
+                'features' => [
+                    'больше места под изображения, файлы и видео',
+                    'расширенные лимиты товаров, сотрудников и заказов',
+                    'приоритетная поддержка по настройке магазина',
+                    'отключение рекламных мест ShopsBox',
+                ],
+                'limits' => [
+                    'ресурсы сверх тарифа согласуются отдельно',
+                    'сложные интеграции и переносы оцениваются после анализа',
+                    'коробочная установка обсуждается как отдельная услуга',
+                ],
+                'checkout' => true,
+            ],
+        ];
     }
 
     /**
@@ -118,6 +211,22 @@ final readonly class SiteController
     <url>
         <loc>https://shopsbox.ru/s/demo-store/products</loc>
         <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing</loc>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing/free</loc>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing/start</loc>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing/business</loc>
+        <priority>0.6</priority>
     </url>
     <url>
         <loc>https://shopsbox.ru/privacy</loc>

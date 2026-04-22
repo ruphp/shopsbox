@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Оформление тарифа {{ plan.title }} - ShopsBox{% endblock %}
+{% block og_title %}Оформление тарифа {{ plan.title }} - ShopsBox{% endblock %}
+{% block meta_description %}Оформление тарифа {{ plan.title }} для интернет-магазина ShopsBox: стоимость, состав услуги, контакты и условия оплаты.{% endblock %}
+{% block og_description %}Оформление тарифа {{ plan.title }} для интернет-магазина ShopsBox.{% endblock %}
+{% block canonical_url %}{{ site_public_base_url ~ path('site_pricing_checkout', {plan: plan.slug}) }}{% endblock %}
+
+{% block body %}
+    {% include 'site/_header.html.twig' %}
+
+    <main class="main">
+        <section class="section pricing-page">
+            <div class="wrap">
+                <p class="eyebrow">Оформление тарифа</p>
+                <h1>{{ plan.title }}</h1>
+                <p class="muted">Это страница оформления услуги ShopsBox для владельца интернет-магазина. Реальная онлайн-оплата будет включена после подключения эквайринга.</p>
+
+                <div class="checkout-layout">
+                    <article class="checkout-panel checkout-panel--main">
+                        <h2>Заказ</h2>
+                        <dl class="checkout-summary">
+                            <div>
+                                <dt>Услуга</dt>
+                                <dd>Тариф ShopsBox «{{ plan.title }}»</dd>
+                            </div>
+                            <div>
+                                <dt>Стоимость</dt>
+                                <dd>{{ plan.price }} {{ plan.period }}</dd>
+                            </div>
+                            <div>
+                                <dt>Состав</dt>
+                                <dd>{{ plan.subtitle }}</dd>
+                            </div>
+                        </dl>
+
+                        <h2>Что будет после оплаты</h2>
+                        <ul class="pricing-list">
+                            {% for feature in plan.features %}
+                                <li>{{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                    </article>
+
+                    <aside class="checkout-panel">
+                        <h2>Оплата</h2>
+                        <p>Пока эквайринг не подключен, можно оставить заявку на подключение тарифа и получить счет или инструкцию по оплате вручную.</p>
+                        <a class="button" href="mailto:ruphp@mail.ru?subject=Подключение тарифа {{ plan.title|url_encode }} ShopsBox">Запросить подключение</a>
+                        <p class="muted">Продавец услуги: Александр Викторович Смирнов, ИНН 590612372849, самозанятый. Контакты: 8 929 203-04-99, ruphp@mail.ru.</p>
+                        <p class="muted">Условия оплаты и возврата: <a href="{{ path('site_static', {page: 'payments'}) }}">платежи и возвраты</a>.</p>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'site/_footer.html.twig' %}
+{% endblock %}

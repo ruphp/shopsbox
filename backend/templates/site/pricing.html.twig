@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Тарифы ShopsBox для создания интернет-магазина{% endblock %}
+{% block og_title %}Тарифы ShopsBox для создания интернет-магазина{% endblock %}
+{% block meta_description %}Тарифы ShopsBox: бесплатный старт на поддомене, запуск продаж на своем домене, расширенные лимиты для интернет-магазина и подключение онлайн-оплаты.{% endblock %}
+{% block og_description %}Выберите тариф ShopsBox для создания интернет-магазина, запуска продаж на своем домене и подключения онлайн-оплаты.{% endblock %}
+{% block canonical_url %}{{ site_public_base_url ~ path('site_pricing') }}{% endblock %}
+
+{% block body %}
+    {% include 'site/_header.html.twig' %}
+
+    <main class="main">
+        <section class="section pricing-page">
+            <div class="wrap">
+                <p class="eyebrow">Тарифы ShopsBox</p>
+                <h1>Тарифы для создания интернет-магазина</h1>
+                <p class="muted">Начните бесплатно, соберите магазин на поддомене ShopsBox, а для продаж на своем домене выберите платный тариф с расширенными лимитами и подготовкой к онлайн-оплате.</p>
+
+                <div class="pricing-grid">
+                    {% for plan in plans %}
+                        <article class="pricing-card">
+                            <div>
+                                <p class="pricing-card__subtitle">{{ plan.subtitle }}</p>
+                                <h2>{{ plan.title }}</h2>
+                                <p class="pricing-price"><strong>{{ plan.price }}</strong> <span>{{ plan.period }}</span></p>
+                                <p class="muted">{{ plan.description }}</p>
+                            </div>
+
+                            <ul class="pricing-list">
+                                {% for feature in plan.features %}
+                                    <li>{{ feature }}</li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="pricing-actions">
+                                <a class="button" href="{{ path('site_pricing_plan', {plan: plan.slug}) }}">Подробнее</a>
+                                {% if plan.checkout %}
+                                    <a class="button button-secondary" href="{{ path('site_pricing_checkout', {plan: plan.slug}) }}">Оформить</a>
+                                {% else %}
+                                    <a class="button button-secondary" href="{{ path('owner_register_form') }}">Начать бесплатно</a>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                <div class="pricing-summary">
+                    <h2>Что оплачивается</h2>
+                    <p>Платные тарифы покрывают ресурсы сервиса: хранение файлов, обработку запросов, работу базы данных, техническую поддержку, подключение домена, SSL и подготовку магазина к боевым платежам.</p>
+                    <p>Условия оплаты, возврата и контактные данные продавца указаны на страницах <a href="{{ path('site_static', {page: 'payments'}) }}">платежей и возвратов</a> и <a href="{{ path('site_static', {page: 'contacts'}) }}">контактов</a>.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'site/_footer.html.twig' %}
+{% endblock %}

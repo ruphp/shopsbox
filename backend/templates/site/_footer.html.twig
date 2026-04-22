@@ -1,11 +1,9 @@
 <footer class="footer site-footer">
     <div class="wrap footer-minimal">
         <span>© {{ 'now'|date('Y') }} ShopsBox.ru</span>
+        <a href="{{ path('site_pricing') }}">Тарифы</a>
         <a href="{{ path('site_static', {page: 'privacy'}) }}">Политика конфиденциальности</a>
-        <a href="{{ path('site_static', {page: 'terms'}) }}">Пользовательское соглашение</a>
-        <a href="{{ path('site_static', {page: 'cookies'}) }}">Cookie</a>
         <a href="{{ path('site_static', {page: 'payments'}) }}">Платежи и возвраты</a>
         <a href="{{ path('site_static', {page: 'contacts'}) }}">Контакты</a>
-        <a href="https://ruphp.su" target="_blank" rel="noopener">Разработано ruphp.su</a>
     </div>
 </footer>
