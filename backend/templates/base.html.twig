@@ -93,19 +93,28 @@
                 color: rgba(255, 255, 255, 0.78);
             }
 
-            .footer-minimal {
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                gap: 18px;
-                flex-wrap: wrap;
+            .footer-columns {
+                display: grid;
+                grid-template-columns: 1.25fr repeat(3, minmax(150px, 1fr));
+                gap: 24px;
+                align-items: start;
             }
 
-            .footer-minimal a {
+            .footer-column {
+                display: grid;
+                gap: 9px;
+            }
+
+            .footer-title {
+                color: #ffffff;
+                font-weight: 700;
+            }
+
+            .footer-column a {
                 color: rgba(255, 255, 255, 0.78);
             }
 
-            .footer-minimal a:hover {
+            .footer-column a:hover {
                 color: #ffffff;
             }
 
@@ -784,9 +793,8 @@
                     border-bottom: 1px solid var(--line);
                 }
 
-                .footer-minimal {
-                    align-items: flex-start;
-                    flex-direction: column;
+                .footer-columns {
+                    grid-template-columns: 1fr;
                 }
 
                 .cookie-banner {

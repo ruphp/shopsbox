@@ -1,9 +1,31 @@
 <footer class="footer site-footer">
-    <div class="wrap footer-minimal">
-        <span>© {{ 'now'|date('Y') }} ShopsBox.ru</span>
-        <a href="{{ path('site_pricing') }}">Тарифы</a>
-        <a href="{{ path('site_static', {page: 'privacy'}) }}">Политика конфиденциальности</a>
-        <a href="{{ path('site_static', {page: 'payments'}) }}">Платежи и возвраты</a>
-        <a href="{{ path('site_static', {page: 'contacts'}) }}">Контакты</a>
+    <div class="wrap footer-columns">
+        <div class="footer-column">
+            <span class="footer-title">ShopsBox.ru</span>
+            <span>© {{ 'now'|date('Y') }} ShopsBox.ru</span>
+            <a href="https://ruphp.su" target="_blank" rel="noopener">Разработано ruphp.su</a>
+        </div>
+
+        <div class="footer-column">
+            <span class="footer-title">Сервис</span>
+            <a href="{{ path('site_home') }}">Главная</a>
+            <a href="{{ path('site_pricing') }}">Прайс</a>
+            <a href="{{ path('owner_register_form') }}">Регистрация</a>
+            <a href="{{ path('auth_code_form') }}">Вход</a>
+        </div>
+
+        <div class="footer-column">
+            <span class="footer-title">Документы</span>
+            <a href="{{ path('site_static', {page: 'privacy'}) }}">Политика конфиденциальности</a>
+            <a href="{{ path('site_static', {page: 'terms'}) }}">Пользовательское соглашение</a>
+            <a href="{{ path('site_static', {page: 'cookies'}) }}">Cookie</a>
+            <a href="{{ path('site_static', {page: 'payments'}) }}">Платежи и возвраты</a>
+        </div>
+
+        <div class="footer-column">
+            <span class="footer-title">Контакты</span>
+            <a href="{{ path('site_static', {page: 'contacts'}) }}">Контактная информация</a>
+            <a href="mailto:ruphp@mail.ru">ruphp@mail.ru</a>
+        </div>
     </div>
 </footer>
