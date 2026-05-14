@@ -4,7 +4,7 @@
 
 ## Архитектура
 
-- Backend развивается как модульный монолит на Symfony.
+- Backend развивается как модульный монолит на Symfony в папке /backend.
 - Основные слои модулей: `Domain`, `Application`, `Infrastructure`, `Presentation`.
 - Бизнес-логика не живет в контроллерах.
 - DTO сценариев лежат в `Application/Dto`.
