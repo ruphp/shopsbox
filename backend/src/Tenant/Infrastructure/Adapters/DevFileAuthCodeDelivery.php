@@ -16,12 +16,18 @@ final readonly class DevFileAuthCodeDelivery implements AuthCodeDelivery
     ) {
     }
 
-    public function deliver(string $channel, string $recipient, string $code, DateTimeImmutable $expiresAt): void
-    {
+    public function deliver(
+        string $requestId,
+        string $channel,
+        string $recipient,
+        string $code,
+        DateTimeImmutable $expiresAt,
+    ): void {
         $path = $this->projectDir . '/var/auth-codes.log';
         $line = sprintf(
-            "[%s] channel=%s recipient=%s code=%s expires_at=%s provider=flash_dev\n",
+            "[%s] request_id=%s channel=%s recipient=%s code=%s expires_at=%s provider=flash_dev\n",
             (new DateTimeImmutable())->format(DATE_ATOM),
+            $requestId,
             $channel,
             $recipient,
             $code,

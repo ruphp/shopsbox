@@ -20,6 +20,9 @@ services:
       SITE_PUBLIC_BASE_URL: https://shopsbox.ru
       DATABASE_URL: postgresql://shopsbox:shopsbox@shopsbox_postgres:5432/shopsbox?serverVersion=16&charset=utf8
       REDIS_URL: redis://shopsbox_redis:6379
+      SMS_PROVIDER: dev_flash
+      SITEWIDGET_SMS_API_URL: https://sitewidget.ru/api/sms/v1/tasks
+      SITEWIDGET_SMS_TOKEN: ""
       FILE_STORAGE_ADAPTER: local
       FILE_STORAGE_LOCAL_PATH: var/storage/files
       FILE_STORAGE_PUBLIC_BASE_URL: http://localhost:8080/files
@@ -34,7 +37,6 @@ services:
     depends_on:
       - postgres
       - redis
-      - minio
     networks:
       - shopsbox_app
     command: >
@@ -68,21 +70,6 @@ services:
     networks:
       - shopsbox_app
 
-  minio:
-    container_name: shopsbox_minio
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: shopsbox
-      MINIO_ROOT_PASSWORD: shopsbox-secret
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - shopsbox_minio_data:/data
-    networks:
-      - shopsbox_app
-
 networks:
   shopsbox_app:
     name: shopsbox_app
@@ -94,5 +81,3 @@ volumes:
     name: shopsbox_postgres_data
   shopsbox_redis_data:
     name: shopsbox_redis_data
-  shopsbox_minio_data:
-    name: shopsbox_minio_data

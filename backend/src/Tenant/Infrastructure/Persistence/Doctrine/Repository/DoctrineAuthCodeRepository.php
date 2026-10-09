@@ -67,4 +67,17 @@ final readonly class DoctrineAuthCodeRepository implements AuthCodeRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function countRecentRequestsByIp(string $ip, DateTimeImmutable $since): int
+    {
+        return (int) $this->entityManager->createQueryBuilder()
+            ->select('COUNT(auth_code.id)')
+            ->from(AuthCode::class, 'auth_code')
+            ->where('auth_code.requestIp = :ip')
+            ->andWhere('auth_code.createdAt >= :since')
+            ->setParameter('ip', $ip)
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

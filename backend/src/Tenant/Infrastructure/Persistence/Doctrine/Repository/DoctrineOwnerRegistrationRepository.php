@@ -17,13 +17,20 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class DoctrineOwnerRegistrationRepository implements OwnerRegistrationRepository
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private string $phoneVerificationProvider,
+    ) {
     }
 
     public function emailExists(string $email): bool
     {
         return $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]) instanceof User;
+    }
+
+    public function phoneExists(string $phone): bool
+    {
+        return $this->entityManager->getRepository(User::class)->findOneBy(['verifiedPhone' => $phone]) instanceof User;
     }
 
     public function storeSlugExists(string $slug): bool
@@ -51,9 +58,10 @@ final readonly class DoctrineOwnerRegistrationRepository implements OwnerRegistr
         $tenant = new Tenant($tenantId, $storeName, 'active', $email);
         $store = new Store($storeId, $tenant, $storeName, $storeSlug, $storeDomain, 'draft', 'RUB', $timezone);
         $store->updateSettings($storeName, null, $email, $phone, 'RUB', $timezone);
+        $store->startTrial(10);
 
         $user = new User($userId, $tenant, $email, $ownerName, 'active', false);
-        $user->confirmPhone($phone, null, null, 'flash_dev');
+        $user->confirmPhone($phone, null, null, $this->phoneVerificationProvider);
 
         $role = $this->entityManager->getRepository(Role::class)->findOneBy(['code' => 'store_owner']);
         if (!$role instanceof Role) {

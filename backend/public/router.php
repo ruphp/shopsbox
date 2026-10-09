@@ -12,4 +12,6 @@ if (is_string($path)) {
     }
 }
 
+$_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/index.php';
+
 require __DIR__ . '/index.php';

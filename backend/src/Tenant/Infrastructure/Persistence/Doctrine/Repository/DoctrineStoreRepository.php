@@ -179,6 +179,10 @@ final class DoctrineStoreRepository implements StoreRepository
             $store->publicationStatus(),
             $store->publicationTermsAcceptedAt()?->format('Y-m-d H:i'),
             $store->publicationReviewReason(),
+            $store->plan(),
+            $store->trialStartedAt()?->format('Y-m-d H:i'),
+            $store->planExpiresAt()?->format('Y-m-d H:i'),
+            $store->trialActive(),
         );
     }
 }

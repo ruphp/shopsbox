@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Подключение тарифа {{ plan.title }} - ShopsBox{% endblock %}
+{% block og_title %}Подключение тарифа {{ plan.title }} - ShopsBox{% endblock %}
+{% block meta_description %}Подключение тарифа {{ plan.title }} для интернет-магазина ShopsBox: стоимость, состав услуги и условия оплаты.{% endblock %}
+{% block og_description %}Подключение тарифа {{ plan.title }} для интернет-магазина ShopsBox.{% endblock %}
+{% block canonical_url %}{{ site_public_base_url ~ path('site_pricing_checkout', {plan: plan.slug}) }}{% endblock %}
+
+{% block body %}
+    {% include 'site/_header.html.twig' %}
+
+    <main class="main">
+        <section class="section pricing-page">
+            <div class="wrap">
+                <p class="eyebrow">Подключение тарифа</p>
+                <h1>{{ plan.title }}</h1>
+                <p class="muted">Подключение платного тарифа согласовывается с технической поддержкой ShopsBox.</p>
+
+                <div class="checkout-layout">
+                    <article class="checkout-panel checkout-panel--main">
+                        <h2>Заказ</h2>
+                        <dl class="checkout-summary">
+                            <div>
+                                <dt>Услуга</dt>
+                                <dd>Тариф ShopsBox «{{ plan.title }}»</dd>
+                            </div>
+                            <div>
+                                <dt>Стоимость</dt>
+                                <dd>{{ plan.price }} {{ plan.period }}</dd>
+                            </div>
+                            <div>
+                                <dt>Состав</dt>
+                                <dd>{{ plan.subtitle }}</dd>
+                            </div>
+                        </dl>
+
+                        <h2>Что входит в тариф</h2>
+                        <ul class="pricing-list">
+                            {% for feature in plan.features %}
+                                <li>{{ feature }}</li>
+                            {% endfor %}
+                        </ul>
+                    </article>
+
+                    <aside class="checkout-panel">
+                        <h2>Оплата</h2>
+                        <p>Напишите в виджет технической поддержки <strong>в правой части страницы</strong>. Укажите название магазина и тариф «{{ plan.title }}».</p>
+                        <p class="muted">Поддержка согласует условия, подготовит договор и счет, а после оплаты подтвердит подключение тарифа.</p>
+                        <p class="muted">Условия оплаты и возврата: <a href="{{ path('site_static', {page: 'payments'}) }}">платежи и возвраты</a>.</p>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'site/_footer.html.twig' %}
+{% endblock %}

@@ -9,6 +9,7 @@ use App\Tenant\Application\Contracts\StoreRepository;
 use App\Tenant\Application\Contracts\TenantRepository;
 use App\Tenant\Application\Contracts\UuidGenerator;
 use App\Tenant\Application\Dto\CreateTenantInput;
+use App\Tenant\Application\Dto\StoreSettingsView;
 use App\Tenant\Application\UseCase\CreateTenantUseCase;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -182,6 +183,47 @@ final class FakeStoreRepository implements StoreRepository
     public function existsByDomain(string $domain): bool
     {
         return in_array($domain, $this->existingDomains, true);
+    }
+
+    public function findSettingsByOwnerEmail(string $email): ?StoreSettingsView
+    {
+        throw new RuntimeException('Not used in this test.');
+    }
+
+    public function updateSettingsForOwnerEmail(
+        string $email,
+        string $name,
+        ?string $publicDescription,
+        ?string $contactEmail,
+        ?string $contactPhone,
+        ?string $contactCity,
+        ?string $contactAddress,
+        ?string $sellerLegalName,
+        ?string $sellerInn,
+        ?string $sellerLegalText,
+        ?string $deliveryText,
+        ?string $paymentText,
+        string $defaultCurrency,
+        string $timezone,
+        array $themeSettings,
+    ): ?StoreSettingsView {
+        throw new RuntimeException('Not used in this test.');
+    }
+
+    public function existsByPublicSubdomain(string $publicSubdomain, string $exceptStoreId): bool
+    {
+        throw new RuntimeException('Not used in this test.');
+    }
+
+    public function updatePublicationForOwnerEmail(
+        string $email,
+        string $ownerName,
+        string $publicationEmail,
+        string $phone,
+        string $publicSubdomain,
+        bool $termsAccepted,
+    ): ?StoreSettingsView {
+        throw new RuntimeException('Not used in this test.');
     }
 
     public function persist(

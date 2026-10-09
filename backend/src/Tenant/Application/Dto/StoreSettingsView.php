@@ -36,6 +36,10 @@ final readonly class StoreSettingsView
         public string $publicationStatus = 'draft',
         public ?string $publicationTermsAcceptedAt = null,
         public ?string $publicationReviewReason = null,
+        public string $plan = 'free',
+        public ?string $trialStartedAt = null,
+        public ?string $planExpiresAt = null,
+        public bool $trialActive = false,
     ) {
     }
 }

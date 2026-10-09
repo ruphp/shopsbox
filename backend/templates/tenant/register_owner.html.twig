@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Регистрация владельца магазина | ShopsBox{% endblock %}
+{% block title %}Завершение регистрации | ShopsBox{% endblock %}
 {% block meta_description %}Регистрация владельца и создание первого магазина ShopsBox.{% endblock %}
 
 {% block body %}
@@ -9,9 +9,9 @@
     <main class="main">
         <section class="section">
             <div class="wrap">
-                <p class="eyebrow">Первый магазин</p>
-                <h1>Зарегистрировать владельца</h1>
-                <p class="muted">Телефон подтвержден: {{ phone }}. Заполните данные владельца и первого магазина.</p>
+                <p class="eyebrow">Личный кабинет</p>
+                <h1>Завершите регистрацию</h1>
+                <p class="muted">Телефон подтвержден: {{ phone }}. Укажите обязательный email для последующих входов и заполните данные первого магазина.</p>
 
                 {% if error is defined %}
                     <p class="legal-note">{{ error }}</p>
@@ -23,8 +23,8 @@
                         <input id="owner-name" name="owner_name" type="text" value="{{ ownerName|default('') }}" required>
                     </p>
                     <p class="form-field">
-                        <label for="owner-email">Email</label>
-                        <input id="owner-email" name="email" type="email" value="{{ email|default('') }}" required>
+                        <label for="owner-email">Email для входа</label>
+                        <input id="owner-email" name="email" type="email" value="{{ email|default('') }}" autocomplete="email" required>
                     </p>
                     <p class="form-field">
                         <label for="store-name">Название магазина</label>

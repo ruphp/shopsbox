@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
 #[ORM\UniqueConstraint(name: 'uniq_users_email', columns: ['email'])]
+#[ORM\UniqueConstraint(name: 'uniq_users_verified_phone', columns: ['verified_phone'], options: ['where' => '(verified_phone IS NOT NULL)'])]
 class User implements PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]

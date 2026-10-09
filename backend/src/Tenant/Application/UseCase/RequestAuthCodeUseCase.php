@@ -16,15 +16,18 @@ use DateTimeImmutable;
 
 final readonly class RequestAuthCodeUseCase
 {
-    private const CODE_TTL_MINUTES = 10;
+    private const CODE_TTL_MINUTES = 5;
     private const MAX_ATTEMPTS = 5;
     private const MAX_REQUESTS_PER_HOUR = 3;
+    private const MAX_REQUESTS_PER_IP_PER_HOUR = 10;
 
     public function __construct(
         private AuthCodeRepository $authCodeRepository,
         private AuthCodeDelivery $authCodeDelivery,
         private EntityFlusher $entityFlusher,
         private UuidGenerator $uuidGenerator,
+        private string $authCodeSecret,
+        private string $smsProvider,
     ) {
     }
 
@@ -39,17 +42,20 @@ final readonly class RequestAuthCodeUseCase
         }
 
         if ($channel === 'phone' && !preg_match('/^\+79\d{9}$/', $phone)) {
-            throw InvalidAuthCodeInput::forField('phone', 'Phone must use +79XXXXXXXXX format.');
+            throw InvalidAuthCodeInput::forField('phone', 'Укажите мобильный номер РФ в формате +79XXXXXXXXX.');
         }
 
         $recipient = $channel === 'phone' ? $phone : $email;
         if (!$input->allowNewRecipient && !$this->authCodeRepository->registeredRecipientExists($channel, $recipient)) {
             throw InvalidAuthCodeInput::forField($channel, 'Account was not found.');
         }
+        if ($input->allowNewRecipient && $this->authCodeRepository->registeredRecipientExists($channel, $recipient)) {
+            throw InvalidAuthCodeInput::forField($channel, 'Этот номер уже зарегистрирован. Войдите по email или восстановите доступ.');
+        }
 
         $openCode = $this->authCodeRepository->findLatestOpenByRecipient($channel, $recipient);
         if ($openCode instanceof AuthCode && !$openCode->isExpired() && $openCode->hasAttemptsLeft()) {
-            throw InvalidAuthCodeInput::forField($channel, 'Confirm the active code before requesting another one.');
+            throw InvalidAuthCodeInput::forField($channel, 'Код уже отправлен. Введите его или дождитесь окончания срока действия.');
         }
 
         if ($this->authCodeRepository->countRecentRequestsByRecipient(
@@ -57,23 +63,32 @@ final readonly class RequestAuthCodeUseCase
             $recipient,
             new DateTimeImmutable('-1 hour'),
         ) >= self::MAX_REQUESTS_PER_HOUR) {
-            throw InvalidAuthCodeInput::forField($channel, 'Too many code requests. Try again later.');
+            throw InvalidAuthCodeInput::forField($channel, 'Для этого номера превышен лимит запросов. Попробуйте позже.');
+        }
+
+        if ($input->requestIp !== '' && $this->authCodeRepository->countRecentRequestsByIp(
+            $input->requestIp,
+            new DateTimeImmutable('-1 hour'),
+        ) >= self::MAX_REQUESTS_PER_IP_PER_HOUR) {
+            throw InvalidAuthCodeInput::forField($channel, 'Слишком много запросов. Попробуйте позже.');
         }
 
         $code = (string) random_int(100000, 999999);
         $expiresAt = new DateTimeImmutable(sprintf('+%d minutes', self::CODE_TTL_MINUTES));
 
+        $requestId = $this->uuidGenerator->generate();
         $this->authCodeRepository->persist(new AuthCode(
-            $this->uuidGenerator->generate(),
+            $requestId,
             $email,
-            hash('sha256', $code),
+            hash_hmac('sha256', $code, $this->authCodeSecret),
             $expiresAt,
             self::MAX_ATTEMPTS,
             $channel === 'phone' ? $phone : null,
             $channel,
-            'flash_dev',
+            $channel === 'phone' ? $this->smsProvider : 'dev_email',
+            $input->requestIp !== '' ? $input->requestIp : null,
         ));
-        $this->authCodeDelivery->deliver($channel, $recipient, $code, $expiresAt);
+        $this->authCodeDelivery->deliver($requestId, $channel, $recipient, $code, $expiresAt);
         $this->entityFlusher->flush();
 
         return new RequestAuthCodeResult($email, $expiresAt, $channel, $recipient, $phone);

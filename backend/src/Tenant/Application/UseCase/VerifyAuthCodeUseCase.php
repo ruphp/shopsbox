@@ -16,6 +16,7 @@ final readonly class VerifyAuthCodeUseCase
     public function __construct(
         private AuthCodeRepository $authCodeRepository,
         private EntityFlusher $entityFlusher,
+        private string $authCodeSecret,
     ) {
     }
 
@@ -52,7 +53,7 @@ final readonly class VerifyAuthCodeUseCase
             throw InvalidAuthCodeInput::forField('code', 'Too many attempts.');
         }
 
-        if (!$authCode->matches($code)) {
+        if (!$authCode->matches($code, $this->authCodeSecret)) {
             $authCode->recordFailedAttempt();
             $this->entityFlusher->flush();
 

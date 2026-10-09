@@ -11,11 +11,13 @@ final readonly class VerifyAuthCodeForm
 {
     public function fromRequest(Request $request): VerifyAuthCodeInput
     {
+        $channel = $request->request->getBoolean('phone_required') ? 'phone' : 'email';
+
         return new VerifyAuthCodeInput(
             (string) $request->request->get('email', ''),
             (string) $request->request->get('code', ''),
             (string) $request->request->get('phone', ''),
-            (string) $request->request->get('channel', 'email'),
+            $channel,
             $request->getClientIp(),
             $request->headers->get('User-Agent'),
         );

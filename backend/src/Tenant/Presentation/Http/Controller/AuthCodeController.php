@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Throwable;
 use Twig\Environment;
 
 #[Route('/auth/code')]
@@ -39,6 +40,8 @@ final readonly class AuthCodeController
     #[Route('/request', name: 'auth_code_request', methods: ['POST'])]
     public function requestCode(Request $request): Response
     {
+        $phoneRequired = $request->request->getBoolean('phone_required');
+
         try {
             $result = $this->requestAuthCode->execute($this->requestAuthCodeForm->fromRequest($request));
         } catch (InvalidAuthCodeInput $exception) {
@@ -46,9 +49,19 @@ final readonly class AuthCodeController
                 'error' => $exception->getMessage(),
                 'email' => (string) $request->request->get('email', ''),
                 'phone' => (string) $request->request->get('phone', ''),
-                'channel' => (string) $request->request->get('channel', 'email'),
-                'phoneRequired' => $request->request->getBoolean('phone_required'),
+                'channel' => $phoneRequired ? 'phone' : 'email',
+                'phoneRequired' => $phoneRequired,
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Throwable) {
+            return new Response($this->twig->render('tenant/auth_code.html.twig', [
+                'error' => $phoneRequired
+                    ? 'Не удалось передать SMS на отправку. Попробуйте немного позже.'
+                    : 'Не удалось отправить код. Попробуйте немного позже.',
+                'email' => (string) $request->request->get('email', ''),
+                'phone' => (string) $request->request->get('phone', ''),
+                'channel' => $phoneRequired ? 'phone' : 'email',
+                'phoneRequired' => $phoneRequired,
+            ]), Response::HTTP_BAD_GATEWAY);
         }
 
         return new Response($this->twig->render('tenant/auth_code.html.twig', [
@@ -58,13 +71,15 @@ final readonly class AuthCodeController
             'recipient' => $result->recipient,
             'requested' => true,
             'expiresAt' => $result->expiresAt,
-            'phoneRequired' => $request->request->getBoolean('phone_required'),
+            'phoneRequired' => $phoneRequired,
         ]));
     }
 
     #[Route('/verify', name: 'auth_code_verify', methods: ['POST'])]
     public function verifyCode(Request $request): Response
     {
+        $phoneRequired = $request->request->getBoolean('phone_required');
+
         try {
             $result = $this->verifyAuthCode->execute($this->verifyAuthCodeForm->fromRequest($request));
         } catch (InvalidAuthCodeInput $exception) {
@@ -72,9 +87,9 @@ final readonly class AuthCodeController
                 'error' => $exception->getMessage(),
                 'email' => (string) $request->request->get('email', ''),
                 'phone' => (string) $request->request->get('phone', ''),
-                'channel' => (string) $request->request->get('channel', 'email'),
+                'channel' => $phoneRequired ? 'phone' : 'email',
                 'requested' => true,
-                'phoneRequired' => $request->request->getBoolean('phone_required'),
+                'phoneRequired' => $phoneRequired,
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -83,19 +98,14 @@ final readonly class AuthCodeController
         }
         if ($result->phone !== '') {
             $request->getSession()->set('shopsbox_auth_phone', $result->phone);
+            $request->getSession()->set('shopsbox_auth_phone_verified_at', time());
         }
         $request->getSession()->set('shopsbox_auth_channel', $result->channel);
 
-        if ($request->request->getBoolean('phone_required')) {
-            return new RedirectResponse('/register');
+        if ($phoneRequired) {
+            return new RedirectResponse('/owner/registration');
         }
 
-        return new Response($this->twig->render('tenant/auth_code.html.twig', [
-            'email' => $result->email,
-            'phone' => $result->phone,
-            'channel' => $result->channel,
-            'recipient' => $result->recipient,
-            'verified' => $result->verified,
-        ]));
+        return new RedirectResponse('/owner');
     }
 }

@@ -11,6 +11,7 @@ final readonly class RequestAuthCodeInput
         public string $phone = '',
         public string $channel = 'email',
         public bool $allowNewRecipient = false,
+        public string $requestIp = '',
     ) {
     }
 }

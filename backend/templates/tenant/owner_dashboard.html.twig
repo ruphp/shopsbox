@@ -23,6 +23,18 @@
                     <h2>{{ settings.publicSubdomain ?: 'Не выбран' }}</h2>
                     <p class="muted">Публичный поддомен</p>
                 </article>
+                <article class="product">
+                    {% if settings.trialActive %}
+                        <h2>Пробный</h2>
+                        <p class="muted">Действует до {{ settings.planExpiresAt|date('d.m.Y H:i') }}</p>
+                    {% elseif settings.plan == 'trial' %}
+                        <h2>Пробный завершен</h2>
+                        <p class="muted">Обратитесь в техподдержку для подключения тарифа</p>
+                    {% else %}
+                        <h2>{{ settings.plan }}</h2>
+                        <p class="muted">Тариф магазина</p>
+                    {% endif %}
+                </article>
             </div>
 
             <div class="legal-note">
@@ -35,6 +47,9 @@
                 {% endif %}
                 {% if settings.publicationReviewReason %}
                     <p>Причина решения модерации: {{ settings.publicationReviewReason }}</p>
+                {% endif %}
+                {% if not settings.trialActive and settings.plan != 'paid' %}
+                    <p>Чтобы подключить и оплатить платный тариф, обратитесь в техническую поддержку ShopsBox.</p>
                 {% endif %}
                 <p>Если место в медиатеке подойдет к лимиту или товары будут отклонены модерацией, предупреждения появятся в этом блоке.</p>
             </div>

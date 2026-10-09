@@ -10,6 +10,8 @@ interface OwnerRegistrationRepository
 {
     public function emailExists(string $email): bool;
 
+    public function phoneExists(string $phone): bool;
+
     public function storeSlugExists(string $slug): bool;
 
     public function storeDomainExists(string $domain): bool;

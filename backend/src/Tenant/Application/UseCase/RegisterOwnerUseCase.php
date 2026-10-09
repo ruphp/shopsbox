@@ -72,6 +72,9 @@ final readonly class RegisterOwnerUseCase
         if ($this->registrationRepository->emailExists($email)) {
             throw InvalidTenantInput::forField('email', 'Email is already registered.');
         }
+        if ($this->registrationRepository->phoneExists($phone)) {
+            throw InvalidTenantInput::forField('phone', 'Этот номер уже зарегистрирован. Войдите по email или восстановите доступ.');
+        }
         if ($this->registrationRepository->storeSlugExists($storeSlug)) {
             throw InvalidTenantInput::forField('store_slug', 'Store slug is already used.');
         }

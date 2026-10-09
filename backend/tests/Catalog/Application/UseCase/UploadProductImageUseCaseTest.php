@@ -15,7 +15,9 @@ use App\Catalog\Application\Exception\InvalidProductImageInput;
 use App\Catalog\Application\UseCase\UploadProductImageUseCase;
 use App\Catalog\Domain\ProductStatus;
 use App\FileStorage\Application\Contracts\FileStorage;
+use App\FileStorage\Application\Contracts\StoreMediaLibraryRepository;
 use App\FileStorage\Application\Dto\StoredFile;
+use App\FileStorage\Application\UseCase\StoreFileUsagePolicy;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -33,6 +35,7 @@ final class UploadProductImageUseCaseTest extends TestCase
             $fileStorage,
             $flusher,
             new StubUploadImageUuidGenerator('77777777-7777-4777-8777-777777777777'),
+            new StoreFileUsagePolicy(new EmptyStoreMediaLibraryRepository()),
         );
 
         $result = $useCase->execute($this->validInput());
@@ -55,6 +58,7 @@ final class UploadProductImageUseCaseTest extends TestCase
             new FakeFileStorage(),
             new SpyUploadImageEntityFlusher(),
             new StubUploadImageUuidGenerator('77777777-7777-4777-8777-777777777777'),
+            new StoreFileUsagePolicy(new EmptyStoreMediaLibraryRepository()),
         );
 
         $this->expectException(InvalidProductImageInput::class);
@@ -187,6 +191,26 @@ final class FakeProductImageRepository implements ProductImageRepository
             '2026-04-19T12:00:00+00:00',
         );
     }
+
+    public function listByStoreAndProduct(string $storeId, string $productId): array
+    {
+        throw new RuntimeException('Not used in this test.');
+    }
+
+    public function setPrimary(string $storeId, string $productId, string $imageId): ?ProductImageView
+    {
+        throw new RuntimeException('Not used in this test.');
+    }
+
+    public function changePosition(string $storeId, string $productId, string $imageId, int $position): ?ProductImageView
+    {
+        throw new RuntimeException('Not used in this test.');
+    }
+
+    public function delete(string $storeId, string $productId, string $imageId): bool
+    {
+        throw new RuntimeException('Not used in this test.');
+    }
 }
 
 final class FakeFileStorage implements FileStorage
@@ -215,6 +239,24 @@ final class FakeFileStorage implements FileStorage
     public function delete(string $key): void
     {
         throw new RuntimeException('Not used in this test.');
+    }
+}
+
+final class EmptyStoreMediaLibraryRepository implements StoreMediaLibraryRepository
+{
+    public function listByStore(string $storeId, ?string $mediaType = null): array
+    {
+        return [];
+    }
+
+    public function totalSizeByStore(string $storeId): int
+    {
+        return 0;
+    }
+
+    public function countByStore(string $storeId): int
+    {
+        return 0;
     }
 }
 

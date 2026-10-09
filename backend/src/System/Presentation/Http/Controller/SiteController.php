@@ -20,6 +20,30 @@ final readonly class SiteController
         return new Response($this->twig->render('site/home.html.twig'));
     }
 
+    #[Route('/pricing', name: 'site_pricing', methods: ['GET'])]
+    public function pricing(): Response
+    {
+        return new Response($this->twig->render('site/pricing.html.twig', [
+            'plans' => $this->pricingPlans(),
+        ]));
+    }
+
+    #[Route('/pricing/{plan}', name: 'site_pricing_plan', requirements: ['plan' => 'free|start|business'], methods: ['GET'])]
+    public function pricingPlan(string $plan): Response
+    {
+        return new Response($this->twig->render('site/pricing_plan.html.twig', [
+            'plan' => $this->pricingPlans()[$plan],
+        ]));
+    }
+
+    #[Route('/pricing/{plan}/checkout', name: 'site_pricing_checkout', requirements: ['plan' => 'start|business'], methods: ['GET'])]
+    public function pricingCheckout(string $plan): Response
+    {
+        return new Response($this->twig->render('site/pricing_checkout.html.twig', [
+            'plan' => $this->pricingPlans()[$plan],
+        ]));
+    }
+
     #[Route('/{page}', name: 'site_static', requirements: ['page' => 'privacy|terms|cookies|payments|contacts'], methods: ['GET'])]
     public function staticPage(string $page): Response
     {
@@ -29,12 +53,79 @@ final readonly class SiteController
     }
 
     /**
+     * @return array<string, array{slug: string, title: string, subtitle: string, price: string, period: string, description: string, features: list<string>, limits: list<string>, checkout: bool}>
+     */
+    private function pricingPlans(): array
+    {
+        return [
+            'free' => [
+                'slug' => 'free',
+                'title' => 'Пробный',
+                'subtitle' => 'Для знакомства с ShopsBox после подтверждения телефона',
+                'price' => '0 ₽',
+                'period' => 'на 10 дней',
+                'description' => 'Пробный период начинается после подтверждения номера и регистрации первого магазина. Платежные данные не требуются.',
+                'features' => [
+                    '10 дней доступа к основным возможностям магазина',
+                    'каталог, категории, товары, варианты и изображения',
+                    'страницы магазина, базовые настройки и проверка пути покупателя',
+                ],
+                'limits' => [
+                    'ограничения по товарам, файлам, трафику и нагрузке',
+                    'пробный период предоставляется один раз',
+                    'после окончания нужно подключить платный тариф через техническую поддержку',
+                    'автоматического списания после пробного периода нет',
+                ],
+                'checkout' => false,
+            ],
+            'start' => [
+                'slug' => 'start',
+                'title' => 'Старт',
+                'subtitle' => 'Для запуска продаж на домене клиента',
+                'price' => '390 ₽',
+                'period' => 'в месяц',
+                'description' => 'Подходит магазину, которому нужен адрес на домене клиента, HTTPS, больше места под файлы и спокойный запуск продаж.',
+                'features' => [
+                    'подключение домена клиента и настройка HTTPS',
+                    'увеличенные лимиты товаров, файлов и заказов',
+                    'подключение оплаты',
+                    'базовое сопровождение по запуску',
+                ],
+                'limits' => [
+                    'точные лимиты тарифа фиксируются в личном кабинете',
+                    'дополнительная нагрузка и хранение оплачиваются отдельно',
+                    'платежные модули подключаются после проверки банка или платежного провайдера',
+                ],
+                'checkout' => true,
+            ],
+            'business' => [
+                'slug' => 'business',
+                'title' => 'Бизнес',
+                'subtitle' => 'Для растущего магазина с большим каталогом',
+                'price' => '990 ₽',
+                'period' => 'в месяц',
+                'description' => 'Для магазинов с большим каталогом, активной загрузкой медиа, расширенной статистикой и повышенной нагрузкой.',
+                'features' => [
+                    'больше места под изображения, файлы и видео',
+                    'расширенные лимиты товаров, сотрудников и заказов',
+                    'приоритетная поддержка по настройке магазина',
+                    'отключение рекламных мест ShopsBox',
+                ],
+                'limits' => [
+                    'ресурсы сверх тарифа согласуются отдельно',
+                    'сложные интеграции и переносы оцениваются после анализа',
+                    'коробочная установка обсуждается как отдельная услуга',
+                ],
+                'checkout' => true,
+            ],
+        ];
+    }
+
+    /**
      * @return array<string, array{slug: string, title: string, description: string, paragraphs: list<string>}>
      */
     private function staticPages(): array
     {
-        $operator = 'Оператор сайта: Смирнов Александр Викторович, ИНН 590612372849, самозанятый. Контакты: телефон 8 929 203-04-99, email ruphp@mail.ru.';
-
         return [
             'privacy' => [
                 'slug' => 'privacy',
@@ -76,20 +167,21 @@ final readonly class SiteController
                 'title' => 'Политика платежей и возврата средств',
                 'description' => 'Порядок оплаты услуг ShopsBox и условия возврата средств.',
                 'paragraphs' => [
-                    'Доступ к расширенному функционалу shopsbox.ru может предоставляться по ежемесячной или годовой подписке, а также по лицензии на коробочную версию.',
-                    'Оплата производится через защищенные платежные системы, включая подключаемые платежные решения для российских пользователей.',
+                    'После подтверждения номера телефона и регистрации первого магазина предоставляется бесплатный пробный период на 10 дней.',
+                    'Для подключения и оплаты платного тарифа владелец магазина обращается в техническую поддержку ShopsBox через виджет на сайте. Условия, срок тарифа и состав услуги согласовываются до оплаты.',
+                    'После согласования техническая поддержка направляет договор и счет. Доступ к платному тарифу активируется после подтверждения оплаты.',
                     'Возврат средств возможен только в случае технических сбоев со стороны платформы или при двойном списании.',
                     'В остальных случаях возврат не предусмотрен, если иное не требуется законодательством РФ.',
                 ],
             ],
             'contacts' => [
                 'slug' => 'contacts',
-                'title' => 'Контактная информация и реквизиты',
-                'description' => 'Контакты разработчика платформы ShopsBox для юридических и финансовых вопросов.',
+                'title' => 'Связаться с ShopsBox',
+                'description' => 'Техническая поддержка и вопросы по подключению ShopsBox.',
                 'paragraphs' => [
-                    'Разработчик платформы: Александр Викторович Смирнов.',
-                    'ИНН: 590612372849, самозанятый.',
-                    'Для связи: email ruphp@mail.ru, телефон 8 929 203-04-99.',
+                    'Для быстрого обращения используйте виджет технической поддержки в правой части страницы.',
+                    'Email: ruphp@mail.ru.',
+                    'Телефон: 8 929 203-04-99.',
                 ],
             ],
         ];
@@ -118,6 +210,22 @@ final readonly class SiteController
     <url>
         <loc>https://shopsbox.ru/s/demo-store/products</loc>
         <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing</loc>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing/free</loc>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing/start</loc>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://shopsbox.ru/pricing/business</loc>
+        <priority>0.6</priority>
     </url>
     <url>
         <loc>https://shopsbox.ru/privacy</loc>

@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: 'auth_codes')]
 #[ORM\Index(name: 'idx_auth_codes_email_created', columns: ['email', 'created_at'])]
+#[ORM\Index(name: 'idx_auth_codes_request_ip_created', columns: ['request_ip', 'created_at'])]
 class AuthCode
 {
     #[ORM\Id]
@@ -46,6 +47,9 @@ class AuthCode
     #[ORM\Column(length: 40)]
     private string $provider = 'flash_dev';
 
+    #[ORM\Column(length: 45, nullable: true)]
+    private ?string $requestIp = null;
+
     #[ORM\Column]
     private int $attempts = 0;
 
@@ -64,6 +68,7 @@ class AuthCode
         ?string $phone = null,
         string $channel = 'email',
         string $provider = 'flash_dev',
+        ?string $requestIp = null,
     ) {
         $this->id = $id;
         $this->email = $email;
@@ -73,6 +78,7 @@ class AuthCode
         $this->expiresAt = $expiresAt;
         $this->maxAttempts = $maxAttempts;
         $this->provider = $provider;
+        $this->requestIp = $requestIp;
         $this->createdAt = new DateTimeImmutable();
     }
 
@@ -96,9 +102,9 @@ class AuthCode
         return $this->channel === 'phone' ? (string) $this->phone : $this->email;
     }
 
-    public function matches(string $code): bool
+    public function matches(string $code, string $secret): bool
     {
-        return hash_equals($this->codeHash, hash('sha256', $code));
+        return hash_equals($this->codeHash, hash_hmac('sha256', $code, $secret));
     }
 
     public function isExpired(): bool

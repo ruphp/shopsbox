@@ -17,9 +17,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Throwable;
 use Twig\Environment;
 
-#[Route('/register')]
 final readonly class RegisterOwnerController
 {
+    private const REGISTRATION_SESSION_TTL_SECONDS = 1800;
+
     private const RESERVED_STORE_SLUGS = [
         'demo',
         'www',
@@ -46,8 +47,8 @@ final readonly class RegisterOwnerController
     ) {
     }
 
-    #[Route('', name: 'owner_register_form', methods: ['GET'])]
-    public function form(Request $request): Response
+    #[Route('/register', name: 'owner_register_form', methods: ['GET'])]
+    public function start(Request $request): Response
     {
         $phone = $this->verifiedPhone($request);
         if ($phone === null) {
@@ -57,13 +58,24 @@ final readonly class RegisterOwnerController
             ]));
         }
 
+        return new RedirectResponse('/owner/registration');
+    }
+
+    #[Route('/owner/registration', name: 'owner_registration_form', methods: ['GET'])]
+    public function form(Request $request): Response
+    {
+        $phone = $this->verifiedPhone($request);
+        if ($phone === null) {
+            return new RedirectResponse('/register');
+        }
+
         return new Response($this->twig->render('tenant/register_owner.html.twig', [
             'phone' => $phone,
             'email' => (string) $request->getSession()->get('shopsbox_auth_email', ''),
         ]));
     }
 
-    #[Route('', name: 'owner_register_submit', methods: ['POST'])]
+    #[Route('/owner/registration', name: 'owner_register_submit', methods: ['POST'])]
     public function submit(Request $request): Response
     {
         $phone = $this->verifiedPhone($request);
@@ -118,7 +130,7 @@ final readonly class RegisterOwnerController
         return new RedirectResponse('/owner');
     }
 
-    #[Route('/slug/check', name: 'owner_register_slug_check', methods: ['GET'])]
+    #[Route('/owner/registration/slug/check', name: 'owner_register_slug_check', methods: ['GET'])]
     public function checkSlug(Request $request): JsonResponse
     {
         $slug = strtolower(trim((string) $request->query->get('slug', '')));
@@ -167,6 +179,11 @@ final readonly class RegisterOwnerController
     private function verifiedPhone(Request $request): ?string
     {
         $phone = $request->getSession()->get('shopsbox_auth_phone');
+        $verifiedAt = $request->getSession()->get('shopsbox_auth_phone_verified_at');
+
+        if (!is_int($verifiedAt) || $verifiedAt < time() - self::REGISTRATION_SESSION_TTL_SECONDS) {
+            return null;
+        }
 
         return is_string($phone) && preg_match('/^\+79\d{9}$/', $phone) === 1 ? $phone : null;
     }

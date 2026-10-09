@@ -18,4 +18,6 @@ interface AuthCodeRepository
     public function registeredRecipientExists(string $channel, string $recipient): bool;
 
     public function countRecentRequestsByRecipient(string $channel, string $recipient, DateTimeImmutable $since): int;
+
+    public function countRecentRequestsByIp(string $ip, DateTimeImmutable $since): int;
 }

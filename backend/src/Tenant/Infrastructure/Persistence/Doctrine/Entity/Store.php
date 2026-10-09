@@ -33,6 +33,15 @@ class Store
     #[ORM\Column(length: 32)]
     private string $status;
 
+    #[ORM\Column(length: 32)]
+    private string $plan = 'free';
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $trialStartedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $planExpiresAt = null;
+
     #[ORM\Column(length: 3)]
     private string $defaultCurrency;
 
@@ -160,6 +169,46 @@ class Store
     public function status(): string
     {
         return $this->status;
+    }
+
+    public function plan(): string
+    {
+        return $this->plan;
+    }
+
+    public function trialStartedAt(): ?DateTimeImmutable
+    {
+        return $this->trialStartedAt;
+    }
+
+    public function planExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->planExpiresAt;
+    }
+
+    public function trialActive(?DateTimeImmutable $at = null): bool
+    {
+        $at ??= new DateTimeImmutable();
+
+        return $this->plan === 'trial'
+            && $this->planExpiresAt instanceof DateTimeImmutable
+            && $this->planExpiresAt > $at;
+    }
+
+    public function startTrial(int $days, ?DateTimeImmutable $startedAt = null): void
+    {
+        if ($days < 1) {
+            throw new \InvalidArgumentException('Trial duration must be at least one day.');
+        }
+        if ($this->trialStartedAt instanceof DateTimeImmutable) {
+            return;
+        }
+
+        $startedAt ??= new DateTimeImmutable();
+        $this->plan = 'trial';
+        $this->trialStartedAt = $startedAt;
+        $this->planExpiresAt = $startedAt->modify(sprintf('+%d days', $days));
+        $this->updatedAt = $startedAt;
     }
 
     public function defaultCurrency(): string

@@ -10,9 +10,9 @@
         <section class="section">
             <div class="wrap">
                 {% set phoneRequiredMode = phoneRequired is defined and phoneRequired %}
-                <p class="eyebrow">{{ phoneRequiredMode ? 'Регистрация магазина' : 'Вход в кабинет' }}</p>
+                <p class="eyebrow">{{ phoneRequiredMode ? 'Регистрация' : 'Вход в кабинет' }}</p>
                 <h1>{{ phoneRequiredMode ? 'Подтвердить телефон' : 'Войти по одноразовому коду' }}</h1>
-                <p class="muted">{{ phoneRequiredMode ? 'Введите номер телефона, чтобы продолжить создание магазина.' : 'Выберите способ входа и получите одноразовый код.' }}</p>
+                <p class="muted">{{ phoneRequiredMode ? 'Введите номер телефона. После подтверждения вы продолжите регистрацию в личном кабинете и обязательно укажете email.' : 'Введите email, указанный при регистрации. SMS при обычном входе не требуется.' }}</p>
 
                 {% for message in app.flashes('auth_code') %}
                     <p class="legal-note">{{ message }}</p>
@@ -30,21 +30,8 @@
                     {% set currentChannel = channel|default('email') %}
                     {% set currentRecipient = currentChannel == 'phone' ? phone|default('') : email|default('') %}
                     <form class="legal-note auth-card" method="post" action="{{ path('auth_code_request') }}" data-auth-code-form>
-                        {% if phoneRequiredMode %}
-                            <input name="channel" type="hidden" value="phone">
-                            <input name="phone_required" type="hidden" value="1">
-                        {% else %}
-                            <div class="auth-switch" role="radiogroup" aria-label="Способ входа">
-                                <label>
-                                    <input name="channel" type="radio" value="email" {{ currentChannel == 'email' ? 'checked' : '' }}>
-                                    <span>Email</span>
-                                </label>
-                                <label>
-                                    <input name="channel" type="radio" value="phone" {{ currentChannel == 'phone' ? 'checked' : '' }}>
-                                    <span>Телефон</span>
-                                </label>
-                            </div>
-                        {% endif %}
+                        <input name="channel" type="hidden" value="{{ phoneRequiredMode ? 'phone' : 'email' }}">
+                        {% if phoneRequiredMode %}<input name="phone_required" type="hidden" value="1">{% endif %}
                         <p class="form-field">
                             <label for="auth-recipient" data-auth-recipient-label>{{ currentChannel == 'phone' ? 'Телефон' : 'Email' }}</label>
                             <input
@@ -58,7 +45,7 @@
                                 required
                             >
                         </p>
-                        <button class="button" type="submit">Получить код</button>
+                        <button class="button" type="submit">{{ phoneRequiredMode ? 'Получить код по SMS' : 'Получить код на email' }}</button>
                     </form>
 
                     {% if requested is defined and requested %}
@@ -74,7 +61,7 @@
                                 <label for="auth-code">Код</label><br>
                                 <input id="auth-code" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" required>
                             </p>
-                            <button class="button" type="submit">Подтвердить вход</button>
+                            <button class="button" type="submit">{{ phoneRequiredMode ? 'Подтвердить номер' : 'Войти' }}</button>
                         </form>
                     {% endif %}
                 {% endif %}
@@ -83,27 +70,4 @@
     </main>
 
     {% include 'site/_footer.html.twig' %}
-
-    <script>
-        document.querySelectorAll('[data-auth-code-form]').forEach((form) => {
-            const input = form.querySelector('[data-auth-recipient-input]');
-            const label = form.querySelector('[data-auth-recipient-label]');
-            const radios = form.querySelectorAll('input[name="channel"]');
-
-            radios.forEach((radio) => {
-                radio.addEventListener('change', () => {
-                    const isPhone = radio.value === 'phone' && radio.checked;
-                    if (!isPhone && !radio.checked) {
-                        return;
-                    }
-
-                    input.value = '';
-                    input.type = isPhone ? 'tel' : 'email';
-                    input.placeholder = isPhone ? '+79XXXXXXXXX' : 'name@example.ru';
-                    input.autocomplete = isPhone ? 'tel' : 'email';
-                    label.textContent = isPhone ? 'Телефон' : 'Email';
-                });
-            });
-        });
-    </script>
 {% endblock %}
