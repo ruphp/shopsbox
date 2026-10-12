@@ -1,92 +1,144 @@
 {% extends 'tenant/_owner_layout.html.twig' %}
 
-{% block title %}Кабинет магазина | ShopsBox{% endblock %}
-{% block meta_description %}Обзор магазина, публикации, товаров, медиа и быстрых действий ShopsBox.{% endblock %}
+{% block title %}Запуск магазина | ShopsBox{% endblock %}
+{% block meta_description %}Пошаговая настройка и запуск интернет-магазина ShopsBox.{% endblock %}
 
 {% block owner_content %}
-    <section class="section">
+    {% set detailsReady = settings.publicDescription and settings.contactEmail and settings.contactPhone %}
+    {% set catalogReady = productCount > 0 %}
+    {% set appearanceReady = settings.themeSettings.hero_title|default('') and settings.themeSettings.hero_text|default('') %}
+    {% set publicationReady = settings.publicationStatus == 'published' %}
+    {% set completedCount = (detailsReady ? 1 : 0) + (catalogReady ? 1 : 0) + (appearanceReady ? 1 : 0) + (publicationReady ? 1 : 0) %}
+    {% set storeStatuses = {'active': 'Работает', 'draft': 'Черновик', 'blocked': 'Заблокирован'} %}
+    {% set publicationStatuses = {
+        'draft': 'Не опубликован',
+        'pending_review': 'На проверке',
+        'published': 'Опубликован',
+        'rejected': 'Нужны исправления',
+        'blocked': 'Публикация остановлена'
+    } %}
+    {% set planLabels = {'free': 'Бесплатный', 'trial': 'Пробный', 'paid': 'Платный'} %}
+
+    <section class="section owner-dashboard">
         <div class="wrap">
-            <p class="eyebrow">Кабинет владельца</p>
-            <h1>{{ settings.name }}</h1>
-            <p class="muted">Главное состояние магазина и быстрые переходы к разделам MVP.</p>
+            <header class="dashboard-heading">
+                <div>
+                    <p class="eyebrow">Ваш магазин</p>
+                    <h1>{{ settings.name }}</h1>
+                    <p class="muted">Пройдите шаги по порядку, чтобы подготовить магазин к первым заказам.</p>
+                </div>
+                <a class="button button-secondary" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Посмотреть витрину</a>
+            </header>
 
-            <div class="grid">
-                <article class="product">
-                    <h2>{{ settings.status }}</h2>
-                    <p class="muted">Статус магазина</p>
-                </article>
-                <article class="product">
-                    <h2>{{ settings.publicationStatus }}</h2>
-                    <p class="muted">Статус публикации</p>
-                </article>
-                <article class="product">
-                    <h2>{{ settings.publicSubdomain ?: 'Не выбран' }}</h2>
-                    <p class="muted">Публичный поддомен</p>
-                </article>
-                <article class="product">
-                    {% if settings.trialActive %}
-                        <h2>Пробный</h2>
-                        <p class="muted">Действует до {{ settings.planExpiresAt|date('d.m.Y H:i') }}</p>
-                    {% elseif settings.plan == 'trial' %}
-                        <h2>Пробный завершен</h2>
-                        <p class="muted">Обратитесь в техподдержку для подключения тарифа</p>
-                    {% else %}
-                        <h2>{{ settings.plan }}</h2>
-                        <p class="muted">Тариф магазина</p>
+            <dl class="dashboard-status" aria-label="Состояние магазина">
+                <div>
+                    <dt>Магазин</dt>
+                    <dd>{{ storeStatuses[settings.status]|default(settings.status) }}</dd>
+                </div>
+                <div>
+                    <dt>Публикация</dt>
+                    <dd>{{ publicationStatuses[settings.publicationStatus]|default(settings.publicationStatus) }}</dd>
+                </div>
+                <div>
+                    <dt>Тариф</dt>
+                    <dd>
+                        {% if settings.trialActive %}
+                            Пробный до {{ settings.planExpiresAt|date('d.m.Y') }}
+                        {% elseif settings.plan == 'trial' %}
+                            Пробный завершён
+                        {% else %}
+                            {{ planLabels[settings.plan]|default(settings.plan) }}
+                        {% endif %}
+                    </dd>
+                </div>
+            </dl>
+
+            {% if not phoneVerified or settings.publicationReviewReason %}
+                <aside class="dashboard-alert" aria-label="Требует внимания">
+                    <strong>Требует внимания</strong>
+                    {% if not phoneVerified %}
+                        <p>Подтвердите номер телефона. Без этого отправить магазин на публикацию не получится.</p>
+                        <a class="button" href="{{ path('auth_code_form', {phone_required: 1}) }}">Подтвердить телефон</a>
                     {% endif %}
-                </article>
-            </div>
+                    {% if settings.publicationReviewReason %}
+                        <p>Комментарий модератора: {{ settings.publicationReviewReason }}</p>
+                        <a class="button" href="{{ path('owner_store_publication') }}">Исправить данные</a>
+                    {% endif %}
+                </aside>
+            {% endif %}
 
-            <div class="legal-note">
-                <h2>Что требует внимания</h2>
-                {% if not phoneVerified %}
-                    <p>Телефон не подтвержден. Подтвердите телефон, чтобы продолжить настройку и публикацию магазина.</p>
-                {% endif %}
-                {% if settings.publicationStatus != 'published' %}
-                    <p>Магазин еще не опубликован. Заполните данные публикации и отправьте заявку на проверку.</p>
-                {% endif %}
-                {% if settings.publicationReviewReason %}
-                    <p>Причина решения модерации: {{ settings.publicationReviewReason }}</p>
-                {% endif %}
-                {% if not settings.trialActive and settings.plan != 'paid' %}
-                    <p>Чтобы подключить и оплатить платный тариф, обратитесь в техническую поддержку ShopsBox.</p>
-                {% endif %}
-                <p>Если место в медиатеке подойдет к лимиту или товары будут отклонены модерацией, предупреждения появятся в этом блоке.</p>
-            </div>
+            <section class="launch-guide" aria-labelledby="launch-guide-title">
+                <header class="launch-guide-heading">
+                    <div>
+                        <p class="eyebrow">План запуска</p>
+                        <h2 id="launch-guide-title">Создайте интернет-магазин по шагам</h2>
+                    </div>
+                    <strong>{{ completedCount }} из 4</strong>
+                </header>
 
-            <h2>Быстрые действия</h2>
-            <div class="grid">
-                <article class="product">
-                    <h3>Товары</h3>
-                    <p class="muted">Каталог, карточки, публикация и изображения товаров.</p>
-                    <p><a class="button" href="{{ path('owner_products') }}">Открыть товары</a></p>
-                </article>
-                <article class="product">
-                    <h3>Медиатека</h3>
-                    <p class="muted">Файлы магазина, изображения товаров и контроль лимитов.</p>
-                    <p><a class="button" href="{{ path('owner_media_library') }}">Открыть медиатеку</a></p>
-                </article>
-                <article class="product">
-                    <h3>Публикация</h3>
-                    <p class="muted">Поддомен, контактные данные, юридическое подтверждение и заявка на модерацию.</p>
-                    <p><a class="button" href="{{ path('owner_store_publication') }}">Настроить публикацию</a></p>
-                </article>
-                <article class="product">
-                    <h3>Настройки</h3>
-                    <p class="muted">Название, описание, контакты, валюта, часовой пояс и базовый вид витрины.</p>
-                    <p><a class="button" href="{{ path('owner_store_settings') }}">Открыть настройки</a></p>
-                </article>
-                <article class="product" id="orders">
-                    <h3>Заказы</h3>
-                    <p class="muted">Новые заказы покупателей и состав каждой покупки.</p>
-                    <p><a class="button" href="{{ path('owner_orders') }}">Открыть заказы</a></p>
-                </article>
-                <article class="product">
-                    <h3>Preview</h3>
-                    <p class="muted">Проверка витрины до публичной публикации.</p>
-                    <p><a class="button" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть preview</a></p>
-                </article>
-            </div>
+                <ol class="launch-steps">
+                    <li class="launch-step {{ detailsReady ? 'is-done' : 'is-current' }}">
+                        <span class="launch-step-number">{{ detailsReady ? '✓' : '1' }}</span>
+                        <div class="launch-step-copy">
+                            <div class="launch-step-title">
+                                <h3>Заполните данные магазина</h3>
+                                <span>{{ detailsReady ? 'Готово' : 'Начните здесь' }}</span>
+                            </div>
+                            <p>Название, описание, контакты, доставка, оплата и данные продавца.</p>
+                        </div>
+                        <a class="button {{ detailsReady ? 'button-secondary' : '' }}" href="{{ path('owner_store_settings') }}">{{ detailsReady ? 'Проверить' : 'Заполнить данные' }}</a>
+                    </li>
+
+                    <li class="launch-step {{ catalogReady ? 'is-done' : (detailsReady ? 'is-current' : '') }}">
+                        <span class="launch-step-number">{{ catalogReady ? '✓' : '2' }}</span>
+                        <div class="launch-step-copy">
+                            <div class="launch-step-title">
+                                <h3>Добавьте товары</h3>
+                                <span>{{ catalogReady ? productCount ~ ' шт.' : 'Не начато' }}</span>
+                            </div>
+                            <p>Создайте карточки, загрузите фотографии, добавьте характеристики и варианты.</p>
+                        </div>
+                        <a class="button {{ not detailsReady ? 'button-secondary' : '' }}" href="{{ path('owner_products') }}">Перейти к товарам</a>
+                    </li>
+
+                    <li class="launch-step {{ appearanceReady ? 'is-done' : (detailsReady and catalogReady ? 'is-current' : '') }}">
+                        <span class="launch-step-number">{{ appearanceReady ? '✓' : '3' }}</span>
+                        <div class="launch-step-copy">
+                            <div class="launch-step-title">
+                                <h3>Оформите витрину</h3>
+                                <span>{{ appearanceReady ? 'Готово' : 'Не начато' }}</span>
+                            </div>
+                            <p>Настройте главный блок, цвет оформления и состав разделов, затем проверьте результат.</p>
+                            <a class="launch-preview-link" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть предварительный просмотр</a>
+                        </div>
+                        <a class="button {{ not (detailsReady and catalogReady) ? 'button-secondary' : '' }}" href="{{ path('owner_store_settings') }}#storefront-settings">Настроить вид</a>
+                    </li>
+
+                    <li class="launch-step {{ publicationReady ? 'is-done' : (detailsReady and catalogReady and appearanceReady ? 'is-current' : '') }}">
+                        <span class="launch-step-number">{{ publicationReady ? '✓' : '4' }}</span>
+                        <div class="launch-step-copy">
+                            <div class="launch-step-title">
+                                <h3>Опубликуйте магазин</h3>
+                                <span>{{ publicationStatuses[settings.publicationStatus]|default('Не начато') }}</span>
+                            </div>
+                            <p>Выберите адрес, подтвердите данные и отправьте магазин на проверку.</p>
+                        </div>
+                        <a class="button {{ not (detailsReady and catalogReady and appearanceReady) ? 'button-secondary' : '' }}" href="{{ path('owner_store_publication') }}">Настроить публикацию</a>
+                    </li>
+                </ol>
+            </section>
+
+            <section class="dashboard-work" aria-labelledby="dashboard-work-title">
+                <div>
+                    <p class="eyebrow">Текущая работа</p>
+                    <h2 id="dashboard-work-title">После запуска</h2>
+                </div>
+                <nav class="dashboard-work-links" aria-label="Рабочие разделы магазина">
+                    <a href="{{ path('owner_orders') }}"><strong>Заказы</strong><span>Покупки и их состав</span></a>
+                    <a href="{{ path('owner_media_library') }}"><strong>Медиатека</strong><span>Все загруженные файлы</span></a>
+                    <a href="/contacts"><strong>Тариф и поддержка</strong><span>Подключение тарифа через виджет</span></a>
+                </nav>
+            </section>
         </div>
     </section>
 {% endblock %}

@@ -2,8 +2,12 @@
 
 {% block meta_robots %}noindex, nofollow{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/owner.css?v=20261012-launch-guide-3">
+{% endblock %}
+
 {% block body %}
-    <header class="header">
+    <header class="header owner-header">
         <div class="wrap nav">
             <a class="brand" href="{{ path('owner_dashboard') }}">Кабинет ShopsBox</a>
             <nav class="links" aria-label="Навигация кабинета">
@@ -13,7 +17,7 @@
                 <a href="{{ path('owner_store_publication') }}">Публикация</a>
                 <a href="{{ path('owner_store_settings') }}">Настройки</a>
                 <a href="{{ path('owner_orders') }}">Заказы</a>
-                <a href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Preview</a>
+                <a href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Витрина</a>
                 <form class="nav-form" method="post" action="{{ path('auth_logout') }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
                     <button type="submit">Выйти</button>

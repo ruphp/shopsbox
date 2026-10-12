@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tenant\Presentation\Http\Controller;
 
+use App\Catalog\Application\UseCase\ListProductsUseCase;
 use App\Tenant\Application\Contracts\UserPasswordRepository;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 use App\Tenant\Application\UseCase\ShowStoreSettingsUseCase;
@@ -19,6 +20,7 @@ final readonly class OwnerDashboardController
     public function __construct(
         private Environment $twig,
         private ShowStoreSettingsUseCase $showStoreSettings,
+        private ListProductsUseCase $listProducts,
         private UserPasswordRepository $users,
     ) {
     }
@@ -40,6 +42,7 @@ final readonly class OwnerDashboardController
         return new Response($this->twig->render('tenant/owner_dashboard.html.twig', [
             'settings' => $settings,
             'phoneVerified' => $this->users->hasVerifiedPhone($ownerEmail),
+            'productCount' => count($this->listProducts->execute($settings->storeId)),
         ]));
     }
 
