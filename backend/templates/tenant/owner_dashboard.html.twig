@@ -6,7 +6,15 @@
 {% block owner_content %}
     {% set detailsReady = settings.publicDescription and settings.contactEmail and settings.contactPhone %}
     {% set catalogReady = productCount > 0 %}
-    {% set appearanceReady = settings.themeSettings.hero_title|default('') and settings.themeSettings.hero_text|default('') %}
+    {% set theme = settings.themeSettings %}
+    {% set appearanceReady = theme.configured|default(false)
+        or theme.template|default('classic') != 'classic'
+        or theme.primary_color|default('#0077b6') != '#0077b6'
+        or theme.hero_title|default('')
+        or theme.hero_text|default('')
+        or theme.logo_image_id|default('')
+        or theme.hero_image_id|default('')
+        or theme.sections|default(['hero', 'featured']) != ['hero', 'featured'] %}
     {% set publicationReady = settings.publicationStatus == 'published' %}
     {% set completedCount = (detailsReady ? 1 : 0) + (catalogReady ? 1 : 0) + (appearanceReady ? 1 : 0) + (publicationReady ? 1 : 0) %}
     {% set storeStatuses = {'active': 'Работает', 'draft': 'Черновик', 'blocked': 'Заблокирован'} %}

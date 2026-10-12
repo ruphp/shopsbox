@@ -7,6 +7,7 @@ namespace App\Tenant\Presentation\Http\Controller;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use App\Tenant\Application\Contracts\OwnerRegistrationRepository;
 use App\Tenant\Application\UseCase\RegisterOwnerUseCase;
+use App\Tenant\Application\UseCase\ConfirmUserPhoneUseCase;
 use App\Tenant\Presentation\Http\Form\RegisterOwnerForm;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -48,12 +49,17 @@ final readonly class RegisterOwnerController
         private LoggerInterface $logger,
         private OwnerRegistrationRepository $registrationRepository,
         private CsrfTokenManagerInterface $csrfTokenManager,
+        private ConfirmUserPhoneUseCase $confirmUserPhone,
     ) {
     }
 
     #[Route('/register', name: 'owner_register_form', methods: ['GET'])]
     public function start(Request $request): Response
     {
+        if ($redirect = $this->redirectAuthenticatedOwner($request)) {
+            return $redirect;
+        }
+
         $phone = $this->verifiedPhone($request);
         if ($phone === null) {
             return new Response($this->twig->render('tenant/auth_code.html.twig', [
@@ -68,6 +74,10 @@ final readonly class RegisterOwnerController
     #[Route('/owner/registration', name: 'owner_registration_form', methods: ['GET'])]
     public function form(Request $request): Response
     {
+        if ($redirect = $this->redirectAuthenticatedOwner($request)) {
+            return $redirect;
+        }
+
         $phone = $this->verifiedPhone($request);
         if ($phone === null) {
             return new RedirectResponse('/register');
@@ -82,6 +92,10 @@ final readonly class RegisterOwnerController
     #[Route('/owner/registration', name: 'owner_register_submit', methods: ['POST'])]
     public function submit(Request $request): Response
     {
+        if ($redirect = $this->redirectAuthenticatedOwner($request)) {
+            return $redirect;
+        }
+
         if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('owner_registration', (string) $request->request->get('_token')))) {
             throw new AccessDeniedHttpException('Invalid CSRF token.');
         }
@@ -194,5 +208,25 @@ final readonly class RegisterOwnerController
         }
 
         return is_string($phone) && preg_match('/^\+79\d{9}$/', $phone) === 1 ? $phone : null;
+    }
+
+    private function redirectAuthenticatedOwner(Request $request): ?RedirectResponse
+    {
+        $email = $request->getSession()->get('shopsbox_auth_email');
+        if (!is_string($email) || $email === '') {
+            return null;
+        }
+
+        $phone = $this->verifiedPhone($request);
+        if ($phone !== null) {
+            $this->confirmUserPhone->execute(
+                $email,
+                $phone,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+            );
+        }
+
+        return new RedirectResponse('/owner');
     }
 }

@@ -28,6 +28,7 @@ services:
     App\Tenant\Application\Contracts\AuthCodeRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineAuthCodeRepository'
     App\Tenant\Application\Contracts\AuthCodeDelivery: '@App\Tenant\Infrastructure\Adapters\ConfiguredAuthCodeDelivery'
     App\Tenant\Application\Contracts\UserPasswordRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserPasswordRepository'
+    App\Tenant\Application\Contracts\UserPhoneRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserPasswordRepository'
     App\Tenant\Application\Contracts\EntityFlusher: '@App\Tenant\Infrastructure\Adapters\DoctrineEntityFlusher'
     App\Tenant\Application\Contracts\UuidGenerator: '@App\Tenant\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\Catalog\Application\Contracts\CategoryRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineCategoryRepository'

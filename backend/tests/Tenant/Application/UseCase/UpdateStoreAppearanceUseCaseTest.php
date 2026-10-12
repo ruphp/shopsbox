@@ -42,6 +42,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 'RUB',
                 'Asia/Yekaterinburg',
                 self::callback(static fn (array $theme): bool => $theme === [
+                    'configured' => true,
                     'template' => 'accent',
                     'primary_color' => '#16876b',
                     'accent' => 'green',

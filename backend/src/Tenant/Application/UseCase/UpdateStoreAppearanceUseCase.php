@@ -68,6 +68,7 @@ final readonly class UpdateStoreAppearanceUseCase
         $heroImage = $this->selectedImage($input->heroImageId, $images, 'hero_image_id');
 
         $themeSettings = [
+            'configured' => true,
             'template' => $template,
             'primary_color' => $primaryColor,
             'accent' => $this->legacyAccent($primaryColor),

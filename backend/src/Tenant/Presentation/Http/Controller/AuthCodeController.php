@@ -7,6 +7,7 @@ namespace App\Tenant\Presentation\Http\Controller;
 use App\Tenant\Application\Exception\InvalidAuthCodeInput;
 use App\Tenant\Application\UseCase\RequestAuthCodeUseCase;
 use App\Tenant\Application\UseCase\VerifyAuthCodeUseCase;
+use App\Tenant\Application\UseCase\ConfirmUserPhoneUseCase;
 use App\Tenant\Presentation\Http\Form\RequestAuthCodeForm;
 use App\Tenant\Presentation\Http\Form\VerifyAuthCodeForm;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -29,6 +30,7 @@ final readonly class AuthCodeController
         private RequestAuthCodeForm $requestAuthCodeForm,
         private VerifyAuthCodeForm $verifyAuthCodeForm,
         private CsrfTokenManagerInterface $csrfTokenManager,
+        private ConfirmUserPhoneUseCase $confirmUserPhone,
     ) {
     }
 
@@ -112,6 +114,16 @@ final readonly class AuthCodeController
         if ($result->phone !== '') {
             $request->getSession()->set('shopsbox_auth_phone', $result->phone);
             $request->getSession()->set('shopsbox_auth_phone_verified_at', time());
+
+            $ownerEmail = $request->getSession()->get('shopsbox_auth_email');
+            if (is_string($ownerEmail) && $ownerEmail !== '' && $this->confirmUserPhone->execute(
+                $ownerEmail,
+                $result->phone,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+            )) {
+                return new RedirectResponse('/owner');
+            }
         }
         $request->getSession()->set('shopsbox_auth_channel', $result->channel);
 
