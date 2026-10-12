@@ -17,6 +17,10 @@ final readonly class StorefrontStoreView
         public string $domain,
         public array $themeSettings = [],
         public string $currency = 'RUB',
+        public ?string $contactEmail = null,
+        public ?string $contactPhone = null,
+        public ?string $contactCity = null,
+        public ?string $contactAddress = null,
     ) {
     }
 }

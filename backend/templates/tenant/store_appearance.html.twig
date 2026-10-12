@@ -166,7 +166,16 @@
                         </div>
                         <div class="preview-section preview-contacts" data-preview-section="contacts">
                             <h3>Контакты магазина</h3>
-                            <p>{{ settings.contactPhone ?: 'Телефон и адрес магазина' }}</p>
+                            <div class="store-contact-list">
+                                {% if settings.contactPhone %}<span>{{ settings.contactPhone }}</span>{% endif %}
+                                {% if settings.contactEmail %}<span>{{ settings.contactEmail }}</span>{% endif %}
+                                {% if settings.contactCity or settings.contactAddress %}
+                                    <p>{{ [settings.contactCity, settings.contactAddress]|filter(value => value)|join(', ') }}</p>
+                                {% endif %}
+                                {% if not settings.contactPhone and not settings.contactEmail and not settings.contactCity and not settings.contactAddress %}
+                                    <p>Контакты пока не указаны.</p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </aside>

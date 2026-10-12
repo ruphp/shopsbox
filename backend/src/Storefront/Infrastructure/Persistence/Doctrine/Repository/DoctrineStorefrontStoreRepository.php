@@ -39,6 +39,10 @@ final readonly class DoctrineStorefrontStoreRepository implements StorefrontStor
             $store->domain(),
             $store->themeSettings(),
             $store->defaultCurrency(),
+            $store->contactEmail(),
+            $store->contactPhone(),
+            $store->contactCity(),
+            $store->contactAddress(),
         );
     }
 }

@@ -620,6 +620,22 @@
     background: var(--surface);
 }
 
+.store-contact-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    align-items: baseline;
+}
+
+.store-contact-list a {
+    font-weight: 700;
+}
+
+.store-contact-list p {
+    flex-basis: 100%;
+    margin: 0;
+}
+
 .media-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 90px 100px 140px auto;

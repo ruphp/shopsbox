@@ -59,7 +59,16 @@
                 <section class="section storefront-contacts">
                     <div class="wrap">
                         <h2>Контакты магазина</h2>
-                        <p class="muted">Домен: {{ store.domain }}</p>
+                        <div class="store-contact-list">
+                            {% if store.contactPhone %}<a href="tel:{{ store.contactPhone }}">{{ store.contactPhone }}</a>{% endif %}
+                            {% if store.contactEmail %}<a href="mailto:{{ store.contactEmail }}">{{ store.contactEmail }}</a>{% endif %}
+                            {% if store.contactCity or store.contactAddress %}
+                                <p>{{ [store.contactCity, store.contactAddress]|filter(value => value)|join(', ') }}</p>
+                            {% endif %}
+                            {% if not store.contactPhone and not store.contactEmail and not store.contactCity and not store.contactAddress %}
+                                <p class="muted">Контакты пока не указаны.</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </section>
             {% endif %}

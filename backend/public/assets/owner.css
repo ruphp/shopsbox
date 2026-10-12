@@ -670,6 +670,20 @@
     font-size: 13px;
 }
 
+.preview-contacts .store-contact-list {
+    display: grid;
+    gap: 4px;
+}
+
+.preview-contacts .store-contact-list span {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.preview-contacts .store-contact-list p {
+    margin: 0;
+}
+
 .preview-button {
     display: inline-block;
     padding: 7px 10px;
