@@ -4,26 +4,26 @@
 {% block meta_description %}Медиатека магазина ShopsBox.{% endblock %}
 
 {% block owner_content %}
-    <section class="section">
+    <section class="section media-library-page">
         <div class="wrap">
-            <p class="eyebrow">Кабинет владельца</p>
-            <h1>Медиатека</h1>
-            <p class="muted">Файлы магазина, которые уже связаны с товарами и будущими разделами витрины.</p>
+            <header class="media-library-heading">
+                <div>
+                    <p class="eyebrow">Кабинет владельца</p>
+                    <h1>Медиатека</h1>
+                    <p class="muted">Изображения и файлы, используемые в товарах и оформлении витрины.</p>
+                </div>
+                <a class="button button-secondary" href="{{ path('owner_products') }}">Перейти к товарам</a>
+            </header>
 
-            <div class="grid">
-                <article class="product">
-                    <h2>{{ library.files|length }}</h2>
-                    <p class="muted">Файлов в списке</p>
-                </article>
-                <article class="product">
-                    <h2>{{ (library.totalSize / 1024 / 1024)|number_format(2, '.', ' ') }} МБ</h2>
-                    <p class="muted">Занято в выбранном фильтре</p>
-                </article>
-                <article class="product">
-                    <h2>{{ library.limit.sizePercent }}%</h2>
-                    <p class="muted">Использовано тарифа: {{ (library.limit.usedSize / 1024 / 1024)|number_format(2, '.', ' ') }} из {{ (library.limit.maxSize / 1024 / 1024)|number_format(0, '.', ' ') }} МБ</p>
-                </article>
-            </div>
+            <dl class="media-library-stats">
+                <div><dt>Файлов</dt><dd>{{ library.files|length }}</dd></div>
+                <div><dt>Размер выборки</dt><dd>{{ (library.totalSize / 1024 / 1024)|number_format(2, '.', ' ') }} МБ</dd></div>
+                <div>
+                    <dt>Хранилище</dt>
+                    <dd>{{ (library.limit.usedSize / 1024 / 1024)|number_format(2, '.', ' ') }} из {{ (library.limit.maxSize / 1024 / 1024)|number_format(0, '.', ' ') }} МБ</dd>
+                    <span><i style="width: {{ library.limit.sizePercent > 100 ? 100 : library.limit.sizePercent }}%"></i></span>
+                </div>
+            </dl>
 
             {% if library.limit.exceeded %}
                 <p class="legal-note">Лимит файлов превышен. Новые загрузки будут отклоняться, опубликованная витрина продолжит работать.</p>
@@ -31,7 +31,7 @@
                 <p class="legal-note">Вы приближаетесь к лимиту файлов. Удалите лишнее или подготовьте расширение тарифа.</p>
             {% endif %}
 
-            <nav class="category-nav" aria-label="Фильтр медиатеки">
+            <nav class="media-library-filters" aria-label="Фильтр медиатеки">
                 <a class="{{ currentType == '' ? 'is-active' : '' }}" href="{{ path('owner_media_library') }}">Все</a>
                 <a class="{{ currentType == 'image' ? 'is-active' : '' }}" href="{{ path('owner_media_library', {type: 'image'}) }}">Изображения</a>
                 <a class="{{ currentType == 'document' ? 'is-active' : '' }}" href="{{ path('owner_media_library', {type: 'document'}) }}">Документы</a>
@@ -41,17 +41,28 @@
             {% if library.files is empty %}
                 <p class="legal-note">Файлы пока не найдены.</p>
             {% else %}
-                <div class="legal-note">
+                <div class="media-library-grid">
                     {% for file in library.files %}
-                        <article class="media-row">
-                            <div>
-                                <strong>{{ file.key }}</strong>
-                                <p class="muted">{{ file.usage }}</p>
+                        <article class="media-file-card">
+                            <a class="media-file-preview" href="{{ file.publicUrl }}" target="_blank" rel="noopener" aria-label="Открыть {{ file.key }}">
+                                {% if file.mediaType == 'image' %}
+                                    <img src="{{ file.publicUrl }}" alt="{{ file.usage }}" loading="lazy">
+                                {% else %}
+                                    <span>{{ file.mediaType == 'video' ? 'Видео' : 'Документ' }}</span>
+                                {% endif %}
+                            </a>
+                            <div class="media-file-body">
+                                <div class="media-file-title">
+                                    <h2>{{ file.usage }}</h2>
+                                    <span>{{ file.mediaType == 'image' ? 'Изображение' : (file.mediaType == 'video' ? 'Видео' : 'Документ') }}</span>
+                                </div>
+                                <p class="media-file-name" title="{{ file.key }}">{{ file.key }}</p>
+                                <div class="media-file-meta">
+                                    <span>{{ (file.size / 1024)|number_format(1, '.', ' ') }} КБ</span>
+                                    <time>{{ file.createdAt|date('d.m.Y') }}</time>
+                                </div>
+                                <a class="button button-secondary" href="{{ file.publicUrl }}" target="_blank" rel="noopener">Открыть файл</a>
                             </div>
-                            <span>{{ file.mediaType }}</span>
-                            <span>{{ (file.size / 1024)|number_format(1, '.', ' ') }} КБ</span>
-                            <span>{{ file.createdAt }}</span>
-                            <a href="{{ file.publicUrl }}" target="_blank" rel="noopener">Открыть</a>
                         </article>
                     {% endfor %}
                 </div>
