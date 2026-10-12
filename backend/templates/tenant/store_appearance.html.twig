@@ -1,0 +1,130 @@
+{% extends 'tenant/_owner_layout.html.twig' %}
+
+{% block title %}Оформление витрины | ShopsBox{% endblock %}
+{% block meta_description %}Настройка внешнего вида витрины магазина ShopsBox.{% endblock %}
+
+{% block owner_content %}
+    {% set theme = settings.themeSettings %}
+    {% set template = theme.template|default('classic') %}
+    {% set primaryColor = theme.primary_color|default('#0077b6') %}
+    {% set sections = theme.sections|default(['hero', 'featured']) %}
+    {% set sectionLabels = {'hero': 'Главный блок', 'featured': 'Популярные товары', 'contacts': 'Контакты'} %}
+    {% set sectionPositions = {} %}
+    {% for enabledSection in sections %}
+        {% set sectionPositions = sectionPositions|merge({(enabledSection): loop.index}) %}
+    {% endfor %}
+
+    <section class="section appearance-page" data-appearance-editor>
+        <div class="wrap">
+            <header class="appearance-heading">
+                <div>
+                    <p class="eyebrow">Внешний вид</p>
+                    <h1>Оформление витрины</h1>
+                    <p class="muted">Настройте главную страницу магазина и сразу посмотрите результат.</p>
+                </div>
+                <a class="button button-secondary" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть витрину</a>
+            </header>
+
+            {% if error is defined %}<p class="appearance-message is-error" role="alert">{{ error }}</p>{% endif %}
+            {% if saved|default(false) %}<p class="appearance-message is-success">Оформление сохранено и уже применяется на витрине.</p>{% endif %}
+
+            <form class="appearance-layout" method="post" action="{{ path('owner_store_appearance_update') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('store_appearance') }}">
+
+                <div class="appearance-controls">
+                    <fieldset class="appearance-group">
+                        <legend>Шаблон</legend>
+                        <div class="template-options">
+                            <label class="template-option">
+                                <input type="radio" name="template" value="classic" {{ template == 'classic' ? 'checked' : '' }}>
+                                <span><strong>Классический</strong><small>Ровная спокойная подача</small></span>
+                            </label>
+                            <label class="template-option">
+                                <input type="radio" name="template" value="catalog" {{ template == 'catalog' ? 'checked' : '' }}>
+                                <span><strong>Каталог</strong><small>Товары ближе к началу</small></span>
+                            </label>
+                            <label class="template-option">
+                                <input type="radio" name="template" value="accent" {{ template == 'accent' ? 'checked' : '' }}>
+                                <span><strong>Акцентный</strong><small>Выразительный главный блок</small></span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
+                        <legend>Основной цвет</legend>
+                        <div class="color-options">
+                            {% for color, label in {'#0077b6': 'Синий', '#16876b': 'Зелёный', '#d1492e': 'Красный', '#6d4bb8': 'Фиолетовый'} %}
+                                <label class="color-option" title="{{ label }}">
+                                    <input type="radio" name="primary_color" value="{{ color }}" {{ primaryColor == color ? 'checked' : '' }}>
+                                    <span style="--swatch: {{ color }}"></span>
+                                    <small>{{ label }}</small>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
+                        <legend>Главный блок</legend>
+                        <label class="appearance-field" for="appearance-title">
+                            <span>Заголовок</span>
+                            <input id="appearance-title" name="hero_title" type="text" maxlength="120" value="{{ theme.hero_title|default('') }}" placeholder="{{ settings.name }}">
+                        </label>
+                        <label class="appearance-field" for="appearance-text">
+                            <span>Короткое описание</span>
+                            <textarea id="appearance-text" name="hero_text" rows="4" maxlength="500" placeholder="Расскажите, что продаёт ваш магазин">{{ theme.hero_text|default('') }}</textarea>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
+                        <legend>Блоки на главной</legend>
+                        <p class="field-hint">Включите нужные блоки и задайте их порядок.</p>
+                        <div class="section-options">
+                            {% for section in ['hero', 'featured', 'contacts'] %}
+                                {% set position = sectionPositions[section]|default(loop.index) %}
+                                <div class="section-option" data-section-control="{{ section }}">
+                                    <label>
+                                        <input type="checkbox" name="enabled_sections[]" value="{{ section }}" {{ section in sections ? 'checked' : '' }}>
+                                        <span>{{ sectionLabels[section] }}</span>
+                                    </label>
+                                    <select name="section_positions[{{ section }}]" aria-label="Порядок блока {{ sectionLabels[section] }}">
+                                        {% for number in 1..3 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
+                                    </select>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <div class="appearance-actions">
+                        <button class="button" type="submit">Сохранить оформление</button>
+                        <a href="{{ path('owner_dashboard') }}">Вернуться к плану запуска</a>
+                    </div>
+                </div>
+
+                <aside class="appearance-preview-wrap" aria-label="Предварительный просмотр">
+                    <div class="appearance-preview-toolbar">
+                        <strong>Предпросмотр</strong>
+                        <span>Главная страница</span>
+                    </div>
+                    <div class="appearance-preview template-{{ template }}" style="--preview-accent: {{ primaryColor }}" data-appearance-preview>
+                        <header><strong>{{ settings.name }}</strong><span>Товары&nbsp;&nbsp; Корзина</span></header>
+                        <div class="preview-section preview-hero" data-preview-section="hero">
+                            <h2 data-preview-title>{{ theme.hero_title|default('') ?: settings.name }}</h2>
+                            <p data-preview-text>{{ theme.hero_text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
+                            <span class="preview-button">Смотреть товары</span>
+                        </div>
+                        <div class="preview-section preview-products" data-preview-section="featured">
+                            <h3>Популярное</h3>
+                            <div><i></i><i></i><i></i></div>
+                        </div>
+                        <div class="preview-section preview-contacts" data-preview-section="contacts">
+                            <h3>Контакты магазина</h3>
+                            <p>{{ settings.contactPhone ?: 'Телефон и адрес магазина' }}</p>
+                        </div>
+                    </div>
+                </aside>
+            </form>
+        </div>
+    </section>
+
+    <script src="/assets/store-appearance.js?v=20261012-2" defer></script>
+{% endblock %}

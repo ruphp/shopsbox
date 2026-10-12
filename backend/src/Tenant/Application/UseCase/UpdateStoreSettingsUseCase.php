@@ -21,6 +21,12 @@ final readonly class UpdateStoreSettingsUseCase
 
     public function execute(UpdateStoreSettingsInput $input): StoreSettingsView
     {
+        $ownerEmail = strtolower(trim($input->ownerEmail));
+        $current = $this->storeRepository->findSettingsByOwnerEmail($ownerEmail);
+        if (!$current instanceof StoreSettingsView) {
+            throw new StoreSettingsAccessDenied('Store settings are not available for this user.');
+        }
+
         $name = trim($input->name);
         $description = $this->emptyToNull($input->publicDescription);
         $contactEmail = $this->emptyToNull($input->contactEmail);
@@ -34,7 +40,9 @@ final readonly class UpdateStoreSettingsUseCase
         $paymentText = $this->emptyToNull($input->paymentText);
         $currency = strtoupper(trim($input->defaultCurrency));
         $timezone = trim($input->timezone);
-        $themeSettings = $this->normalizeThemeSettings($input->themeSettings);
+        $themeSettings = $input->themeSettings === []
+            ? $current->themeSettings
+            : $this->normalizeThemeSettings($input->themeSettings);
 
         if ($name === '' || strlen($name) > 160) {
             throw InvalidTenantInput::forField('name', 'Store name must be from 1 to 160 characters.');
@@ -60,7 +68,7 @@ final readonly class UpdateStoreSettingsUseCase
         }
 
         $view = $this->storeRepository->updateSettingsForOwnerEmail(
-            strtolower(trim($input->ownerEmail)),
+            $ownerEmail,
             $name,
             $description,
             $contactEmail,

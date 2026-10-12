@@ -555,20 +555,35 @@
     border-bottom-color: var(--storefront-accent);
 }
 
-.storefront-accent-blue {
+.storefront-page {
     --storefront-accent: #0077b6;
-}
-
-.storefront-accent-green {
-    --storefront-accent: #16876b;
-}
-
-.storefront-accent-coral {
-    --storefront-accent: #ff5a3c;
 }
 
 .storefront-hero .button {
     background: var(--storefront-accent);
+}
+
+.storefront-template-catalog .storefront-hero {
+    padding-top: 28px;
+    padding-bottom: 24px;
+}
+
+.storefront-template-catalog .storefront-featured {
+    background: var(--surface);
+}
+
+.storefront-template-accent .storefront-hero {
+    color: #ffffff;
+    background: var(--storefront-accent);
+}
+
+.storefront-template-accent .storefront-hero p {
+    color: rgba(255, 255, 255, 0.84);
+}
+
+.storefront-template-accent .storefront-hero .button {
+    color: var(--storefront-accent);
+    background: #ffffff;
 }
 
 .storefront-contacts {

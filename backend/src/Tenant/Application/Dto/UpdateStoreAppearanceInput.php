@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tenant\Application\Dto;
+
+final readonly class UpdateStoreAppearanceInput
+{
+    /**
+     * @param list<string> $sections
+     */
+    public function __construct(
+        public string $ownerEmail,
+        public string $template,
+        public string $primaryColor,
+        public string $heroTitle,
+        public string $heroText,
+        public array $sections,
+    ) {
+    }
+}

@@ -3,7 +3,7 @@
 {% block meta_robots %}noindex, nofollow{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/owner.css?v=20261012-launch-guide-3">
+    <link rel="stylesheet" href="/assets/owner.css?v=20261012-appearance">
 {% endblock %}
 
 {% block body %}
@@ -16,6 +16,7 @@
                 <a href="{{ path('owner_media_library') }}">Медиатека</a>
                 <a href="{{ path('owner_store_publication') }}">Публикация</a>
                 <a href="{{ path('owner_store_settings') }}">Настройки</a>
+                <a href="{{ path('owner_store_appearance') }}">Оформление</a>
                 <a href="{{ path('owner_orders') }}">Заказы</a>
                 <a href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Витрина</a>
                 <form class="nav-form" method="post" action="{{ path('auth_logout') }}">

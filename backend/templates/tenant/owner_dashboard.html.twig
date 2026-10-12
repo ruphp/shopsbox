@@ -111,7 +111,7 @@
                             <p>Настройте главный блок, цвет оформления и состав разделов, затем проверьте результат.</p>
                             <a class="launch-preview-link" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть предварительный просмотр</a>
                         </div>
-                        <a class="button {{ not (detailsReady and catalogReady) ? 'button-secondary' : '' }}" href="{{ path('owner_store_settings') }}#storefront-settings">Настроить вид</a>
+                        <a class="button {{ not (detailsReady and catalogReady) ? 'button-secondary' : '' }}" href="{{ path('owner_store_appearance') }}">Настроить вид</a>
                     </li>
 
                     <li class="launch-step {{ publicationReady ? 'is-done' : (detailsReady and catalogReady and appearanceReady ? 'is-current' : '') }}">
