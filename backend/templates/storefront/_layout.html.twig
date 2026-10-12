@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/storefront.css?v=20261012-exit-label">
+    <link rel="stylesheet" href="/assets/storefront.css?v=20261012-exit-return">
 {% endblock %}
 
 {% block body %}
@@ -25,11 +25,7 @@
                 {% set cart_count = app.session.get('shopsbox_cart_' ~ store.slug)|default([])|length %}
                 <a href="{{ path(storefront_cart_route, {storeSlug: store.slug}) }}">Корзина{% if cart_count > 0 %} ({{ cart_count }}){% endif %}</a>
                 {% if app.session.get('shopsbox_auth_email') %}
-                    <a href="{{ path('owner_dashboard') }}">В кабинет</a>
-                    <form class="nav-form" method="post" action="{{ path('auth_logout') }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
-                        <button class="storefront-exit" type="submit">{{ store.slug == 'demo-store' ? 'Выйти из демо-витрины' : 'Выйти из витрины' }}</button>
-                    </form>
+                    <a href="{{ path('owner_dashboard') }}">{{ store.slug == 'demo-store' ? 'Выйти из демо-витрины' : 'Выйти из витрины' }}</a>
                 {% endif %}
             </nav>
         </div>
