@@ -7,6 +7,7 @@ namespace App\Catalog\Presentation\Http\Controller;
 use App\Catalog\Application\Contracts\CategoryRepository;
 use App\Catalog\Application\Contracts\EntityFlusher;
 use App\Catalog\Application\Contracts\ProductImageRepository;
+use App\Catalog\Application\Contracts\ProductStructureRepository;
 use App\Catalog\Application\Dto\ChangeProductStatusInput;
 use App\Catalog\Application\Dto\CreateProductInput;
 use App\Catalog\Application\Dto\ProductView;
@@ -24,6 +25,7 @@ use App\Catalog\Application\UseCase\UploadProductImageUseCase;
 use App\Tenant\Application\Dto\StoreSettingsView;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 use App\Tenant\Application\UseCase\ShowStoreSettingsUseCase;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,6 +48,7 @@ final readonly class OwnerProductController
         private UploadProductImageUseCase $uploadProductImage,
         private CategoryRepository $categoryRepository,
         private ProductImageRepository $productImageRepository,
+        private ProductStructureRepository $productStructureRepository,
         private EntityFlusher $entityFlusher,
         private CsrfTokenManagerInterface $csrfTokenManager,
     ) {
@@ -237,6 +240,153 @@ final readonly class OwnerProductController
         return $this->changeImage($request, $productId, $imageId, true);
     }
 
+    #[Route('/{productId}/attributes', name: 'owner_product_attribute_create', methods: ['POST'])]
+    #[Route('/{productId}/attributes/{attributeId}', name: 'owner_product_attribute_update', methods: ['POST'])]
+    public function attribute(Request $request, string $productId, ?string $attributeId = null): Response
+    {
+        $context = $this->structureContext($request, $productId);
+        if ($context instanceof Response) {
+            return $context;
+        }
+        [$settings, $product] = $context;
+        if (!$this->validCsrf($request, 'owner_product_structure_'.$productId)) {
+            return $this->renderForm($settings, $product, 'Форма устарела. Обновите страницу.');
+        }
+
+        $name = trim($request->request->getString('name'));
+        $value = trim($request->request->getString('value'));
+        if ($attributeId !== null && $request->request->getBoolean('_delete')) {
+            $changed = $this->productStructureRepository->deleteAttribute($settings->storeId, $productId, $attributeId);
+        } elseif ($name === '' || $this->textLength($name) > 120 || $value === '') {
+            return $this->renderForm($settings, $product, 'Укажите название и значение характеристики.');
+        } elseif ($attributeId === null) {
+            $this->productStructureRepository->createAttribute($settings->tenantId, $settings->storeId, $productId, $name, $value);
+            $changed = true;
+        } else {
+            $changed = $this->productStructureRepository->updateAttribute($settings->storeId, $productId, $attributeId, $name, $value);
+        }
+
+        return $this->finishStructureChange($settings, $product, $changed, 'Характеристика не найдена.', 'characteristics');
+    }
+
+    #[Route('/{productId}/options', name: 'owner_product_option_group_create', methods: ['POST'])]
+    #[Route('/{productId}/options/{groupId}', name: 'owner_product_option_group_update', methods: ['POST'])]
+    public function optionGroup(Request $request, string $productId, ?string $groupId = null): Response
+    {
+        $context = $this->structureContext($request, $productId);
+        if ($context instanceof Response) {
+            return $context;
+        }
+        [$settings, $product] = $context;
+        if (!$this->validCsrf($request, 'owner_product_structure_'.$productId)) {
+            return $this->renderForm($settings, $product, 'Форма устарела. Обновите страницу.');
+        }
+
+        $name = trim($request->request->getString('name'));
+        if ($groupId !== null && $request->request->getBoolean('_delete')) {
+            $changed = $this->productStructureRepository->deleteOptionGroup($settings->storeId, $productId, $groupId);
+        } elseif ($name === '' || $this->textLength($name) > 120) {
+            return $this->renderForm($settings, $product, 'Укажите название опции, например «Размер» или «Цвет».');
+        } elseif ($groupId === null) {
+            $this->productStructureRepository->createOptionGroup($settings->tenantId, $settings->storeId, $productId, $name);
+            $changed = true;
+        } else {
+            $changed = $this->productStructureRepository->updateOptionGroup($settings->storeId, $productId, $groupId, $name);
+        }
+
+        return $this->finishStructureChange($settings, $product, $changed, 'Группа опций не найдена.', 'options');
+    }
+
+    #[Route('/{productId}/options/{groupId}/values', name: 'owner_product_option_value_create', methods: ['POST'])]
+    #[Route('/{productId}/options/{groupId}/values/{valueId}', name: 'owner_product_option_value_update', methods: ['POST'])]
+    public function optionValue(Request $request, string $productId, string $groupId, ?string $valueId = null): Response
+    {
+        $context = $this->structureContext($request, $productId);
+        if ($context instanceof Response) {
+            return $context;
+        }
+        [$settings, $product] = $context;
+        if (!$this->validCsrf($request, 'owner_product_structure_'.$productId)) {
+            return $this->renderForm($settings, $product, 'Форма устарела. Обновите страницу.');
+        }
+
+        $value = trim($request->request->getString('value'));
+        if ($valueId !== null && $request->request->getBoolean('_delete')) {
+            $changed = $this->productStructureRepository->deleteOptionValue($settings->storeId, $productId, $valueId);
+        } elseif ($value === '' || $this->textLength($value) > 120) {
+            return $this->renderForm($settings, $product, 'Укажите значение опции, например «M» или «Красный».');
+        } elseif ($valueId === null) {
+            $changed = $this->productStructureRepository->createOptionValue($settings->tenantId, $settings->storeId, $productId, $groupId, $value);
+        } else {
+            $changed = $this->productStructureRepository->updateOptionValue($settings->storeId, $productId, $valueId, $value);
+        }
+
+        return $this->finishStructureChange($settings, $product, $changed, 'Значение опции не найдено.', 'options');
+    }
+
+    #[Route('/{productId}/variants', name: 'owner_product_variant_create', methods: ['POST'])]
+    #[Route('/{productId}/variants/{variantId}', name: 'owner_product_variant_update', methods: ['POST'])]
+    public function variant(Request $request, string $productId, ?string $variantId = null): Response
+    {
+        $context = $this->structureContext($request, $productId);
+        if ($context instanceof Response) {
+            return $context;
+        }
+        [$settings, $product] = $context;
+        if (!$this->validCsrf($request, 'owner_product_structure_'.$productId)) {
+            return $this->renderForm($settings, $product, 'Форма устарела. Обновите страницу.');
+        }
+
+        if ($variantId !== null && $request->request->getBoolean('_delete')) {
+            $changed = $this->productStructureRepository->deleteVariant($settings->storeId, $productId, $variantId);
+
+            return $this->finishStructureChange($settings, $product, $changed, 'Вариант не найден.', 'variants');
+        }
+
+        $name = trim($request->request->getString('name'));
+        $sku = trim($request->request->getString('sku'));
+        $priceAdjustment = str_replace(',', '.', trim($request->request->getString('price_adjustment')));
+        if ($name === '' || $this->textLength($name) > 120 || $sku === '' || strlen($sku) > 120) {
+            return $this->renderForm($settings, $product, 'Укажите название варианта и SKU.');
+        }
+        if ($priceAdjustment !== '' && !preg_match('/^-?\d{1,10}(?:\.\d{1,2})?$/', $priceAdjustment)) {
+            return $this->renderForm($settings, $product, 'Наценка должна быть числом, например 500 или -200.');
+        }
+        $normalizedAdjustment = $priceAdjustment === '' ? null : number_format((float) $priceAdjustment, 2, '.', '');
+        $valueIds = array_values(array_filter($request->request->all('option_values'), 'is_string'));
+
+        try {
+            if ($variantId === null) {
+                $this->productStructureRepository->createVariant(
+                    $settings->tenantId,
+                    $settings->storeId,
+                    $productId,
+                    $name,
+                    $sku,
+                    $normalizedAdjustment,
+                    $request->request->getBoolean('active'),
+                    $valueIds,
+                );
+                $changed = true;
+            } else {
+                $changed = $this->productStructureRepository->updateVariant(
+                    $settings->storeId,
+                    $productId,
+                    $variantId,
+                    $name,
+                    $sku,
+                    $normalizedAdjustment,
+                    $request->request->getBoolean('active'),
+                    $valueIds,
+                );
+            }
+        } catch (InvalidArgumentException $exception) {
+            return $this->renderForm($settings, $product, $exception->getMessage());
+        }
+
+        return $this->finishStructureChange($settings, $product, $changed, 'Вариант не найден.', 'variants');
+    }
+
     private function changeImage(Request $request, string $productId, string $imageId, bool $delete): Response
     {
         $settings = $this->settings($request);
@@ -275,6 +425,9 @@ final readonly class OwnerProductController
             'images' => $product instanceof ProductView
                 ? $this->productImageRepository->listByStoreAndProduct($settings->storeId, $product->id)
                 : [],
+            'structure' => $product instanceof ProductView
+                ? $this->productStructureRepository->view($settings->storeId, $product->id)
+                : null,
             'form' => $request instanceof Request ? $request->request->all() : [],
             'error' => $error,
             'notice' => $notice,
@@ -293,6 +446,31 @@ final readonly class OwnerProductController
         } catch (StoreSettingsAccessDenied $exception) {
             return new Response($exception->getMessage(), Response::HTTP_FORBIDDEN);
         }
+    }
+
+    /** @return array{StoreSettingsView, ProductView}|Response */
+    private function structureContext(Request $request, string $productId): array|Response
+    {
+        $settings = $this->settings($request);
+        if (!$settings instanceof StoreSettingsView) {
+            return $settings;
+        }
+        $product = $this->ownedProduct($settings->storeId, $productId);
+        if (!$product instanceof ProductView) {
+            return new Response('Товар не найден.', Response::HTTP_NOT_FOUND);
+        }
+
+        return [$settings, $product];
+    }
+
+    private function finishStructureChange(StoreSettingsView $settings, ProductView $product, bool $changed, string $notFound, string $anchor): Response
+    {
+        if (!$changed) {
+            return $this->renderForm($settings, $product, $notFound);
+        }
+        $this->entityFlusher->flush();
+
+        return new RedirectResponse('/owner/products/'.$product->id.'?notice=structure#'.$anchor);
     }
 
     private function ownedProduct(string $storeId, string $productId): ?ProductView
@@ -316,6 +494,13 @@ final readonly class OwnerProductController
         $value = trim($value);
 
         return $value === '' ? null : $value;
+    }
+
+    private function textLength(string $value): int
+    {
+        preg_match_all('/./us', $value, $characters);
+
+        return count($characters[0]);
     }
 
     private function productError(InvalidProductInput $exception): string

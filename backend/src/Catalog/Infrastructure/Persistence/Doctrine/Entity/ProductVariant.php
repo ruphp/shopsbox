@@ -104,4 +104,13 @@ class ProductVariant
     {
         return $this->active;
     }
+
+    public function update(string $name, string $sku, ?string $priceAdjustment, bool $active): void
+    {
+        $this->name = $name;
+        $this->sku = $sku;
+        $this->priceAdjustment = $priceAdjustment;
+        $this->active = $active;
+        $this->updatedAt = new DateTimeImmutable();
+    }
 }

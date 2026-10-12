@@ -90,4 +90,10 @@ class ProductAttribute
     {
         return $this->position;
     }
+
+    public function update(string $name, string $value): void
+    {
+        $this->name = $name;
+        $this->value = $value;
+    }
 }

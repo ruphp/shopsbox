@@ -81,4 +81,9 @@ class ProductOptionGroup
     {
         return $this->position;
     }
+
+    public function rename(string $name): void
+    {
+        $this->name = $name;
+    }
 }

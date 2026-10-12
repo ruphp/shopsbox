@@ -81,4 +81,9 @@ class ProductOptionValue
     {
         return $this->position;
     }
+
+    public function rename(string $value): void
+    {
+        $this->value = $value;
+    }
 }

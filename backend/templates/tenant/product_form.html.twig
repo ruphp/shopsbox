@@ -28,7 +28,28 @@
         .button-danger { color: #b42318; background: #ffffff; border: 1px solid #d92d20 !important; }
         .button-danger:hover { color: #ffffff; background: #b42318; }
         .back-link { display: inline-block; margin-bottom: 18px; }
+        .structure-section { padding-top: 28px; margin-top: 28px; border-top: 1px solid var(--line); scroll-margin-top: 90px; }
+        .structure-section > h2 { margin-bottom: 4px; }
+        .structure-list { display: grid; gap: 12px; margin: 18px 0; }
+        .structure-item { padding: 14px; border: 1px solid var(--line); border-radius: 8px; }
+        .structure-row { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(180px, 1.4fr) auto; gap: 10px; align-items: end; }
+        .structure-row--variant { grid-template-columns: minmax(150px, 1fr) minmax(130px, .8fr) minmax(110px, .6fr); }
+        .structure-row .form-field { margin: 0; }
+        .structure-actions { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+        .structure-actions button { border: 0; cursor: pointer; font: inherit; }
+        .option-values { display: grid; gap: 8px; margin-top: 12px; padding-left: 14px; border-left: 3px solid var(--line); }
+        .option-value-form { display: grid; grid-template-columns: minmax(150px, 1fr) auto; gap: 8px; }
+        .option-value-form input { min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+        .variant-options { display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0; }
+        .variant-options fieldset { min-width: 150px; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+        .variant-options label { display: block; margin-top: 5px; }
+        .active-check { display: inline-flex; gap: 8px; align-items: center; margin: 12px 0; }
+        .owner-side__links { display: grid; gap: 6px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
         @media (max-width: 760px) { .owner-form-layout { grid-template-columns: 1fr; } }
+        @media (max-width: 560px) {
+            .structure-row, .structure-row--variant, .option-value-form { grid-template-columns: 1fr; }
+            .structure-actions .button { flex: 1; }
+        }
     </style>
 {% endblock %}
 
@@ -113,6 +134,147 @@
                                 <p class="muted">Изображений пока нет.</p>
                             {% endfor %}
                         </div>
+
+                        <section class="structure-section" id="characteristics">
+                            <h2>Характеристики</h2>
+                            <p class="muted">Дополнительные поля карточки: материал, состав, размеры, уход и другие свойства.</p>
+                            <div class="structure-list">
+                                {% for attribute in structure.attributes %}
+                                    <form class="structure-item structure-row" method="post" action="{{ path('owner_product_attribute_update', {productId: product.id, attributeId: attribute.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                        <div class="form-field">
+                                            <label for="attribute-name-{{ attribute.id }}">Название</label>
+                                            <input id="attribute-name-{{ attribute.id }}" name="name" value="{{ attribute.name }}" maxlength="120" required>
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="attribute-value-{{ attribute.id }}">Значение</label>
+                                            <input id="attribute-value-{{ attribute.id }}" name="value" value="{{ attribute.value }}" required>
+                                        </div>
+                                        <div class="structure-actions">
+                                            <button class="button" type="submit">Сохранить</button>
+                                            <button class="button button-danger" type="submit" name="_delete" value="1">Удалить</button>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <p class="muted">Характеристик пока нет.</p>
+                                {% endfor %}
+                            </div>
+                            <form class="structure-item structure-row" method="post" action="{{ path('owner_product_attribute_create', {productId: product.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                <div class="form-field">
+                                    <label for="new-attribute-name">Новая характеристика</label>
+                                    <input id="new-attribute-name" name="name" maxlength="120" placeholder="Материал" required>
+                                </div>
+                                <div class="form-field">
+                                    <label for="new-attribute-value">Значение</label>
+                                    <input id="new-attribute-value" name="value" placeholder="Хлопок 100%" required>
+                                </div>
+                                <div class="structure-actions"><button class="button" type="submit">Добавить</button></div>
+                            </form>
+                        </section>
+
+                        <section class="structure-section" id="options">
+                            <h2>Опции товара</h2>
+                            <p class="muted">Создайте группы выбора, например «Размер» и «Цвет», затем добавьте их значения.</p>
+                            <div class="structure-list">
+                                {% for group in structure.optionGroups %}
+                                    <article class="structure-item">
+                                        <form class="structure-row" method="post" action="{{ path('owner_product_option_group_update', {productId: product.id, groupId: group.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                            <div class="form-field" style="grid-column: 1 / 3">
+                                                <label for="group-name-{{ group.id }}">Название группы</label>
+                                                <input id="group-name-{{ group.id }}" name="name" value="{{ group.name }}" maxlength="120" required>
+                                            </div>
+                                            <div class="structure-actions">
+                                                <button class="button" type="submit">Сохранить</button>
+                                                <button class="button button-danger" type="submit" name="_delete" value="1">Удалить группу</button>
+                                            </div>
+                                        </form>
+                                        <div class="option-values">
+                                            {% for optionValue in group.values %}
+                                                <form class="option-value-form" method="post" action="{{ path('owner_product_option_value_update', {productId: product.id, groupId: group.id, valueId: optionValue.id}) }}">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                                    <input name="value" value="{{ optionValue.value }}" maxlength="120" aria-label="Значение опции" required>
+                                                    <div class="structure-actions">
+                                                        <button class="button button-secondary" type="submit">Сохранить</button>
+                                                        <button class="button button-danger" type="submit" name="_delete" value="1">Удалить</button>
+                                                    </div>
+                                                </form>
+                                            {% endfor %}
+                                            <form class="option-value-form" method="post" action="{{ path('owner_product_option_value_create', {productId: product.id, groupId: group.id}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                                <input name="value" maxlength="120" placeholder="Новое значение" aria-label="Новое значение опции" required>
+                                                <div class="structure-actions"><button class="button" type="submit">Добавить значение</button></div>
+                                            </form>
+                                        </div>
+                                    </article>
+                                {% else %}
+                                    <p class="muted">Групп опций пока нет.</p>
+                                {% endfor %}
+                            </div>
+                            <form class="structure-item structure-row" method="post" action="{{ path('owner_product_option_group_create', {productId: product.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                <div class="form-field" style="grid-column: 1 / 3">
+                                    <label for="new-option-group">Новая группа опций</label>
+                                    <input id="new-option-group" name="name" maxlength="120" placeholder="Размер" required>
+                                </div>
+                                <div class="structure-actions"><button class="button" type="submit">Создать группу</button></div>
+                            </form>
+                        </section>
+
+                        <section class="structure-section" id="variants">
+                            <h2>Варианты</h2>
+                            <p class="muted">Объединяйте значения опций в продаваемые варианты. Наценка прибавляется к базовой цене товара.</p>
+                            <div class="structure-list">
+                                {% for variant in structure.variants %}
+                                    <form class="structure-item" method="post" action="{{ path('owner_product_variant_update', {productId: product.id, variantId: variant.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                        <div class="structure-row structure-row--variant">
+                                            <div class="form-field"><label for="variant-name-{{ variant.id }}">Название</label><input id="variant-name-{{ variant.id }}" name="name" value="{{ variant.name }}" maxlength="120" required></div>
+                                            <div class="form-field"><label for="variant-sku-{{ variant.id }}">SKU</label><input id="variant-sku-{{ variant.id }}" name="sku" value="{{ variant.sku }}" maxlength="120" required></div>
+                                            <div class="form-field"><label for="variant-price-{{ variant.id }}">Наценка, ₽</label><input id="variant-price-{{ variant.id }}" name="price_adjustment" value="{{ variant.priceAdjustment }}" inputmode="decimal" placeholder="0"></div>
+                                        </div>
+                                        <div class="variant-options">
+                                            {% for group in structure.optionGroups %}
+                                                <fieldset>
+                                                    <legend>{{ group.name }}</legend>
+                                                    {% for optionValue in group.values %}
+                                                        <label><input type="checkbox" name="option_values[]" value="{{ optionValue.id }}" {{ optionValue.id in variant.optionValueIds ? 'checked' : '' }}> {{ optionValue.value }}</label>
+                                                    {% endfor %}
+                                                </fieldset>
+                                            {% endfor %}
+                                        </div>
+                                        <label class="active-check"><input type="checkbox" name="active" value="1" {{ variant.active ? 'checked' : '' }}> Доступен покупателям</label>
+                                        <div class="structure-actions">
+                                            <button class="button" type="submit">Сохранить вариант</button>
+                                            <button class="button button-danger" type="submit" name="_delete" value="1">Удалить</button>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <p class="muted">Вариантов пока нет. Товар продаётся по базовой цене.</p>
+                                {% endfor %}
+                            </div>
+                            <form class="structure-item" method="post" action="{{ path('owner_product_variant_create', {productId: product.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('owner_product_structure_' ~ product.id) }}">
+                                <div class="structure-row structure-row--variant">
+                                    <div class="form-field"><label for="new-variant-name">Название варианта</label><input id="new-variant-name" name="name" maxlength="120" placeholder="M / графит" required></div>
+                                    <div class="form-field"><label for="new-variant-sku">SKU</label><input id="new-variant-sku" name="sku" maxlength="120" placeholder="HOODIE-M-GR" required></div>
+                                    <div class="form-field"><label for="new-variant-price">Наценка, ₽</label><input id="new-variant-price" name="price_adjustment" inputmode="decimal" placeholder="0"></div>
+                                </div>
+                                <div class="variant-options">
+                                    {% for group in structure.optionGroups %}
+                                        <fieldset>
+                                            <legend>{{ group.name }}</legend>
+                                            {% for optionValue in group.values %}
+                                                <label><input type="checkbox" name="option_values[]" value="{{ optionValue.id }}"> {{ optionValue.value }}</label>
+                                            {% endfor %}
+                                        </fieldset>
+                                    {% endfor %}
+                                </div>
+                                <label class="active-check"><input type="checkbox" name="active" value="1" checked> Доступен покупателям</label>
+                                <div class="structure-actions"><button class="button" type="submit">Создать вариант</button></div>
+                            </form>
+                        </section>
                     {% endif %}
                 </div>
 
@@ -133,6 +295,11 @@
                         {% if product.status == 'active' %}
                             <p style="margin-bottom: 0"><a href="{{ path('storefront_product', {storeSlug: settings.slug, productSlug: product.slug}) }}">Открыть на витрине</a></p>
                         {% endif %}
+                        <nav class="owner-side__links" aria-label="Разделы товара">
+                            <a href="#characteristics">Характеристики</a>
+                            <a href="#options">Опции товара</a>
+                            <a href="#variants">Варианты</a>
+                        </nav>
                     </aside>
                 {% endif %}
             </div>
