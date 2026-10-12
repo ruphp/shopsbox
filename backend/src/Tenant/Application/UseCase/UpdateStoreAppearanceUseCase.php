@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tenant\Application\UseCase;
 
+use App\FileStorage\Application\Contracts\StoreMediaLibraryRepository;
+use App\FileStorage\Application\Dto\StoreMediaFileView;
 use App\Tenant\Application\Contracts\EntityFlusher;
 use App\Tenant\Application\Contracts\StoreRepository;
 use App\Tenant\Application\Dto\StoreSettingsView;
@@ -19,6 +21,7 @@ final readonly class UpdateStoreAppearanceUseCase
     public function __construct(
         private StoreRepository $storeRepository,
         private EntityFlusher $entityFlusher,
+        private StoreMediaLibraryRepository $mediaLibraryRepository,
     ) {
     }
 
@@ -57,6 +60,13 @@ final readonly class UpdateStoreAppearanceUseCase
             throw InvalidTenantInput::forField('sections', 'Choose at least one storefront section.');
         }
 
+        $images = [];
+        foreach ($this->mediaLibraryRepository->listByStore($current->storeId, 'image') as $image) {
+            $images[$image->id] = $image;
+        }
+        $logo = $this->selectedImage($input->logoImageId, $images, 'logo_image_id');
+        $heroImage = $this->selectedImage($input->heroImageId, $images, 'hero_image_id');
+
         $themeSettings = [
             'template' => $template,
             'primary_color' => $primaryColor,
@@ -64,6 +74,10 @@ final readonly class UpdateStoreAppearanceUseCase
             'hero_title' => $heroTitle,
             'hero_text' => $heroText,
             'sections' => $sections,
+            'logo_image_id' => $logo?->id,
+            'logo_image_url' => $logo?->publicUrl,
+            'hero_image_id' => $heroImage?->id,
+            'hero_image_url' => $heroImage?->publicUrl,
         ];
 
         $view = $this->storeRepository->updateSettingsForOwnerEmail(
@@ -100,5 +114,20 @@ final readonly class UpdateStoreAppearanceUseCase
             '#ff5a3c' => 'coral',
             default => 'blue',
         };
+    }
+
+    /**
+     * @param array<string, StoreMediaFileView> $images
+     */
+    private function selectedImage(?string $imageId, array $images, string $field): ?StoreMediaFileView
+    {
+        if ($imageId === null) {
+            return null;
+        }
+        if (!isset($images[$imageId])) {
+            throw InvalidTenantInput::forField($field, 'Choose an image from the store media library.');
+        }
+
+        return $images[$imageId];
     }
 }

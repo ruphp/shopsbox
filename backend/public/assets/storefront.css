@@ -559,8 +559,32 @@
     --storefront-accent: #0077b6;
 }
 
+.storefront-logo {
+    display: block;
+    width: auto;
+    max-width: 180px;
+    height: 42px;
+    object-fit: contain;
+    object-position: left center;
+}
+
 .storefront-hero .button {
     background: var(--storefront-accent);
+}
+
+.storefront-hero.has-image {
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    background:
+        linear-gradient(90deg, rgba(11, 25, 38, 0.84), rgba(11, 25, 38, 0.28)),
+        var(--storefront-hero-image) center / cover no-repeat;
+}
+
+.storefront-hero.has-image p {
+    max-width: 680px;
+    color: rgba(255, 255, 255, 0.88);
 }
 
 .storefront-template-catalog .storefront-hero {
@@ -575,6 +599,12 @@
 .storefront-template-accent .storefront-hero {
     color: #ffffff;
     background: var(--storefront-accent);
+}
+
+.storefront-template-accent .storefront-hero.has-image {
+    background:
+        linear-gradient(90deg, rgba(11, 25, 38, 0.78), rgba(11, 25, 38, 0.24)),
+        var(--storefront-hero-image) center / cover no-repeat;
 }
 
 .storefront-template-accent .storefront-hero p {

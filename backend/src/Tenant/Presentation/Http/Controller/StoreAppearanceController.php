@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tenant\Presentation\Http\Controller;
 
+use App\FileStorage\Application\UseCase\ListStoreMediaLibraryUseCase;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 use App\Tenant\Application\UseCase\ShowStoreSettingsUseCase;
@@ -27,6 +28,7 @@ final readonly class StoreAppearanceController
         private UpdateStoreAppearanceUseCase $updateAppearance,
         private UpdateStoreAppearanceForm $form,
         private CsrfTokenManagerInterface $csrfTokenManager,
+        private ListStoreMediaLibraryUseCase $listMediaLibrary,
     ) {
     }
 
@@ -47,6 +49,7 @@ final readonly class StoreAppearanceController
         return new Response($this->twig->render('tenant/store_appearance.html.twig', [
             'settings' => $settings,
             'saved' => $request->query->getBoolean('saved'),
+            'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
         ]));
     }
 
@@ -67,6 +70,7 @@ final readonly class StoreAppearanceController
             return new Response($this->twig->render('tenant/store_appearance.html.twig', [
                 'settings' => $this->showStoreSettings->execute($ownerEmail),
                 'error' => $exception->getMessage(),
+                'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (StoreSettingsAccessDenied $exception) {
             return new Response($exception->getMessage(), Response::HTTP_FORBIDDEN);

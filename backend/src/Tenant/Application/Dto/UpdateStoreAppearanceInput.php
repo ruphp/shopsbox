@@ -16,6 +16,8 @@ final readonly class UpdateStoreAppearanceInput
         public string $heroTitle,
         public string $heroText,
         public array $sections,
+        public ?string $logoImageId = null,
+        public ?string $heroImageId = null,
     ) {
     }
 }

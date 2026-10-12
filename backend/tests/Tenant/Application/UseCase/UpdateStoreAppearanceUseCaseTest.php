@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Tenant\Application\UseCase;
 
+use App\FileStorage\Application\Contracts\StoreMediaLibraryRepository;
+use App\FileStorage\Application\Dto\StoreMediaFileView;
 use App\Tenant\Application\Contracts\EntityFlusher;
 use App\Tenant\Application\Contracts\StoreRepository;
 use App\Tenant\Application\Dto\StoreSettingsView;
@@ -46,14 +48,23 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'hero_title' => 'Новая коллекция',
                     'hero_text' => 'Доставка по России',
                     'sections' => ['hero', 'contacts', 'featured'],
+                    'logo_image_id' => 'logo-id',
+                    'logo_image_url' => '/media/logo.jpg',
+                    'hero_image_id' => 'hero-id',
+                    'hero_image_url' => '/media/hero.jpg',
                 ]),
             )
             ->willReturn($current);
 
         $flusher = $this->createMock(EntityFlusher::class);
         $flusher->expects(self::once())->method('flush');
+        $media = $this->createStub(StoreMediaLibraryRepository::class);
+        $media->method('listByStore')->willReturn([
+            $this->image('logo-id', '/media/logo.jpg'),
+            $this->image('hero-id', '/media/hero.jpg'),
+        ]);
 
-        $result = (new UpdateStoreAppearanceUseCase($repository, $flusher))->execute(
+        $result = (new UpdateStoreAppearanceUseCase($repository, $flusher, $media))->execute(
             new UpdateStoreAppearanceInput(
                 ' OWNER@EXAMPLE.TEST ',
                 'accent',
@@ -61,6 +72,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 ' Новая коллекция ',
                 ' Доставка по России ',
                 ['hero', 'contacts', 'featured', 'hero', 'unknown'],
+                'logo-id',
+                'hero-id',
             ),
         );
 
@@ -72,11 +85,35 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
         $repository = $this->createStub(StoreRepository::class);
         $repository->method('findSettingsByOwnerEmail')->willReturn($this->settings());
         $flusher = $this->createStub(EntityFlusher::class);
+        $media = $this->createStub(StoreMediaLibraryRepository::class);
 
         $this->expectException(InvalidTenantInput::class);
 
-        (new UpdateStoreAppearanceUseCase($repository, $flusher))->execute(
+        (new UpdateStoreAppearanceUseCase($repository, $flusher, $media))->execute(
             new UpdateStoreAppearanceInput('owner@example.test', 'unknown', '#0077b6', '', '', ['hero']),
+        );
+    }
+
+    public function testItRejectsImageFromAnotherStore(): void
+    {
+        $repository = $this->createStub(StoreRepository::class);
+        $repository->method('findSettingsByOwnerEmail')->willReturn($this->settings());
+        $flusher = $this->createStub(EntityFlusher::class);
+        $media = $this->createStub(StoreMediaLibraryRepository::class);
+        $media->method('listByStore')->willReturn([$this->image('available-id', '/media/available.jpg')]);
+
+        $this->expectException(InvalidTenantInput::class);
+
+        (new UpdateStoreAppearanceUseCase($repository, $flusher, $media))->execute(
+            new UpdateStoreAppearanceInput(
+                'owner@example.test',
+                'classic',
+                '#0077b6',
+                '',
+                '',
+                ['hero'],
+                'foreign-id',
+            ),
         );
     }
 
@@ -94,6 +131,20 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
             publicDescription: 'Описание',
             contactEmail: 'shop@example.test',
             contactPhone: '+79990000000',
+        );
+    }
+
+    private function image(string $id, string $url): StoreMediaFileView
+    {
+        return new StoreMediaFileView(
+            id: $id,
+            key: 'media/'.$id.'.jpg',
+            publicUrl: $url,
+            mimeType: 'image/jpeg',
+            mediaType: 'image',
+            size: 1024,
+            usage: 'Товар',
+            createdAt: '2026-10-12 12:00',
         );
     }
 }

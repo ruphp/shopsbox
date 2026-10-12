@@ -24,6 +24,15 @@ final readonly class UpdateStoreAppearanceForm
             (string) $request->request->get('hero_title', ''),
             (string) $request->request->get('hero_text', ''),
             $enabled,
+            $this->emptyToNull($request->request->getString('logo_image_id')),
+            $this->emptyToNull($request->request->getString('hero_image_id')),
         );
+    }
+
+    private function emptyToNull(string $value): ?string
+    {
+        $value = trim($value);
+
+        return $value === '' ? null : $value;
     }
 }

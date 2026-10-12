@@ -7,6 +7,7 @@
 {% set hero_text = theme.hero_text|default('') ?: 'Витрина магазина открыта. Ниже первые опубликованные товары.' %}
 {% set template = theme.template|default('classic') %}
 {% set primary_color = theme.primary_color|default('#0077b6') %}
+{% set hero_image = theme.hero_image_url|default('') %}
 
 {% block title %}{{ store.name }}{% endblock %}
 {% block og_title %}{{ store.name }}{% endblock %}
@@ -18,7 +19,7 @@
     <div class="storefront-page storefront-template-{{ template }}" style="--storefront-accent: {{ primary_color }}">
         {% for section in sections %}
             {% if section == 'hero' %}
-                <section class="hero storefront-hero">
+                <section class="hero storefront-hero {{ hero_image ? 'has-image' : '' }}"{% if hero_image %} style="--storefront-hero-image: url('{{ hero_image }}')"{% endif %}>
                     <div class="wrap">
                         <h1>{{ hero_title }}</h1>
                         <p>{{ hero_text }}</p>

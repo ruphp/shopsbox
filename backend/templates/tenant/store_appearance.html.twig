@@ -8,6 +8,8 @@
     {% set template = theme.template|default('classic') %}
     {% set primaryColor = theme.primary_color|default('#0077b6') %}
     {% set sections = theme.sections|default(['hero', 'featured']) %}
+    {% set logoImageId = theme.logo_image_id|default('') %}
+    {% set heroImageId = theme.hero_image_id|default('') %}
     {% set sectionLabels = {'hero': 'Главный блок', 'featured': 'Популярные товары', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
@@ -64,6 +66,48 @@
                     </fieldset>
 
                     <fieldset class="appearance-group">
+                        <legend>Логотип и баннер</legend>
+                        {% if mediaImages is empty %}
+                            <p class="muted">В медиатеке пока нет изображений.</p>
+                            <a href="{{ path('owner_products') }}">Загрузить изображения к товарам</a>
+                        {% else %}
+                            <div class="media-picker">
+                                <h3>Логотип</h3>
+                                <p class="field-hint">Лучше использовать компактное изображение на светлом фоне.</p>
+                                <div class="media-options" role="radiogroup" aria-label="Логотип магазина">
+                                    <label class="media-option media-option-none">
+                                        <input type="radio" name="logo_image_id" value="" data-image-url="" {{ logoImageId == '' ? 'checked' : '' }}>
+                                        <span>Без логотипа</span>
+                                    </label>
+                                    {% for image in mediaImages|slice(0, 12) %}
+                                        <label class="media-option" title="{{ image.usage }}">
+                                            <input type="radio" name="logo_image_id" value="{{ image.id }}" data-image-url="{{ image.publicUrl }}" {{ logoImageId == image.id ? 'checked' : '' }}>
+                                            <span><img src="{{ image.publicUrl }}" alt="" loading="lazy"></span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="media-picker">
+                                <h3>Баннер</h3>
+                                <p class="field-hint">Выбирайте широкое изображение без текста: заголовок будет расположен поверх него.</p>
+                                <div class="media-options" role="radiogroup" aria-label="Баннер магазина">
+                                    <label class="media-option media-option-none">
+                                        <input type="radio" name="hero_image_id" value="" data-image-url="" {{ heroImageId == '' ? 'checked' : '' }}>
+                                        <span>Без баннера</span>
+                                    </label>
+                                    {% for image in mediaImages|slice(0, 12) %}
+                                        <label class="media-option" title="{{ image.usage }}">
+                                            <input type="radio" name="hero_image_id" value="{{ image.id }}" data-image-url="{{ image.publicUrl }}" {{ heroImageId == image.id ? 'checked' : '' }}>
+                                            <span><img src="{{ image.publicUrl }}" alt="" loading="lazy"></span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
                         <legend>Главный блок</legend>
                         <label class="appearance-field" for="appearance-title">
                             <span>Заголовок</span>
@@ -106,8 +150,12 @@
                         <span>Главная страница</span>
                     </div>
                     <div class="appearance-preview template-{{ template }}" style="--preview-accent: {{ primaryColor }}" data-appearance-preview>
-                        <header><strong>{{ settings.name }}</strong><span>Товары&nbsp;&nbsp; Корзина</span></header>
-                        <div class="preview-section preview-hero" data-preview-section="hero">
+                        <header>
+                            <img data-preview-logo src="{{ theme.logo_image_url|default('') }}" alt="" {{ logoImageId == '' ? 'hidden' : '' }}>
+                            <strong data-preview-store-name {{ logoImageId != '' ? 'hidden' : '' }}>{{ settings.name }}</strong>
+                            <span>Товары&nbsp;&nbsp; Корзина</span>
+                        </header>
+                        <div class="preview-section preview-hero {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero"{% if heroImageId != '' %} style="--preview-image: url('{{ theme.hero_image_url }}')"{% endif %}>
                             <h2 data-preview-title>{{ theme.hero_title|default('') ?: settings.name }}</h2>
                             <p data-preview-text>{{ theme.hero_text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
                             <span class="preview-button">Смотреть товары</span>
@@ -126,5 +174,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261012-2" defer></script>
+    <script src="/assets/store-appearance.js?v=20261012-media" defer></script>
 {% endblock %}
