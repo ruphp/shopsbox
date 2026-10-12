@@ -88,9 +88,19 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
+    public function tenant(): ?Tenant
+    {
+        return $this->tenant;
+    }
+
     public function displayName(): string
     {
         return $this->displayName;
+    }
+
+    public function verifiedPhone(): ?string
+    {
+        return $this->verifiedPhone;
     }
 
     public function getPassword(): ?string

@@ -53,6 +53,8 @@ final readonly class UpdateProductUseCase
             throw InvalidProductInput::forField('slug', 'Product slug is already used in this store.');
         }
 
+        $price = $this->normalizePrice($input->price);
+
         $product = $this->productRepository->update(
             $input->storeId,
             $input->productId,
@@ -60,6 +62,7 @@ final readonly class UpdateProductUseCase
             $input->name,
             $input->slug,
             $this->normalizeDescription($input->description),
+            $price,
         );
         if (!$product instanceof ProductView) {
             throw ProductNotFound::byId($input->productId);
@@ -75,6 +78,16 @@ final readonly class UpdateProductUseCase
         $description = trim((string) $description);
 
         return $description === '' ? null : $description;
+    }
+
+    private function normalizePrice(string $price): string
+    {
+        $price = str_replace(',', '.', trim($price));
+        if (!preg_match('/^\d{1,10}(?:\.\d{1,2})?$/', $price)) {
+            throw InvalidProductInput::forField('price', 'Price must be a non-negative amount with up to two decimal places.');
+        }
+
+        return number_format((float) $price, 2, '.', '');
     }
 
     private function isUuid(string $value): bool

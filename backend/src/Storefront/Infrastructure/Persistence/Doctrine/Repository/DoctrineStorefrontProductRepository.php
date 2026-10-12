@@ -129,6 +129,7 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             $this->attributes($product),
             $this->optionGroups($product),
             $this->variants($product),
+            $product->price(),
         );
     }
 
@@ -224,6 +225,7 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             ->getResult();
 
         return array_map(fn (ProductVariant $variant): StorefrontProductVariantView => new StorefrontProductVariantView(
+            $variant->id(),
             $variant->name(),
             $variant->sku(),
             $variant->priceAdjustment(),

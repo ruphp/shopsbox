@@ -28,6 +28,7 @@ final readonly class RequestAuthCodeUseCase
         private UuidGenerator $uuidGenerator,
         private string $authCodeSecret,
         private string $smsProvider,
+        private string $emailProvider,
     ) {
     }
 
@@ -85,7 +86,7 @@ final readonly class RequestAuthCodeUseCase
             self::MAX_ATTEMPTS,
             $channel === 'phone' ? $phone : null,
             $channel,
-            $channel === 'phone' ? $this->smsProvider : 'dev_email',
+            $channel === 'phone' ? $this->smsProvider : $this->emailProvider,
             $input->requestIp !== '' ? $input->requestIp : null,
         ));
         $this->authCodeDelivery->deliver($requestId, $channel, $recipient, $code, $expiresAt);

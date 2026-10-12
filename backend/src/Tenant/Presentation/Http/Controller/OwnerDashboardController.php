@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tenant\Presentation\Http\Controller;
 
+use App\Tenant\Application\Contracts\UserPasswordRepository;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 use App\Tenant\Application\UseCase\ShowStoreSettingsUseCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,6 +19,7 @@ final readonly class OwnerDashboardController
     public function __construct(
         private Environment $twig,
         private ShowStoreSettingsUseCase $showStoreSettings,
+        private UserPasswordRepository $users,
     ) {
     }
 
@@ -26,7 +28,7 @@ final readonly class OwnerDashboardController
     {
         $ownerEmail = $this->ownerEmail($request);
         if ($ownerEmail === null) {
-            return new RedirectResponse('/auth/code');
+            return new RedirectResponse('/auth/login');
         }
 
         try {
@@ -37,7 +39,7 @@ final readonly class OwnerDashboardController
 
         return new Response($this->twig->render('tenant/owner_dashboard.html.twig', [
             'settings' => $settings,
-            'phoneVerified' => $this->phoneVerified($request),
+            'phoneVerified' => $this->users->hasVerifiedPhone($ownerEmail),
         ]));
     }
 
@@ -48,10 +50,4 @@ final readonly class OwnerDashboardController
         return is_string($email) && $email !== '' ? $email : null;
     }
 
-    private function phoneVerified(Request $request): bool
-    {
-        $phone = $request->getSession()->get('shopsbox_auth_phone');
-
-        return is_string($phone) && preg_match('/^\+79\d{9}$/', $phone) === 1;
-    }
 }

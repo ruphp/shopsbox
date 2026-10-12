@@ -13,6 +13,7 @@ final readonly class UpdateProductInput
         public string $slug,
         public ?string $categoryId,
         public ?string $description,
+        public string $price = '0.00',
     ) {
     }
 }

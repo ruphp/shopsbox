@@ -17,6 +17,7 @@ final readonly class ProductView
         public string $status,
         public string $createdAt,
         public string $updatedAt,
+        public string $price = '0.00',
     ) {
     }
 }

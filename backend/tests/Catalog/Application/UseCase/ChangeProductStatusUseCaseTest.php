@@ -119,6 +119,7 @@ final class FakeCatalogProductRepository implements ProductRepository
         string $slug,
         ?string $description,
         ProductStatus $status,
+        string $price,
     ): ProductView {
         $product = new ProductView(
             $id,
@@ -144,6 +145,7 @@ final class FakeCatalogProductRepository implements ProductRepository
         string $name,
         string $slug,
         ?string $description,
+        string $price,
     ): ?ProductView {
         $product = $this->findByStore($storeId, $productId);
         if (!$product instanceof ProductView) {

@@ -30,6 +30,7 @@
                     {% set currentChannel = channel|default('email') %}
                     {% set currentRecipient = currentChannel == 'phone' ? phone|default('') : email|default('') %}
                     <form class="legal-note auth-card" method="post" action="{{ path('auth_code_request') }}" data-auth-code-form>
+                        <input name="_token" type="hidden" value="{{ csrf_token('registration_phone_request') }}">
                         <input name="channel" type="hidden" value="{{ phoneRequiredMode ? 'phone' : 'email' }}">
                         {% if phoneRequiredMode %}<input name="phone_required" type="hidden" value="1">{% endif %}
                         <p class="form-field">
@@ -50,6 +51,7 @@
 
                     {% if requested is defined and requested %}
                         <form class="legal-note" method="post" action="{{ path('auth_code_verify') }}">
+                            <input name="_token" type="hidden" value="{{ csrf_token('registration_phone_verify') }}">
                             <input name="email" type="hidden" value="{{ email }}">
                             <input name="phone" type="hidden" value="{{ phone|default('') }}">
                             <input name="channel" type="hidden" value="{{ currentChannel }}">

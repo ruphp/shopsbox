@@ -35,6 +35,7 @@ final readonly class CreateProductUseCase
         $this->validateName($input->name);
         $this->validateSlug($input->slug);
         $this->validateCategory($input->storeId, $input->categoryId);
+        $price = $this->normalizePrice($input->price);
 
         if ($this->productRepository->existsByStoreAndSlug($input->storeId, $input->slug)) {
             throw InvalidProductInput::forField('slug', 'Product slug is already used in this store.');
@@ -49,6 +50,7 @@ final readonly class CreateProductUseCase
             $input->slug,
             $this->normalizeDescription($input->description),
             $status,
+            $price,
         );
         $this->entityFlusher->flush();
 
@@ -103,6 +105,16 @@ final readonly class CreateProductUseCase
         $description = trim((string) $description);
 
         return $description === '' ? null : $description;
+    }
+
+    private function normalizePrice(string $price): string
+    {
+        $price = str_replace(',', '.', trim($price));
+        if (!preg_match('/^\d{1,10}(?:\.\d{1,2})?$/', $price)) {
+            throw InvalidProductInput::forField('price', 'Price must be a non-negative amount with up to two decimal places.');
+        }
+
+        return number_format((float) $price, 2, '.', '');
     }
 
     private function isUuid(string $value): bool

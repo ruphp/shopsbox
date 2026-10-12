@@ -13,6 +13,8 @@ final readonly class RegisterOwnerInput
         public string $storeName,
         public string $storeSlug,
         public string $timezone = 'Asia/Yekaterinburg',
+        public string $password = '',
+        public string $passwordConfirmation = '',
     ) {
     }
 }

@@ -27,6 +27,7 @@ services:
     App\Tenant\Application\Contracts\OwnerRegistrationRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineOwnerRegistrationRepository'
     App\Tenant\Application\Contracts\AuthCodeRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineAuthCodeRepository'
     App\Tenant\Application\Contracts\AuthCodeDelivery: '@App\Tenant\Infrastructure\Adapters\ConfiguredAuthCodeDelivery'
+    App\Tenant\Application\Contracts\UserPasswordRepository: '@App\Tenant\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserPasswordRepository'
     App\Tenant\Application\Contracts\EntityFlusher: '@App\Tenant\Infrastructure\Adapters\DoctrineEntityFlusher'
     App\Tenant\Application\Contracts\UuidGenerator: '@App\Tenant\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\Catalog\Application\Contracts\CategoryRepository: '@App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineCategoryRepository'
@@ -36,6 +37,9 @@ services:
     App\Catalog\Application\Contracts\UuidGenerator: '@App\Catalog\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\Storefront\Application\Contracts\StorefrontStoreRepository: '@App\Storefront\Infrastructure\Persistence\Doctrine\Repository\DoctrineStorefrontStoreRepository'
     App\Storefront\Application\Contracts\StorefrontProductRepository: '@App\Storefront\Infrastructure\Persistence\Doctrine\Repository\DoctrineStorefrontProductRepository'
+    App\Sales\Application\Contracts\SalesRepository: '@App\Sales\Infrastructure\Persistence\Doctrine\Repository\DoctrineSalesRepository'
+    App\Sales\Application\Contracts\EntityFlusher: '@App\Sales\Infrastructure\Adapters\DoctrineEntityFlusher'
+    App\Sales\Application\Contracts\UuidGenerator: '@App\Sales\Infrastructure\Adapters\SymfonyUuidGenerator'
     App\FileStorage\Application\Contracts\FileStorage: '@App\FileStorage\Infrastructure\Storage\FlysystemFileStorage'
     App\FileStorage\Application\Contracts\FileUrlBuilder: '@App\FileStorage\Infrastructure\Url\ConfiguredFileUrlBuilder'
     App\Moderation\Application\Contracts\ModerationQueueRepository: '@App\Moderation\Infrastructure\Persistence\Doctrine\Repository\DoctrineModerationQueueRepository'
@@ -70,14 +74,20 @@ services:
             $apiUrl: '%env(SITEWIDGET_SMS_API_URL)%'
             $token: '%env(SITEWIDGET_SMS_TOKEN)%'
 
+    App\Tenant\Infrastructure\Adapters\EmailAuthCodeDelivery:
+        arguments:
+            $fromAddress: '%env(NOTIFICATION_EMAIL_FROM)%'
+
     App\Tenant\Infrastructure\Adapters\ConfiguredAuthCodeDelivery:
         arguments:
             $smsProvider: '%env(SMS_PROVIDER)%'
+            $emailProvider: '%env(AUTH_EMAIL_PROVIDER)%'
 
     App\Tenant\Application\UseCase\RequestAuthCodeUseCase:
         arguments:
             $authCodeSecret: '%kernel.secret%'
             $smsProvider: '%env(SMS_PROVIDER)%'
+            $emailProvider: '%env(AUTH_EMAIL_PROVIDER)%'
 
     App\Tenant\Application\UseCase\VerifyAuthCodeUseCase:
         arguments:

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tenant\Presentation\Http\Controller;
 
+use App\Tenant\Application\Contracts\UserPasswordRepository;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 use App\Tenant\Application\UseCase\ShowStoreSettingsUseCase;
@@ -23,6 +24,7 @@ final readonly class StorePublicationController
         private ShowStoreSettingsUseCase $showStoreSettings,
         private UpdateStorePublicationUseCase $updateStorePublication,
         private UpdateStorePublicationForm $form,
+        private UserPasswordRepository $users,
     ) {
     }
 
@@ -31,9 +33,9 @@ final readonly class StorePublicationController
     {
         $ownerEmail = $this->ownerEmail($request);
         if ($ownerEmail === null) {
-            return new RedirectResponse('/auth/code');
+            return new RedirectResponse('/auth/login');
         }
-        if (!$this->hasVerifiedPhone($request)) {
+        if (!$this->users->hasVerifiedPhone($ownerEmail)) {
             return new RedirectResponse('/auth/code?phone_required=1');
         }
 
@@ -53,9 +55,9 @@ final readonly class StorePublicationController
     {
         $ownerEmail = $this->ownerEmail($request);
         if ($ownerEmail === null) {
-            return new RedirectResponse('/auth/code');
+            return new RedirectResponse('/auth/login');
         }
-        if (!$this->hasVerifiedPhone($request)) {
+        if (!$this->users->hasVerifiedPhone($ownerEmail)) {
             return new RedirectResponse('/auth/code?phone_required=1');
         }
 
@@ -85,10 +87,4 @@ final readonly class StorePublicationController
         return is_string($email) && $email !== '' ? $email : null;
     }
 
-    private function hasVerifiedPhone(Request $request): bool
-    {
-        $phone = $request->getSession()->get('shopsbox_auth_phone');
-
-        return is_string($phone) && preg_match('/^\+79\d{9}$/', $phone) === 1;
-    }
 }

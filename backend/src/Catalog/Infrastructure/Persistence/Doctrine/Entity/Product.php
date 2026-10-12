@@ -46,6 +46,9 @@ class Product
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description;
 
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
+    private string $price;
+
     #[ORM\Column(length: 32, enumType: ProductStatus::class)]
     private ProductStatus $status;
 
@@ -82,6 +85,7 @@ class Product
         string $slug,
         ?string $description,
         ProductStatus $status,
+        string $price = '0.00',
     ) {
         $now = new DateTimeImmutable();
 
@@ -92,6 +96,7 @@ class Product
         $this->name = $name;
         $this->slug = $slug;
         $this->description = $description;
+        $this->price = $price;
         $this->status = $status;
         $this->createdAt = $now;
         $this->updatedAt = $now;
@@ -132,6 +137,11 @@ class Product
         return $this->description;
     }
 
+    public function price(): string
+    {
+        return $this->price;
+    }
+
     public function status(): ProductStatus
     {
         return $this->status;
@@ -162,12 +172,13 @@ class Product
         return $this->updatedAt;
     }
 
-    public function updateDetails(?Category $category, string $name, string $slug, ?string $description): void
+    public function updateDetails(?Category $category, string $name, string $slug, ?string $description, string $price): void
     {
         $this->category = $category;
         $this->name = $name;
         $this->slug = $slug;
         $this->description = $description;
+        $this->price = $price;
         $this->updatedAt = new DateTimeImmutable();
     }
 

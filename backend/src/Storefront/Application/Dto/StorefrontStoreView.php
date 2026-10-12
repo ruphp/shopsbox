@@ -16,6 +16,7 @@ final readonly class StorefrontStoreView
         public string $slug,
         public string $domain,
         public array $themeSettings = [],
+        public string $currency = 'RUB',
     ) {
     }
 }

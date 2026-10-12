@@ -18,6 +18,8 @@ final readonly class RegisterOwnerForm
             (string) $request->request->get('store_name', ''),
             (string) $request->request->get('store_slug', ''),
             (string) $request->request->get('timezone', 'Asia/Yekaterinburg'),
+            (string) $request->request->get('password', ''),
+            (string) $request->request->get('password_confirmation', ''),
         );
     }
 }

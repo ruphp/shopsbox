@@ -1,0 +1,36 @@
+{% extends 'tenant/_owner_layout.html.twig' %}
+
+{% block title %}Заказы | ShopsBox{% endblock %}
+
+{% block owner_content %}
+    <section class="section">
+        <div class="wrap">
+            <p class="eyebrow">{{ settings.name }}</p>
+            <h1>Заказы</h1>
+            {% if orders is empty %}
+                <div class="legal-note">
+                    <h2>Заказов пока нет</h2>
+                    <p>После оформления на витрине новые заказы появятся здесь.</p>
+                </div>
+            {% else %}
+                <div class="order-list">
+                    {% for order in orders %}
+                        <article class="owner-order">
+                            <header>
+                                <div><span class="eyebrow">{{ order.createdAt|date('d.m.Y H:i') }}</span><h2>Заказ {{ order.number }}</h2></div>
+                                <strong>{{ (order.totalMinor / 100)|number_format(2, ',', ' ') }} {{ order.currency }}</strong>
+                            </header>
+                            <p>{{ order.customerName }} · <a href="tel:{{ order.customerPhone }}">{{ order.customerPhone }}</a> · <a href="mailto:{{ order.customerEmail }}">{{ order.customerEmail }}</a></p>
+                            {% if order.comment %}<p class="muted">Комментарий: {{ order.comment }}</p>{% endif %}
+                            <div class="owner-order-items">
+                                {% for item in order.items %}
+                                    <div><span>{{ item.productName }}{% if item.variantName %} · {{ item.variantName }}{% endif %} × {{ item.quantity }}</span><strong>{{ (item.lineTotalMinor / 100)|number_format(2, ',', ' ') }} {{ order.currency }}</strong></div>
+                                {% endfor %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

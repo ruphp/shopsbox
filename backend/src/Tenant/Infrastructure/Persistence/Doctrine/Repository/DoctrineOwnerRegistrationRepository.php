@@ -14,12 +14,14 @@ use App\Tenant\Infrastructure\Persistence\Doctrine\Entity\UserRoleAssignment;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final readonly class DoctrineOwnerRegistrationRepository implements OwnerRegistrationRepository
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private string $phoneVerificationProvider,
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -54,6 +56,7 @@ final readonly class DoctrineOwnerRegistrationRepository implements OwnerRegistr
         string $storeSlug,
         string $storeDomain,
         string $timezone,
+        string $password,
     ): RegisterOwnerResult {
         $tenant = new Tenant($tenantId, $storeName, 'active', $email);
         $store = new Store($storeId, $tenant, $storeName, $storeSlug, $storeDomain, 'draft', 'RUB', $timezone);
@@ -61,6 +64,7 @@ final readonly class DoctrineOwnerRegistrationRepository implements OwnerRegistr
         $store->startTrial(10);
 
         $user = new User($userId, $tenant, $email, $ownerName, 'active', false);
+        $user->setPasswordHash($this->passwordHasher->hashPassword($user, $password));
         $user->confirmPhone($phone, null, null, $this->phoneVerificationProvider);
 
         $role = $this->entityManager->getRepository(Role::class)->findOneBy(['code' => 'store_owner']);

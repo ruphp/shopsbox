@@ -5,12 +5,24 @@
 {% endblock %}
 
 {% block body %}
+    {% set current_route = app.request.attributes.get('_route')|default('') %}
+    {% set route_prefix = current_route starts with 'local_host_' ? 'local_host_' : (current_route starts with 'host_' ? 'host_' : '') %}
+    {% set storefront_home_route = route_prefix ~ 'storefront_home' %}
+    {% set storefront_products_route = route_prefix ~ 'storefront_products' %}
+    {% set storefront_product_route = route_prefix ~ 'storefront_product' %}
+    {% set storefront_category_route = route_prefix ~ 'storefront_category' %}
+    {% set storefront_cart_route = route_prefix ~ 'storefront_cart' %}
+    {% set storefront_cart_add_route = route_prefix ~ 'storefront_cart_add' %}
+    {% set storefront_cart_update_route = route_prefix ~ 'storefront_cart_update' %}
+    {% set storefront_checkout_route = route_prefix ~ 'storefront_checkout' %}
     <header class="header">
         <div class="wrap nav">
-            <a class="brand" href="{{ path('storefront_home', {storeSlug: store.slug}) }}">{{ store.name }}</a>
+            <a class="brand" href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">{{ store.name }}</a>
             <nav class="links" aria-label="Навигация витрины">
-                <a href="{{ path('storefront_home', {storeSlug: store.slug}) }}">Главная</a>
-                <a href="{{ path('storefront_products', {storeSlug: store.slug}) }}">Товары</a>
+                <a href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">Главная</a>
+                <a href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Товары</a>
+                {% set cart_count = app.session.get('shopsbox_cart_' ~ store.slug)|default([])|length %}
+                <a href="{{ path(storefront_cart_route, {storeSlug: store.slug}) }}">Корзина{% if cart_count > 0 %} ({{ cart_count }}){% endif %}</a>
             </nav>
         </div>
     </header>

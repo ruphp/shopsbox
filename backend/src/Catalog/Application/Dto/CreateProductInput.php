@@ -14,6 +14,7 @@ final readonly class CreateProductInput
         public ?string $categoryId,
         public ?string $description,
         public string $status = 'draft',
+        public string $price = '0.00',
     ) {
     }
 }

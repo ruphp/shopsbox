@@ -22,6 +22,7 @@ final readonly class StorefrontProductView
         public array $attributes = [],
         public array $optionGroups = [],
         public array $variants = [],
+        public string $price = '0.00',
     ) {
     }
 }

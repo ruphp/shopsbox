@@ -31,7 +31,7 @@ final readonly class StoreSettingsController
     {
         $ownerEmail = $this->ownerEmail($request);
         if ($ownerEmail === null) {
-            return new RedirectResponse('/auth/code');
+            return new RedirectResponse('/auth/login');
         }
 
         try {
@@ -50,7 +50,7 @@ final readonly class StoreSettingsController
     {
         $ownerEmail = $this->ownerEmail($request);
         if ($ownerEmail === null) {
-            return new RedirectResponse('/auth/code');
+            return new RedirectResponse('/auth/login');
         }
 
         try {

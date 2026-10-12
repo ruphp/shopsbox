@@ -136,6 +136,7 @@ final class FakeUploadImageProductRepository implements ProductRepository
         string $slug,
         ?string $description,
         ProductStatus $status,
+        string $price,
     ): ProductView {
         throw new RuntimeException('Not used in this test.');
     }
@@ -147,6 +148,7 @@ final class FakeUploadImageProductRepository implements ProductRepository
         string $name,
         string $slug,
         ?string $description,
+        string $price,
     ): ?ProductView {
         throw new RuntimeException('Not used in this test.');
     }

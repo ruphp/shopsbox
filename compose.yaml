@@ -21,6 +21,9 @@ services:
       DATABASE_URL: postgresql://shopsbox:shopsbox@shopsbox_postgres:5432/shopsbox?serverVersion=16&charset=utf8
       REDIS_URL: redis://shopsbox_redis:6379
       SMS_PROVIDER: dev_flash
+      AUTH_EMAIL_PROVIDER: dev_flash
+      MAILER_DSN: null://null
+      NOTIFICATION_EMAIL_FROM: no-reply@shopsbox.local
       SITEWIDGET_SMS_API_URL: https://sitewidget.ru/api/sms/v1/tasks
       SITEWIDGET_SMS_TOKEN: ""
       FILE_STORAGE_ADAPTER: local

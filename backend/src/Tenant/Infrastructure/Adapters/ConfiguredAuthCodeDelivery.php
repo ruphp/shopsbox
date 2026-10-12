@@ -13,7 +13,9 @@ final readonly class ConfiguredAuthCodeDelivery implements AuthCodeDelivery
     public function __construct(
         private DevFileAuthCodeDelivery $devDelivery,
         private SiteWidgetSmsAuthCodeDelivery $siteWidgetDelivery,
+        private EmailAuthCodeDelivery $emailDelivery,
         private string $smsProvider,
+        private string $emailProvider,
     ) {
     }
 
@@ -24,7 +26,22 @@ final readonly class ConfiguredAuthCodeDelivery implements AuthCodeDelivery
         string $code,
         DateTimeImmutable $expiresAt,
     ): void {
-        if ($channel !== 'phone' || $this->smsProvider === 'dev_flash') {
+        if ($channel === 'email') {
+            if ($this->emailProvider === 'dev_flash') {
+                $this->devDelivery->deliver($requestId, $channel, $recipient, $code, $expiresAt);
+
+                return;
+            }
+            if ($this->emailProvider === 'mailer') {
+                $this->emailDelivery->deliver($requestId, $channel, $recipient, $code, $expiresAt);
+
+                return;
+            }
+
+            throw new RuntimeException(sprintf('Unsupported AUTH_EMAIL_PROVIDER "%s".', $this->emailProvider));
+        }
+
+        if ($this->smsProvider === 'dev_flash') {
             $this->devDelivery->deliver($requestId, $channel, $recipient, $code, $expiresAt);
 
             return;

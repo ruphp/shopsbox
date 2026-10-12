@@ -127,6 +127,7 @@ final readonly class AdminProductController
             'name' => $product->name,
             'slug' => $product->slug,
             'description' => $product->description,
+            'price' => $product->price,
             'status' => $product->status,
             'created_at' => $product->createdAt,
             'updated_at' => $product->updatedAt,

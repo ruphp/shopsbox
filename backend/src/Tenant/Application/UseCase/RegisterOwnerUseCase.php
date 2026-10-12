@@ -10,6 +10,7 @@ use App\Tenant\Application\Contracts\UuidGenerator;
 use App\Tenant\Application\Dto\RegisterOwnerInput;
 use App\Tenant\Application\Dto\RegisterOwnerResult;
 use App\Tenant\Application\Exception\InvalidTenantInput;
+use App\Tenant\Application\Security\PasswordPolicy;
 use DateTimeZone;
 
 final readonly class RegisterOwnerUseCase
@@ -47,6 +48,7 @@ final readonly class RegisterOwnerUseCase
         $storeSlug = strtolower(trim($input->storeSlug));
         $storeDomain = $storeSlug . '.shopsbox.ru';
         $timezone = $this->normalizeTimezone(trim($input->timezone));
+        $passwordError = PasswordPolicy::validationError($input->password, $input->passwordConfirmation);
 
         if ($ownerName === '' || mb_strlen($ownerName) > 120) {
             throw InvalidTenantInput::forField('owner_name', 'Owner name must be from 1 to 120 characters.');
@@ -68,6 +70,9 @@ final readonly class RegisterOwnerUseCase
         }
         if ($timezone === null || !in_array($timezone, DateTimeZone::listIdentifiers(), true)) {
             throw InvalidTenantInput::forField('timezone', 'Timezone must be a valid IANA identifier.');
+        }
+        if ($passwordError !== null) {
+            throw InvalidTenantInput::forField('password', $passwordError);
         }
         if ($this->registrationRepository->emailExists($email)) {
             throw InvalidTenantInput::forField('email', 'Email is already registered.');
@@ -93,6 +98,7 @@ final readonly class RegisterOwnerUseCase
             $storeSlug,
             $storeDomain,
             $timezone,
+            $input->password,
         );
         $this->entityFlusher->flush();
 

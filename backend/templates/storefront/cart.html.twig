@@ -1,0 +1,66 @@
+{% extends 'storefront/_layout.html.twig' %}
+
+{% block title %}Корзина - {{ store.name }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block storefront_content %}
+    <section class="section">
+        <div class="wrap cart-page">
+            <div>
+                <p class="eyebrow">{{ store.name }}</p>
+                <h1>Корзина</h1>
+
+                {% if cart.items is empty %}
+                    <div class="empty-state">
+                        <h2>Корзина пуста</h2>
+                        <p class="muted">Добавьте товары из каталога, чтобы оформить заказ.</p>
+                        <a class="button" href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Перейти к товарам</a>
+                    </div>
+                {% else %}
+                    <form method="post" action="{{ path(storefront_cart_update_route, {storeSlug: store.slug}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cart_update') }}">
+                        <div class="cart-items">
+                            {% for item in cart.items %}
+                                <article class="cart-row">
+                                    <a class="cart-image" href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: item.productSlug}) }}">
+                                        {% if item.imageUrl %}<img src="{{ item.imageUrl }}" alt="{{ item.productName }}">{% else %}<span>Нет фото</span>{% endif %}
+                                    </a>
+                                    <div>
+                                        <h2><a href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: item.productSlug}) }}">{{ item.productName }}</a></h2>
+                                        {% if item.variantName %}<p class="muted">{{ item.variantName }}</p>{% endif %}
+                                        <p>{{ (item.unitPriceMinor / 100)|number_format(2, ',', ' ') }} {{ cart.currency }}</p>
+                                    </div>
+                                    <label>
+                                        <span>Количество</span>
+                                        <input type="number" name="quantity[{{ item.key }}]" min="0" max="99" value="{{ item.quantity }}">
+                                    </label>
+                                    <strong>{{ (item.lineTotalMinor / 100)|number_format(2, ',', ' ') }} {{ cart.currency }}</strong>
+                                </article>
+                            {% endfor %}
+                        </div>
+                        <div class="cart-update"><button class="button button-secondary" type="submit">Обновить корзину</button></div>
+                    </form>
+                {% endif %}
+            </div>
+
+            {% if cart.items is not empty %}
+                <aside class="checkout-panel">
+                    <div class="checkout-total"><span>Итого</span><strong>{{ (cart.totalMinor / 100)|number_format(2, ',', ' ') }} {{ cart.currency }}</strong></div>
+                    {% if checkoutError %}<p class="form-error" role="alert">{{ checkoutError }}</p>{% endif %}
+                    <form class="checkout-form" method="post" action="{{ path(storefront_checkout_route, {storeSlug: store.slug}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
+                        <label for="customer_name">Имя</label>
+                        <input id="customer_name" name="customer_name" maxlength="120" value="{{ customer.name|default('') }}" required>
+                        <label for="customer_email">Email</label>
+                        <input id="customer_email" name="customer_email" type="email" maxlength="180" value="{{ customer.email|default('') }}" required>
+                        <label for="customer_phone">Телефон</label>
+                        <input id="customer_phone" name="customer_phone" type="tel" placeholder="+79XXXXXXXXX" value="{{ customer.phone|default('') }}" required>
+                        <label for="comment">Комментарий</label>
+                        <textarea id="comment" name="comment" maxlength="2000" rows="4">{{ customer.comment|default('') }}</textarea>
+                        <button class="button" type="submit">Оформить заказ</button>
+                    </form>
+                </aside>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

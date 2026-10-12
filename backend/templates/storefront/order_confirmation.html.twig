@@ -1,0 +1,16 @@
+{% extends 'storefront/_layout.html.twig' %}
+
+{% block title %}Заказ принят - {{ store.name }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block storefront_content %}
+    <section class="section">
+        <div class="wrap order-success">
+            <p class="eyebrow">Заказ {{ order.number }}</p>
+            <h1>Заказ принят</h1>
+            <p>Мы получили ваш заказ на сумму <strong>{{ (order.totalMinor / 100)|number_format(2, ',', ' ') }} {{ order.currency }}</strong>.</p>
+            <p class="muted">Магазин свяжется с вами по телефону {{ order.customerPhone }} или email {{ order.customerEmail }}.</p>
+            <a class="button" href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Вернуться к товарам</a>
+        </div>
+    </section>
+{% endblock %}

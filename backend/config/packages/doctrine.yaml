@@ -32,6 +32,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Catalog/Infrastructure/Persistence/Doctrine/Entity'
                 prefix: 'App\Catalog\Infrastructure\Persistence\Doctrine\Entity'
                 alias: Catalog
+            Sales:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Sales/Infrastructure/Persistence/Doctrine/Entity'
+                prefix: 'App\Sales\Infrastructure\Persistence\Doctrine\Entity'
+                alias: Sales
 
 when@test:
     doctrine:

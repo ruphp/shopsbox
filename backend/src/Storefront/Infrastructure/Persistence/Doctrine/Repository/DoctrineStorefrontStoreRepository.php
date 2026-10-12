@@ -38,6 +38,7 @@ final readonly class DoctrineStorefrontStoreRepository implements StorefrontStor
             $store->slug(),
             $store->domain(),
             $store->themeSettings(),
+            $store->defaultCurrency(),
         );
     }
 }

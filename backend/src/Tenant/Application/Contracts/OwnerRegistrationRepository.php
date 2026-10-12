@@ -27,5 +27,6 @@ interface OwnerRegistrationRepository
         string $storeSlug,
         string $storeDomain,
         string $timezone,
+        string $password,
     ): RegisterOwnerResult;
 }

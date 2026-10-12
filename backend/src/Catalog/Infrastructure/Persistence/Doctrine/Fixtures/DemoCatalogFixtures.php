@@ -85,6 +85,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                     $row['slug'],
                     $row['description'],
                     $row['status'],
+                    $row['price'],
                 );
                 $manager->persist($product);
             }
@@ -276,7 +277,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
     }
 
     /**
-     * @return list<array{key: string, id: string, category: string, name: string, slug: string, description: string, status: ProductStatus}>
+     * @return list<array{key: string, id: string, category: string, name: string, slug: string, description: string, status: ProductStatus, price: string}>
      */
     private function productRows(): array
     {
@@ -289,6 +290,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'slug' => 'shopsbox-core-hoodie',
                 'description' => 'Базовое худи для демонстрации товара с размером, цветом и разницей цены у вариаций.',
                 'status' => ProductStatus::ACTIVE,
+                'price' => '4990.00',
             ],
             [
                 'key' => 'mug',
@@ -298,6 +300,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'slug' => 'storefront-mug',
                 'description' => 'Простой активный товар без вариаций: нужен как контрольный пример обычной карточки.',
                 'status' => ProductStatus::ACTIVE,
+                'price' => '790.00',
             ],
             [
                 'key' => 'starterKit',
@@ -307,6 +310,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'slug' => 'starter-store-kit',
                 'description' => 'Товар с опцией комплектации: базовая и подарочная версия.',
                 'status' => ProductStatus::ACTIVE,
+                'price' => '2490.00',
             ],
             [
                 'key' => 'guide',
@@ -316,6 +320,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'slug' => 'launch-guide',
                 'description' => 'Цифровой товар без физических опций. Показывает, что каталог не ограничен одеждой.',
                 'status' => ProductStatus::ACTIVE,
+                'price' => '990.00',
             ],
             [
                 'key' => 'draftLanding',
@@ -325,6 +330,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'slug' => 'draft-banner-kit',
                 'description' => 'Draft-пример: должен быть в данных, но не должен попадать на публичную витрину.',
                 'status' => ProductStatus::DRAFT,
+                'price' => '1500.00',
             ],
             [
                 'key' => 'archivedPoster',
@@ -334,6 +340,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'slug' => 'archived-poster',
                 'description' => 'Archived-пример: нужен для проверки статусов и будущей админки.',
                 'status' => ProductStatus::ARCHIVED,
+                'price' => '500.00',
             ],
         ];
     }

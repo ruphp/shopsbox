@@ -19,7 +19,7 @@
             <div class="wrap">
                 <h1>{{ hero_title }}</h1>
                 <p>{{ hero_text }}</p>
-                <a class="button" href="{{ path('storefront_products', {storeSlug: store.slug}) }}">Смотреть товары</a>
+                <a class="button" href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Смотреть товары</a>
             </div>
         </section>
     {% endif %}
@@ -35,7 +35,7 @@
                     <div class="product-grid">
                         {% for product in view.featuredProducts %}
                             <article class="product-card">
-                                <a class="product-media" href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">
+                                <a class="product-media" href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: product.slug}) }}">
                                     {% if product.imageUrl %}
                                         <img src="{{ product.imageUrl }}" alt="{{ product.name }}" loading="lazy">
                                     {% else %}
@@ -43,8 +43,9 @@
                                     {% endif %}
                                 </a>
                                 <div class="product-card-body">
-                                    <h3><a href="{{ path('storefront_product', {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h3>
+                                    <h3><a href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h3>
                                     <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+                                    <p class="product-price product-price-small">{{ product.price|number_format(2, ',', ' ') }} {{ store.currency }}</p>
                                 </div>
                             </article>
                         {% endfor %}

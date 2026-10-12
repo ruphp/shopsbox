@@ -386,6 +386,39 @@
                 max-width: 520px;
             }
 
+            .auth-page {
+                max-width: 1080px;
+            }
+
+            .auth-message {
+                max-width: 520px;
+                padding: 14px 16px;
+            }
+
+            .auth-actions {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .nav-form {
+                margin: 0;
+            }
+
+            .nav-form button {
+                padding: 0;
+                border: 0;
+                color: var(--accent-dark);
+                background: transparent;
+                font: inherit;
+                cursor: pointer;
+            }
+
+            .nav-form button:hover {
+                text-decoration: underline;
+            }
+
             .auth-switch {
                 display: inline-flex;
                 gap: 4px;
@@ -451,7 +484,8 @@
             .form-field select,
             .legal-note input[type="text"],
             .legal-note input[type="email"],
-            .legal-note input[type="tel"] {
+            .legal-note input[type="tel"],
+            .legal-note input[type="password"] {
                 width: 100%;
                 box-sizing: border-box;
                 min-height: 44px;
@@ -466,7 +500,8 @@
             .form-field select:focus,
             .legal-note input[type="text"]:focus,
             .legal-note input[type="email"]:focus,
-            .legal-note input[type="tel"]:focus {
+            .legal-note input[type="tel"]:focus,
+            .legal-note input[type="password"]:focus {
                 outline: 2px solid rgba(0, 115, 230, 0.18);
                 border-color: var(--accent);
             }

@@ -76,6 +76,7 @@ final class DoctrineProductRepository extends ServiceEntityRepository implements
         string $slug,
         ?string $description,
         ProductStatus $status,
+        string $price,
     ): ProductView {
         $tenant = $this->entityManager->getReference(Tenant::class, $tenantId);
         $store = $this->entityManager->getReference(Store::class, $storeId);
@@ -85,7 +86,7 @@ final class DoctrineProductRepository extends ServiceEntityRepository implements
             throw new LogicException('Catalog references must resolve to Doctrine entities.');
         }
 
-        $product = new Product($id, $tenant, $store, $category, $name, $slug, $description, $status);
+        $product = new Product($id, $tenant, $store, $category, $name, $slug, $description, $status, $price);
         $this->entityManager->persist($product);
 
         return $this->map($product);
@@ -98,6 +99,7 @@ final class DoctrineProductRepository extends ServiceEntityRepository implements
         string $name,
         string $slug,
         ?string $description,
+        string $price,
     ): ?ProductView {
         $product = $this->findEntityByStore($storeId, $productId);
         if (!$product instanceof Product) {
@@ -109,7 +111,7 @@ final class DoctrineProductRepository extends ServiceEntityRepository implements
             throw new LogicException('Category reference must resolve to a Doctrine entity.');
         }
 
-        $product->updateDetails($category, $name, $slug, $description);
+        $product->updateDetails($category, $name, $slug, $description, $price);
 
         return $this->map($product);
     }
@@ -150,6 +152,7 @@ final class DoctrineProductRepository extends ServiceEntityRepository implements
             $product->status()->value,
             $product->createdAt()->format(DATE_ATOM),
             $product->updatedAt()->format(DATE_ATOM),
+            $product->price(),
         );
     }
 }

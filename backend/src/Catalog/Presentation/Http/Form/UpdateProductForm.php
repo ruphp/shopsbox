@@ -22,6 +22,7 @@ final class UpdateProductForm
 
         $categoryId = isset($payload['category_id']) ? trim((string) $payload['category_id']) : null;
         $description = isset($payload['description']) ? trim((string) $payload['description']) : null;
+        $price = trim((string) ($payload['price'] ?? '0.00'));
 
         return new UpdateProductInput(
             $storeId,
@@ -30,6 +31,7 @@ final class UpdateProductForm
             $slug,
             $categoryId === '' ? null : $categoryId,
             $description === '' ? null : $description,
+            $price,
         );
     }
 

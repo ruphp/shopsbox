@@ -23,6 +23,7 @@ final class CreateProductForm
         $categoryId = isset($payload['category_id']) ? trim((string) $payload['category_id']) : null;
         $description = isset($payload['description']) ? trim((string) $payload['description']) : null;
         $status = trim((string) ($payload['status'] ?? 'draft'));
+        $price = trim((string) ($payload['price'] ?? '0.00'));
 
         return new CreateProductInput(
             $tenantId,
@@ -32,6 +33,7 @@ final class CreateProductForm
             $categoryId === '' ? null : $categoryId,
             $description === '' ? null : $description,
             $status,
+            $price,
         );
     }
 

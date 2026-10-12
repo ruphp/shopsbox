@@ -10,6 +10,7 @@ final readonly class StorefrontProductVariantView
      * @param list<string> $optionValues
      */
     public function __construct(
+        public string $id,
         public string $name,
         public string $sku,
         public ?string $priceAdjustment,

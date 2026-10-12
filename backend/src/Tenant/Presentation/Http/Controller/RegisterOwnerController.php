@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 use Twig\Environment;
 
@@ -44,6 +47,7 @@ final readonly class RegisterOwnerController
         private RegisterOwnerForm $form,
         private LoggerInterface $logger,
         private OwnerRegistrationRepository $registrationRepository,
+        private CsrfTokenManagerInterface $csrfTokenManager,
     ) {
     }
 
@@ -78,9 +82,13 @@ final readonly class RegisterOwnerController
     #[Route('/owner/registration', name: 'owner_register_submit', methods: ['POST'])]
     public function submit(Request $request): Response
     {
+        if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('owner_registration', (string) $request->request->get('_token')))) {
+            throw new AccessDeniedHttpException('Invalid CSRF token.');
+        }
+
         $phone = $this->verifiedPhone($request);
         if ($phone === null) {
-            return new RedirectResponse('/auth/code?phone_required=1');
+            return new RedirectResponse('/register');
         }
 
         if ($request->request->get('terms') !== '1' || $request->request->get('privacy') !== '1') {

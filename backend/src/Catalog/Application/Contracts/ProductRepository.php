@@ -27,6 +27,7 @@ interface ProductRepository
         string $slug,
         ?string $description,
         ProductStatus $status,
+        string $price,
     ): ProductView;
 
     public function update(
@@ -36,6 +37,7 @@ interface ProductRepository
         string $name,
         string $slug,
         ?string $description,
+        string $price,
     ): ?ProductView;
 
     public function changeStatus(string $storeId, string $productId, ProductStatus $status): ?ProductView;

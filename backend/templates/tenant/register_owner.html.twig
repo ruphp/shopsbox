@@ -18,6 +18,7 @@
                 {% endif %}
 
                 <form class="legal-note" method="post" action="{{ path('owner_register_submit') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('owner_registration') }}">
                     <p class="form-field">
                         <label for="owner-name">ФИО владельца</label>
                         <input id="owner-name" name="owner_name" type="text" value="{{ ownerName|default('') }}" required>
@@ -25,6 +26,15 @@
                     <p class="form-field">
                         <label for="owner-email">Email для входа</label>
                         <input id="owner-email" name="email" type="email" value="{{ email|default('') }}" autocomplete="email" required>
+                    </p>
+                    <p class="form-field">
+                        <label for="owner-password">Пароль</label>
+                        <input id="owner-password" name="password" type="password" minlength="10" maxlength="128" autocomplete="new-password" required>
+                        <small class="field-hint">От 10 символов, минимум одна буква и одна цифра.</small>
+                    </p>
+                    <p class="form-field">
+                        <label for="owner-password-confirmation">Повторите пароль</label>
+                        <input id="owner-password-confirmation" name="password_confirmation" type="password" minlength="10" maxlength="128" autocomplete="new-password" required>
                     </p>
                     <p class="form-field">
                         <label for="store-name">Название магазина</label>
