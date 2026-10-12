@@ -10,6 +10,7 @@
             <h1>Заказ принят</h1>
             <p>Мы получили ваш заказ на сумму <strong>{{ (order.totalMinor / 100)|number_format(2, ',', ' ') }} {{ order.currency }}</strong>.</p>
             <p class="muted">Магазин свяжется с вами по телефону {{ order.customerPhone }} или email {{ order.customerEmail }}.</p>
+            <p>Если нужно уточнить детали, напишите в виджет технической поддержки. Кнопка виджета находится справа.</p>
             <a class="button" href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Вернуться к товарам</a>
         </div>
     </section>
