@@ -57,7 +57,7 @@
                         <input type="hidden" name="_token" value="{{ csrf_token('cart_add') }}">
                         <input type="hidden" name="product_id" value="{{ product.id }}">
                         {% if product.variants is not empty %}
-                            <div class="product-field">
+                            <div class="product-field product-field-variant">
                                 <label for="variant_id">Вариант</label>
                                 <select id="variant_id" name="variant_id" required>
                                     <option value="">Выберите вариант</option>
@@ -69,7 +69,7 @@
                                 </select>
                             </div>
                         {% endif %}
-                        <div class="product-field">
+                        <div class="product-field product-field-quantity">
                             <label for="quantity">Количество</label>
                             <input id="quantity" name="quantity" type="number" min="1" max="99" value="1" required>
                         </div>

@@ -104,12 +104,24 @@
 }
 
 .add-to-cart {
-    grid-template-columns: minmax(0, 1fr) 100px auto;
+    grid-template-columns: minmax(100px, 140px) minmax(150px, max-content);
     align-items: end;
     margin: 22px 0;
     padding: 18px 0;
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
+}
+
+.product-field-variant {
+    grid-column: 1 / -1;
+}
+
+.product-field-quantity {
+    grid-column: 1;
+}
+
+.add-to-cart .button {
+    grid-column: 2;
 }
 
 .product-field {
@@ -546,6 +558,12 @@
     .cart-row,
     .add-to-cart {
         grid-template-columns: 1fr;
+    }
+
+    .product-field-variant,
+    .product-field-quantity,
+    .add-to-cart .button {
+        grid-column: 1;
     }
 
     .checkout-panel {
