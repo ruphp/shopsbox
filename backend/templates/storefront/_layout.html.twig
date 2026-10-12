@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/storefront.css?v=20261012-zoom">
+    <link rel="stylesheet" href="/assets/storefront.css?v=20261012-exit-label">
 {% endblock %}
 
 {% block body %}
@@ -28,7 +28,7 @@
                     <a href="{{ path('owner_dashboard') }}">В кабинет</a>
                     <form class="nav-form" method="post" action="{{ path('auth_logout') }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
-                        <button type="submit">Выйти</button>
+                        <button class="storefront-exit" type="submit">{{ store.slug == 'demo-store' ? 'Выйти из демо-витрины' : 'Выйти из витрины' }}</button>
                     </form>
                 {% endif %}
             </nav>

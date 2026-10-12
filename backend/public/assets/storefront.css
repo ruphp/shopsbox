@@ -6,6 +6,10 @@
     margin-bottom: 22px;
 }
 
+.storefront-exit {
+    white-space: nowrap;
+}
+
 .category-nav {
     display: flex;
     flex-wrap: wrap;
