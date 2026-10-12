@@ -24,6 +24,13 @@
                 <a href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Товары</a>
                 {% set cart_count = app.session.get('shopsbox_cart_' ~ store.slug)|default([])|length %}
                 <a href="{{ path(storefront_cart_route, {storeSlug: store.slug}) }}">Корзина{% if cart_count > 0 %} ({{ cart_count }}){% endif %}</a>
+                {% if app.session.get('shopsbox_auth_email') %}
+                    <a href="{{ path('owner_dashboard') }}">В кабинет</a>
+                    <form class="nav-form" method="post" action="{{ path('auth_logout') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
+                        <button type="submit">Выйти</button>
+                    </form>
+                {% endif %}
             </nav>
         </div>
     </header>

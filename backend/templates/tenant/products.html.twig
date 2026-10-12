@@ -1,0 +1,66 @@
+{% extends 'tenant/_owner_layout.html.twig' %}
+
+{% block title %}Товары | ShopsBox{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .owner-heading, .owner-row, .owner-row__actions { display: flex; align-items: center; gap: 12px; }
+        .owner-heading { justify-content: space-between; margin-bottom: 24px; }
+        .owner-heading h1 { margin: 0; }
+        .owner-list { border-top: 1px solid var(--line); }
+        .owner-row { justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--line); }
+        .owner-row__main { min-width: 0; }
+        .owner-row__main h2 { margin: 0 0 4px; font-size: 19px; }
+        .owner-row__meta { margin: 0; color: var(--muted); }
+        .owner-row__actions { flex: 0 0 auto; }
+        .status-label { display: inline-flex; padding: 3px 8px; border-radius: 6px; background: var(--surface); font-size: 13px; font-weight: 700; }
+        .owner-notice { margin: 0 0 20px; padding: 12px 14px; border-left: 4px solid #0a7a3d; background: #eef9f2; }
+        @media (max-width: 640px) {
+            .owner-heading, .owner-row { align-items: stretch; flex-direction: column; }
+            .owner-heading .button, .owner-row__actions .button { width: 100%; }
+        }
+    </style>
+{% endblock %}
+
+{% block owner_content %}
+    <section class="section">
+        <div class="wrap">
+            <div class="owner-heading">
+                <div>
+                    <p class="eyebrow">Каталог</p>
+                    <h1>Товары</h1>
+                </div>
+                <a class="button" href="{{ path('owner_product_new') }}">Добавить товар</a>
+            </div>
+
+            {% if notice %}<p class="owner-notice">Изменения сохранены.</p>{% endif %}
+
+            {% if products is empty %}
+                <div class="legal-note">
+                    <h2>Каталог пока пуст</h2>
+                    <p>Добавьте первый товар, цену, описание и изображения.</p>
+                </div>
+            {% else %}
+                <div class="owner-list">
+                    {% for item in products %}
+                        <article class="owner-row">
+                            <div class="owner-row__main">
+                                <h2><a href="{{ path('owner_product_edit', {productId: item.id}) }}">{{ item.name }}</a></h2>
+                                <p class="owner-row__meta">
+                                    {{ item.price|number_format(2, ',', ' ') }} ₽ ·
+                                    <span class="status-label">{{ item.status == 'active' ? 'Опубликован' : (item.status == 'archived' ? 'В архиве' : 'Черновик') }}</span>
+                                </p>
+                            </div>
+                            <div class="owner-row__actions">
+                                {% if item.status == 'active' %}
+                                    <a class="button button-secondary" href="{{ path('storefront_product', {storeSlug: settings.slug, productSlug: item.slug}) }}">На витрине</a>
+                                {% endif %}
+                                <a class="button" href="{{ path('owner_product_edit', {productId: item.id}) }}">Редактировать</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

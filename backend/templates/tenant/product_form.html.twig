@@ -1,0 +1,141 @@
+{% extends 'tenant/_owner_layout.html.twig' %}
+
+{% set editing = product is not null %}
+{% set name_value = form.name|default(editing ? product.name : '') %}
+{% set slug_value = form.slug|default(editing ? product.slug : '') %}
+{% set price_value = form.price|default(editing ? product.price : '') %}
+{% set category_value = form.category_id|default(editing ? product.categoryId : '') %}
+{% set description_value = form.description|default(editing ? product.description : '') %}
+
+{% block title %}{{ editing ? 'Редактирование товара' : 'Новый товар' }} | ShopsBox{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .owner-form-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 32px; align-items: start; }
+        .owner-form-layout h1 { margin-top: 0; }
+        .owner-form textarea { width: 100%; min-height: 150px; resize: vertical; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+        .owner-form__actions, .status-actions, .image-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .owner-form button, .status-actions button, .image-actions button { border: 0; cursor: pointer; font: inherit; }
+        .owner-side { padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+        .owner-side h2 { margin-top: 0; font-size: 20px; }
+        .owner-error, .owner-notice { margin: 0 0 20px; padding: 12px 14px; }
+        .owner-error { border-left: 4px solid #b42318; background: #fff1f0; color: #8a1c13; }
+        .owner-notice { border-left: 4px solid #0a7a3d; background: #eef9f2; }
+        .gallery-editor { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin: 18px 0; }
+        .gallery-item { padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+        .gallery-item img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; background: var(--surface); }
+        .gallery-item p { margin: 8px 0; font-size: 13px; }
+        .button-danger { color: #b42318; background: #ffffff; border: 1px solid #d92d20 !important; }
+        .button-danger:hover { color: #ffffff; background: #b42318; }
+        .back-link { display: inline-block; margin-bottom: 18px; }
+        @media (max-width: 760px) { .owner-form-layout { grid-template-columns: 1fr; } }
+    </style>
+{% endblock %}
+
+{% block owner_content %}
+    <section class="section">
+        <div class="wrap">
+            <a class="back-link" href="{{ path('owner_products') }}">← Назад к товарам</a>
+            {% if error %}<p class="owner-error">{{ error }}</p>{% endif %}
+            {% if notice %}<p class="owner-notice">Изменения сохранены.</p>{% endif %}
+
+            <div class="owner-form-layout">
+                <div>
+                    <p class="eyebrow">{{ editing ? 'Карточка товара' : 'Каталог' }}</p>
+                    <h1>{{ editing ? product.name : 'Новый товар' }}</h1>
+
+                    <form class="owner-form" method="post" action="{{ editing ? path('owner_product_update', {productId: product.id}) : path('owner_product_create') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token(editing ? 'owner_product_update_' ~ product.id : 'owner_product_create') }}">
+                        <div class="form-field">
+                            <label for="product-name">Название</label>
+                            <input id="product-name" name="name" value="{{ name_value }}" maxlength="180" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="product-slug">Адрес товара</label>
+                            <input id="product-slug" name="slug" value="{{ slug_value }}" maxlength="140" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required>
+                            <span class="field-hint">Строчные латинские буквы, цифры и дефисы.</span>
+                        </div>
+                        <div class="form-field">
+                            <label for="product-price">Цена, ₽</label>
+                            <input id="product-price" name="price" value="{{ price_value }}" inputmode="decimal" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="product-category">Категория</label>
+                            <select id="product-category" name="category_id">
+                                <option value="">Без категории</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {{ category_value == category.id ? 'selected' : '' }}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="product-description">Описание</label>
+                            <textarea id="product-description" name="description">{{ description_value }}</textarea>
+                        </div>
+                        <div class="owner-form__actions">
+                            <button class="button" type="submit">{{ editing ? 'Сохранить' : 'Создать товар' }}</button>
+                            <a class="button button-secondary" href="{{ path('owner_products') }}">Отмена</a>
+                        </div>
+                    </form>
+
+                    {% if editing %}
+                        <hr style="margin: 32px 0; border: 0; border-top: 1px solid var(--line)">
+                        <h2>Изображения</h2>
+                        <p class="muted">Первое или отмеченное главным изображение показывается в каталоге. До 5 МБ, JPG, PNG, WebP или GIF.</p>
+                        <form method="post" enctype="multipart/form-data" action="{{ path('owner_product_image_upload', {productId: product.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('owner_product_images_' ~ product.id) }}">
+                            <div class="form-field">
+                                <label for="product-image">Добавить изображение</label>
+                                <input id="product-image" type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif" required>
+                            </div>
+                            <button class="button" type="submit">Загрузить</button>
+                        </form>
+
+                        <div class="gallery-editor">
+                            {% for image in images %}
+                                <article class="gallery-item">
+                                    <img src="{{ image.publicUrl }}" alt="Изображение товара">
+                                    <p>{{ image.primaryImage ? 'Главное изображение' : 'Дополнительное изображение' }}</p>
+                                    <div class="image-actions">
+                                        {% if not image.primaryImage %}
+                                            <form method="post" action="{{ path('owner_product_image_primary', {productId: product.id, imageId: image.id}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('owner_product_images_' ~ product.id) }}">
+                                                <button class="button button-secondary" type="submit">Сделать главным</button>
+                                            </form>
+                                        {% endif %}
+                                        <form method="post" action="{{ path('owner_product_image_remove', {productId: product.id, imageId: image.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('owner_product_images_' ~ product.id) }}">
+                                            <button class="button button-danger" type="submit">Удалить</button>
+                                        </form>
+                                    </div>
+                                </article>
+                            {% else %}
+                                <p class="muted">Изображений пока нет.</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if editing %}
+                    <aside class="owner-side">
+                        <h2>Публикация</h2>
+                        <p>Сейчас: <strong>{{ product.status == 'active' ? 'опубликован' : (product.status == 'archived' ? 'в архиве' : 'черновик') }}</strong></p>
+                        {% if product.status != 'archived' %}
+                            <form class="status-actions" method="post" action="{{ path('owner_product_status', {productId: product.id, status: product.status == 'active' ? 'draft' : 'active'}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('owner_product_status_' ~ product.id) }}">
+                                <button class="button" type="submit">{{ product.status == 'active' ? 'Скрыть с витрины' : 'Опубликовать' }}</button>
+                            </form>
+                            <form class="status-actions" style="margin-top: 12px" method="post" action="{{ path('owner_product_status', {productId: product.id, status: 'archived'}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('owner_product_status_' ~ product.id) }}">
+                                <button class="button button-danger" type="submit">Перенести в архив</button>
+                            </form>
+                        {% endif %}
+                        {% if product.status == 'active' %}
+                            <p style="margin-bottom: 0"><a href="{{ path('storefront_product', {storeSlug: settings.slug, productSlug: product.slug}) }}">Открыть на витрине</a></p>
+                        {% endif %}
+                    </aside>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
