@@ -175,7 +175,7 @@
 
                         <section class="structure-section" id="options">
                             <h2>Опции товара</h2>
-                            <p class="muted">То, что выбирает покупатель: размер, цвет или комплектацию. Сама опция цену не меняет.</p>
+                            <p class="muted">Управляемые поля, из которых собираются варианты: размер, цвет, комплектация. Сами опции не задают цену и SKU.</p>
                             <div class="structure-list">
                                 {% for group in structure.optionGroups %}
                                     <article class="structure-item">
@@ -224,7 +224,7 @@
 
                         <section class="structure-section" id="variants">
                             <h2>Варианты</h2>
-                            <p class="muted">Создайте вариант, если выбор влияет на цену, SKU или доступность. Например: «L / красный», SKU RED-L, наценка 300 ₽.</p>
+                            <p class="muted">Конкретные сочетания значений опций. Здесь задаются SKU, наценка и доступность. Например: «L / красный», SKU RED-L, наценка 300 ₽.</p>
                             <div class="structure-list">
                                 {% for variant in structure.variants %}
                                     <form class="structure-item" method="post" action="{{ path('owner_product_variant_update', {productId: product.id, variantId: variant.id}) }}">
