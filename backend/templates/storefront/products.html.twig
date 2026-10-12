@@ -48,7 +48,7 @@
                                 {% endif %}
                                 <h2><a href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h2>
                                 <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
-                                <p class="product-price product-price-small">{{ product.price|number_format(2, ',', ' ') }} {{ store.currency }}</p>
+                                <p class="product-price product-price-small">{{ product.price|number_format(2, ',', ' ') }} {{ currency_symbol }}</p>
                                 {% if product.variants is not empty %}
                                     <p class="product-note">Вариантов: {{ product.variants|length }}</p>
                                 {% endif %}

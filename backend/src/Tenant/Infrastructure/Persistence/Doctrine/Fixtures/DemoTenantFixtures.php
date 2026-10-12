@@ -32,7 +32,7 @@ final class DemoTenantFixtures extends Fixture
         if (!$tenant instanceof Tenant) {
             $tenant = new Tenant(
                 self::DEMO_TENANT_ID,
-                'Demo Tenant',
+                'Демонстрационный проект',
                 'active',
                 'billing@demo.shopsbox.local',
             );
@@ -45,7 +45,7 @@ final class DemoTenantFixtures extends Fixture
             $store = new Store(
                 self::DEMO_STORE_ID,
                 $tenant,
-                'Demo Store',
+                'Демо Витрина',
                 'demo-store',
                 'demo.shopsbox.ru',
                 'active',

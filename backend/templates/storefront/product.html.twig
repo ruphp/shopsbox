@@ -16,11 +16,31 @@
             <p><a href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Назад к товарам</a></p>
 
             <div class="product-detail">
-                <div class="product-detail-media">
+                <div class="product-gallery" data-product-gallery>
+                    <div class="product-detail-media">
+                        {% if product.imageUrl %}
+                            <img src="{{ product.imageUrl }}" alt="{{ product.name }}" data-gallery-main>
+                            <button class="product-gallery-expand" type="button" data-gallery-expand aria-label="Увеличить изображение" title="Увеличить изображение">
+                                <span class="zoom-icon" aria-hidden="true"></span>
+                            </button>
+                        {% else %}
+                            <span>{{ product.name }}</span>
+                        {% endif %}
+                    </div>
+                    {% if product.imageUrls|length > 1 %}
+                        <div class="product-gallery-thumbnails" aria-label="Фотографии товара">
+                            {% for imageUrl in product.imageUrls %}
+                                <button class="product-gallery-thumbnail{{ loop.first ? ' is-active' : '' }}" type="button" data-gallery-image="{{ imageUrl }}" aria-label="Показать фотографию {{ loop.index }}" aria-pressed="{{ loop.first ? 'true' : 'false' }}">
+                                    <img src="{{ imageUrl }}" alt="">
+                                </button>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     {% if product.imageUrl %}
-                        <img src="{{ product.imageUrl }}" alt="{{ product.name }}">
-                    {% else %}
-                        <span>{{ product.name }}</span>
+                        <dialog class="product-lightbox" data-product-lightbox aria-label="Увеличенное изображение товара">
+                            <button class="product-lightbox-close" type="button" data-lightbox-close aria-label="Закрыть увеличенное изображение" title="Закрыть">×</button>
+                            <img src="{{ product.imageUrl }}" alt="{{ product.name }}" data-lightbox-image>
+                        </dialog>
                     {% endif %}
                 </div>
 
@@ -31,24 +51,28 @@
                     <h1>{{ product.name }}</h1>
                     <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
 
-                    <p class="product-price">{{ product.price|number_format(2, ',', ' ') }} {{ store.currency }}</p>
+                    <p class="product-price">{{ product.price|number_format(2, ',', ' ') }} {{ currency_symbol }}</p>
 
                     <form class="add-to-cart" method="post" action="{{ path(storefront_cart_add_route, {storeSlug: store.slug}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('cart_add') }}">
                         <input type="hidden" name="product_id" value="{{ product.id }}">
                         {% if product.variants is not empty %}
-                            <label for="variant_id">Вариант</label>
-                            <select id="variant_id" name="variant_id" required>
-                                <option value="">Выберите вариант</option>
-                                {% for variant in product.variants %}
-                                    <option value="{{ variant.id }}">
-                                        {{ variant.name }}{% if variant.priceAdjustment %} (+{{ variant.priceAdjustment|number_format(2, ',', ' ') }} {{ store.currency }}){% endif %}
-                                    </option>
-                                {% endfor %}
-                            </select>
+                            <div class="product-field">
+                                <label for="variant_id">Вариант</label>
+                                <select id="variant_id" name="variant_id" required>
+                                    <option value="">Выберите вариант</option>
+                                    {% for variant in product.variants %}
+                                        <option value="{{ variant.id }}">
+                                            {{ variant.name }}{% if variant.priceAdjustment %} (+{{ variant.priceAdjustment|number_format(2, ',', ' ') }} {{ currency_symbol }}){% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         {% endif %}
-                        <label for="quantity">Количество</label>
-                        <input id="quantity" name="quantity" type="number" min="1" max="99" value="1" required>
+                        <div class="product-field">
+                            <label for="quantity">Количество</label>
+                            <input id="quantity" name="quantity" type="number" min="1" max="99" value="1" required>
+                        </div>
                         <button class="button" type="submit">Добавить в корзину</button>
                     </form>
 
@@ -78,9 +102,9 @@
                                             <strong>{{ variant.name }}</strong>
                                             <span>{{ variant.optionValues|join(' / ') }}</span>
                                         </div>
-                                        <small>SKU: {{ variant.sku }}</small>
+                                        <small>Артикул: {{ variant.sku }}</small>
                                         {% if variant.priceAdjustment %}
-                                            <small>Доплата: {{ variant.priceAdjustment }}</small>
+                                            <small>Доплата: {{ variant.priceAdjustment|number_format(2, ',', ' ') }} {{ currency_symbol }}</small>
                                         {% endif %}
                                     </article>
                                 {% endfor %}
@@ -105,4 +129,42 @@
             </div>
         </div>
     </section>
+    <script>
+        document.querySelectorAll('[data-product-gallery]').forEach(function (gallery) {
+            var mainImage = gallery.querySelector('[data-gallery-main]');
+            var expandButton = gallery.querySelector('[data-gallery-expand]');
+            var lightbox = gallery.querySelector('[data-product-lightbox]');
+            var lightboxImage = gallery.querySelector('[data-lightbox-image]');
+            var closeButton = gallery.querySelector('[data-lightbox-close]');
+
+            function openLightbox() {
+                lightboxImage.src = mainImage.src;
+                lightboxImage.alt = mainImage.alt;
+                lightbox.showModal();
+            }
+
+            if (expandButton && lightbox) {
+                expandButton.addEventListener('click', openLightbox);
+                closeButton.addEventListener('click', function () {
+                    lightbox.close();
+                });
+                lightbox.addEventListener('click', function (event) {
+                    if (event.target === lightbox) {
+                        lightbox.close();
+                    }
+                });
+            }
+
+            gallery.querySelectorAll('[data-gallery-image]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    mainImage.src = button.dataset.galleryImage;
+                    gallery.querySelectorAll('[data-gallery-image]').forEach(function (item) {
+                        var active = item === button;
+                        item.classList.toggle('is-active', active);
+                        item.setAttribute('aria-pressed', active ? 'true' : 'false');
+                    });
+                });
+            });
+        });
+    </script>
 {% endblock %}

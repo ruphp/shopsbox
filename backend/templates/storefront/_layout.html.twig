@@ -15,6 +15,7 @@
     {% set storefront_cart_add_route = route_prefix ~ 'storefront_cart_add' %}
     {% set storefront_cart_update_route = route_prefix ~ 'storefront_cart_update' %}
     {% set storefront_checkout_route = route_prefix ~ 'storefront_checkout' %}
+    {% set currency_symbol = store.currency == 'RUB' ? '₽' : store.currency %}
     <header class="header">
         <div class="wrap nav">
             <a class="brand" href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">{{ store.name }}</a>

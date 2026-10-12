@@ -28,13 +28,13 @@
                                     <div>
                                         <h2><a href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: item.productSlug}) }}">{{ item.productName }}</a></h2>
                                         {% if item.variantName %}<p class="muted">{{ item.variantName }}</p>{% endif %}
-                                        <p>{{ (item.unitPriceMinor / 100)|number_format(2, ',', ' ') }} {{ cart.currency }}</p>
+                                        <p>{{ (item.unitPriceMinor / 100)|number_format(2, ',', ' ') }} {{ currency_symbol }}</p>
                                     </div>
                                     <label>
                                         <span>Количество</span>
                                         <input type="number" name="quantity[{{ item.key }}]" min="0" max="99" value="{{ item.quantity }}">
                                     </label>
-                                    <strong>{{ (item.lineTotalMinor / 100)|number_format(2, ',', ' ') }} {{ cart.currency }}</strong>
+                                    <strong>{{ (item.lineTotalMinor / 100)|number_format(2, ',', ' ') }} {{ currency_symbol }}</strong>
                                 </article>
                             {% endfor %}
                         </div>
@@ -45,7 +45,7 @@
 
             {% if cart.items is not empty %}
                 <aside class="checkout-panel">
-                    <div class="checkout-total"><span>Итого</span><strong>{{ (cart.totalMinor / 100)|number_format(2, ',', ' ') }} {{ cart.currency }}</strong></div>
+                    <div class="checkout-total"><span>Итого</span><strong>{{ (cart.totalMinor / 100)|number_format(2, ',', ' ') }} {{ currency_symbol }}</strong></div>
                     {% if checkoutError %}<p class="form-error" role="alert">{{ checkoutError }}</p>{% endif %}
                     <form class="checkout-form" method="post" action="{{ path(storefront_checkout_route, {storeSlug: store.slug}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">

@@ -106,14 +106,20 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 continue;
             }
 
-            $manager->persist(new ProductImage(
+            $image = new ProductImage(
                 $row['id'],
                 $products[$row['product']],
                 $row['key'],
                 $row['publicUrl'],
                 'image/jpeg',
-                120000,
-            ));
+                $row['size'],
+            );
+            $image->changePosition($row['position']);
+            if ($row['primary']) {
+                $image->makePrimary();
+            }
+
+            $manager->persist($image);
         }
     }
 
@@ -286,7 +292,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'key' => 'hoodie',
                 'id' => '66666666-0101-4666-8666-666666666666',
                 'category' => 'apparel',
-                'name' => 'Худи ShopsBox Core',
+                'name' => 'Базовое худи ShopsBox',
                 'slug' => 'shopsbox-core-hoodie',
                 'description' => 'Базовое худи для демонстрации товара с размером, цветом и разницей цены у вариаций.',
                 'status' => ProductStatus::ACTIVE,
@@ -328,7 +334,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'category' => 'digital',
                 'name' => 'Черновик набора баннеров',
                 'slug' => 'draft-banner-kit',
-                'description' => 'Draft-пример: должен быть в данных, но не должен попадать на публичную витрину.',
+                'description' => 'Черновой пример: должен быть в данных, но не должен попадать на публичную витрину.',
                 'status' => ProductStatus::DRAFT,
                 'price' => '1500.00',
             ],
@@ -338,7 +344,7 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
                 'category' => 'archive',
                 'name' => 'Архивный постер',
                 'slug' => 'archived-poster',
-                'description' => 'Archived-пример: нужен для проверки статусов и будущей админки.',
+                'description' => 'Архивный пример: нужен для проверки статусов и будущей админки.',
                 'status' => ProductStatus::ARCHIVED,
                 'price' => '500.00',
             ],
@@ -346,15 +352,19 @@ final class DemoCatalogFixtures extends Fixture implements DependentFixtureInter
     }
 
     /**
-     * @return list<array{id: string, product: string, key: string, publicUrl: string}>
+     * @return list<array{id: string, product: string, key: string, publicUrl: string, size: int, position: int, primary: bool}>
      */
     private function imageRows(): array
     {
         return [
-            ['id' => '88888888-0101-4888-8888-888888888888', 'product' => 'hoodie', 'key' => 'demo-catalog/hoodie.jpg', 'publicUrl' => 'https://picsum.photos/seed/shopsbox-hoodie/900/700'],
-            ['id' => '88888888-0102-4888-8888-888888888888', 'product' => 'mug', 'key' => 'demo-catalog/mug.jpg', 'publicUrl' => 'https://picsum.photos/seed/shopsbox-mug/900/700'],
-            ['id' => '88888888-0103-4888-8888-888888888888', 'product' => 'starterKit', 'key' => 'demo-catalog/starter-kit.jpg', 'publicUrl' => 'https://picsum.photos/seed/shopsbox-kit/900/700'],
-            ['id' => '88888888-0104-4888-8888-888888888888', 'product' => 'guide', 'key' => 'demo-catalog/guide.jpg', 'publicUrl' => 'https://picsum.photos/seed/shopsbox-guide/900/700'],
+            ['id' => '88888888-0101-4888-8888-888888888888', 'product' => 'hoodie', 'key' => 'demo/hoodie-1.jpg', 'publicUrl' => '/assets/demo/hoodie-1.jpg', 'size' => 122858, 'position' => 10, 'primary' => true],
+            ['id' => '88888888-0201-4888-8888-888888888888', 'product' => 'hoodie', 'key' => 'demo/hoodie-2.jpg', 'publicUrl' => '/assets/demo/hoodie-2.jpg', 'size' => 118125, 'position' => 20, 'primary' => false],
+            ['id' => '88888888-0102-4888-8888-888888888888', 'product' => 'mug', 'key' => 'demo/mug-1.jpg', 'publicUrl' => '/assets/demo/mug-1.jpg', 'size' => 97942, 'position' => 10, 'primary' => true],
+            ['id' => '88888888-0202-4888-8888-888888888888', 'product' => 'mug', 'key' => 'demo/mug-2.jpg', 'publicUrl' => '/assets/demo/mug-2.jpg', 'size' => 49646, 'position' => 20, 'primary' => false],
+            ['id' => '88888888-0103-4888-8888-888888888888', 'product' => 'starterKit', 'key' => 'demo/starter-kit-1.jpg', 'publicUrl' => '/assets/demo/starter-kit-1.jpg', 'size' => 173112, 'position' => 10, 'primary' => true],
+            ['id' => '88888888-0203-4888-8888-888888888888', 'product' => 'starterKit', 'key' => 'demo/starter-kit-2.jpg', 'publicUrl' => '/assets/demo/starter-kit-2.jpg', 'size' => 161324, 'position' => 20, 'primary' => false],
+            ['id' => '88888888-0104-4888-8888-888888888888', 'product' => 'guide', 'key' => 'demo/launch-guide-1.jpg', 'publicUrl' => '/assets/demo/launch-guide-1.jpg', 'size' => 109909, 'position' => 10, 'primary' => true],
+            ['id' => '88888888-0204-4888-8888-888888888888', 'product' => 'guide', 'key' => 'demo/launch-guide-2.jpg', 'publicUrl' => '/assets/demo/launch-guide-2.jpg', 'size' => 112538, 'position' => 20, 'primary' => false],
         ];
     }
 

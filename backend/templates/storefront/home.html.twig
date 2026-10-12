@@ -45,7 +45,7 @@
                                 <div class="product-card-body">
                                     <h3><a href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h3>
                                     <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
-                                    <p class="product-price product-price-small">{{ product.price|number_format(2, ',', ' ') }} {{ store.currency }}</p>
+                                    <p class="product-price product-price-small">{{ product.price|number_format(2, ',', ' ') }} {{ currency_symbol }}</p>
                                 </div>
                             </article>
                         {% endfor %}

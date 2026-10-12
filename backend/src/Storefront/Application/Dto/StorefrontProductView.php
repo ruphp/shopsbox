@@ -10,6 +10,7 @@ final readonly class StorefrontProductView
      * @param list<StorefrontProductAttributeView> $attributes
      * @param list<StorefrontProductOptionGroupView> $optionGroups
      * @param list<StorefrontProductVariantView> $variants
+     * @param list<string> $imageUrls
      */
     public function __construct(
         public string $id,
@@ -23,6 +24,7 @@ final readonly class StorefrontProductView
         public array $optionGroups = [],
         public array $variants = [],
         public string $price = '0.00',
+        public array $imageUrls = [],
     ) {
     }
 }

@@ -118,6 +118,8 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
 
     private function map(Product $product): StorefrontProductView
     {
+        $imageUrls = $this->imageUrls($product);
+
         return new StorefrontProductView(
             $product->id(),
             $product->store()->id(),
@@ -125,11 +127,12 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             $product->slug(),
             $product->description(),
             $product->category() instanceof Category ? $this->mapCategory($product->category()) : null,
-            $this->firstImageUrl($product),
+            $imageUrls[0] ?? null,
             $this->attributes($product),
             $this->optionGroups($product),
             $this->variants($product),
             $product->price(),
+            $imageUrls,
         );
     }
 
@@ -138,9 +141,12 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
         return new StorefrontCategoryView($category->id(), $category->name(), $category->slug());
     }
 
-    private function firstImageUrl(Product $product): ?string
+    /**
+     * @return list<string>
+     */
+    private function imageUrls(Product $product): array
     {
-        $image = $this->entityManager->createQueryBuilder()
+        $images = $this->entityManager->createQueryBuilder()
             ->select('image')
             ->from(ProductImage::class, 'image')
             ->where('image.product = :product')
@@ -148,11 +154,13 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             ->setParameter('product', $product)
             ->orderBy('image.primaryImage', 'DESC')
             ->addOrderBy('image.position', 'ASC')
-            ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getResult();
 
-        return $image instanceof ProductImage ? $image->publicUrl() : null;
+        return array_map(
+            static fn (ProductImage $image): string => $image->publicUrl(),
+            $images,
+        );
     }
 
     /**

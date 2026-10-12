@@ -109,7 +109,7 @@ final readonly class StorefrontCartController
 
         $emptyCart = $this->buildCart->execute($storeSlug, []);
         if ($emptyCart === null) {
-            return new Response('Store not found.', Response::HTTP_NOT_FOUND);
+            return new Response('Магазин не найден.', Response::HTTP_NOT_FOUND);
         }
 
         return new Response($this->twig->render('storefront/order_confirmation.html.twig', [
@@ -123,7 +123,7 @@ final readonly class StorefrontCartController
     {
         $cart = $this->buildCart->execute($storeSlug, $this->lineInputs($request, $storeSlug));
         if ($cart === null) {
-            return new Response('Store not found.', Response::HTTP_NOT_FOUND);
+            return new Response('Магазин не найден.', Response::HTTP_NOT_FOUND);
         }
 
         return new Response($this->twig->render('storefront/cart.html.twig', [
@@ -170,7 +170,7 @@ final readonly class StorefrontCartController
     private function requireValidToken(Request $request, string $id): void
     {
         if (!$this->csrfTokenManager->isTokenValid(new CsrfToken($id, (string) $request->request->get('_token')))) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Invalid CSRF token.');
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Недействительный защитный токен.');
         }
     }
 
