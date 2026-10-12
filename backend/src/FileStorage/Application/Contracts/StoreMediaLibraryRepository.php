@@ -16,4 +16,10 @@ interface StoreMediaLibraryRepository
     public function totalSizeByStore(string $storeId): int;
 
     public function countByStore(string $storeId): int;
+
+    public function persist(string $id, string $storeId, string $key, string $publicUrl, string $originalName, string $mimeType, int $size): StoreMediaFileView;
+
+    public function findByStore(string $storeId, string $fileId): ?StoreMediaFileView;
+
+    public function deleteIfUnused(string $storeId, string $fileId): ?string;
 }

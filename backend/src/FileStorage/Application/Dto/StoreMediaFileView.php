@@ -15,6 +15,8 @@ final readonly class StoreMediaFileView
         public int $size,
         public string $usage,
         public string $createdAt,
+        public string $originalName = '',
+        public int $usageCount = 0,
     ) {
     }
 }

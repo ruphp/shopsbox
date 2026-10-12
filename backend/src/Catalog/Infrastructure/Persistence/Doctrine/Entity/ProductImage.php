@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Catalog\Infrastructure\Persistence\Doctrine\Entity;
 
 use App\Catalog\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductImageRepository;
+use App\FileStorage\Infrastructure\Persistence\Doctrine\Entity\MediaFile;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DoctrineProductImageRepository::class)]
 #[ORM\Table(name: 'product_images')]
 #[ORM\Index(name: 'idx_product_images_product', columns: ['product_id'])]
+#[ORM\Index(name: 'idx_product_images_media_file', columns: ['media_file_id'])]
 class ProductImage
 {
     #[ORM\Id]
@@ -20,6 +22,10 @@ class ProductImage
     #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private Product $product;
+
+    #[ORM\ManyToOne(targetEntity: MediaFile::class)]
+    #[ORM\JoinColumn(name: 'media_file_id', referencedColumnName: 'id', nullable: false, onDelete: 'RESTRICT')]
+    private MediaFile $mediaFile;
 
     #[ORM\Column(name: 'storage_key', length: 500)]
     private string $key;
@@ -48,17 +54,15 @@ class ProductImage
     public function __construct(
         string $id,
         Product $product,
-        string $key,
-        string $publicUrl,
-        string $mimeType,
-        int $size,
+        MediaFile $mediaFile,
     ) {
         $this->id = $id;
         $this->product = $product;
-        $this->key = $key;
-        $this->publicUrl = $publicUrl;
-        $this->mimeType = $mimeType;
-        $this->size = $size;
+        $this->mediaFile = $mediaFile;
+        $this->key = $mediaFile->key();
+        $this->publicUrl = $mediaFile->publicUrl();
+        $this->mimeType = $mediaFile->mimeType();
+        $this->size = $mediaFile->size();
         $this->createdAt = new DateTimeImmutable();
     }
 
@@ -70,6 +74,11 @@ class ProductImage
     public function product(): Product
     {
         return $this->product;
+    }
+
+    public function mediaFile(): MediaFile
+    {
+        return $this->mediaFile;
     }
 
     public function key(): string

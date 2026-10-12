@@ -14,6 +14,7 @@ use App\Catalog\Application\Dto\UploadProductImageInput;
 use App\Catalog\Application\Exception\InvalidProductImageInput;
 use App\Catalog\Application\Exception\ProductNotFound;
 use App\FileStorage\Application\Contracts\FileStorage;
+use App\FileStorage\Application\Contracts\StoreMediaLibraryRepository;
 use App\FileStorage\Application\UseCase\StoreFileUsagePolicy;
 use RuntimeException;
 
@@ -35,6 +36,7 @@ final readonly class UploadProductImageUseCase
         private EntityFlusher $entityFlusher,
         private UuidGenerator $uuidGenerator,
         private StoreFileUsagePolicy $fileUsagePolicy,
+        private StoreMediaLibraryRepository $mediaLibraryRepository,
     ) {
     }
 
@@ -53,22 +55,20 @@ final readonly class UploadProductImageUseCase
             throw InvalidProductImageInput::forField('image', 'Store file storage limit exceeded.');
         }
 
-        $imageId = $this->uuidGenerator->generate();
+        $fileId = $this->uuidGenerator->generate();
         $key = sprintf(
-            'catalog/products/%s/images/%s.%s',
-            $input->productId,
-            $imageId,
+            'stores/%s/media/%s.%s',
+            $input->storeId,
+            $fileId,
             self::MIME_EXTENSIONS[$input->mimeType],
         );
 
         $storedFile = $this->fileStorage->write($key, $input->contents, $input->mimeType);
+        $this->mediaLibraryRepository->persist($fileId, $input->storeId, $storedFile->key, $storedFile->publicUrl, $input->originalFilename, $input->mimeType, $input->size);
         $image = $this->productImageRepository->persist(
-            $imageId,
+            $this->uuidGenerator->generate(),
             $input->productId,
-            $storedFile->key,
-            $storedFile->publicUrl,
-            $input->mimeType,
-            $input->size,
+            $fileId,
         );
 
         $this->entityFlusher->flush();

@@ -29,21 +29,23 @@ final class UploadProductImageUseCaseTest extends TestCase
         $imageRepository = new FakeProductImageRepository();
         $fileStorage = new FakeFileStorage();
         $flusher = new SpyUploadImageEntityFlusher();
+        $mediaRepository = new EmptyStoreMediaLibraryRepository();
         $useCase = new UploadProductImageUseCase(
             $productRepository,
             $imageRepository,
             $fileStorage,
             $flusher,
             new StubUploadImageUuidGenerator('77777777-7777-4777-8777-777777777777'),
-            new StoreFileUsagePolicy(new EmptyStoreMediaLibraryRepository()),
+            new StoreFileUsagePolicy($mediaRepository),
+            $mediaRepository,
         );
 
         $result = $useCase->execute($this->validInput());
 
         self::assertSame('77777777-7777-4777-8777-777777777777', $result->id);
         self::assertSame('33333333-3333-4333-8333-333333333333', $result->productId);
-        self::assertSame('catalog/products/33333333-3333-4333-8333-333333333333/images/77777777-7777-4777-8777-777777777777.png', $result->key);
-        self::assertSame('http://files.local/catalog/products/33333333-3333-4333-8333-333333333333/images/77777777-7777-4777-8777-777777777777.png', $result->publicUrl);
+        self::assertSame('stores/22222222-2222-4222-8222-222222222222/media/77777777-7777-4777-8777-777777777777.png', $result->key);
+        self::assertSame('http://files.local/stores/22222222-2222-4222-8222-222222222222/media/77777777-7777-4777-8777-777777777777.png', $result->publicUrl);
         self::assertSame('image/png', $fileStorage->written[0]['contentType']);
         self::assertSame('image-binary', $fileStorage->written[0]['contents']);
         self::assertCount(1, $imageRepository->saved);
@@ -52,13 +54,15 @@ final class UploadProductImageUseCaseTest extends TestCase
 
     public function testItRejectsUnsupportedMimeType(): void
     {
+        $mediaRepository = new EmptyStoreMediaLibraryRepository();
         $useCase = new UploadProductImageUseCase(
             new FakeUploadImageProductRepository($this->product()),
             new FakeProductImageRepository(),
             new FakeFileStorage(),
             new SpyUploadImageEntityFlusher(),
             new StubUploadImageUuidGenerator('77777777-7777-4777-8777-777777777777'),
-            new StoreFileUsagePolicy(new EmptyStoreMediaLibraryRepository()),
+            new StoreFileUsagePolicy($mediaRepository),
+            $mediaRepository,
         );
 
         $this->expectException(InvalidProductImageInput::class);
@@ -162,34 +166,28 @@ final class FakeUploadImageProductRepository implements ProductRepository
 final class FakeProductImageRepository implements ProductImageRepository
 {
     /**
-     * @var list<array{id: string, productId: string, key: string, publicUrl: string, mimeType: string, size: int}>
+     * @var list<array{id: string, productId: string, mediaFileId: string}>
      */
     public array $saved = [];
 
     public function persist(
         string $id,
         string $productId,
-        string $key,
-        string $publicUrl,
-        string $mimeType,
-        int $size,
+        string $mediaFileId,
     ): ProductImageView {
         $this->saved[] = [
             'id' => $id,
             'productId' => $productId,
-            'key' => $key,
-            'publicUrl' => $publicUrl,
-            'mimeType' => $mimeType,
-            'size' => $size,
+            'mediaFileId' => $mediaFileId,
         ];
 
         return new ProductImageView(
             $id,
             $productId,
-            $key,
-            $publicUrl,
-            $mimeType,
-            $size,
+            'stores/22222222-2222-4222-8222-222222222222/media/'.$mediaFileId.'.png',
+            'http://files.local/stores/22222222-2222-4222-8222-222222222222/media/'.$mediaFileId.'.png',
+            'image/png',
+            12,
             '2026-04-19T12:00:00+00:00',
         );
     }
@@ -246,6 +244,7 @@ final class FakeFileStorage implements FileStorage
 
 final class EmptyStoreMediaLibraryRepository implements StoreMediaLibraryRepository
 {
+    private array $files = [];
     public function listByStore(string $storeId, ?string $mediaType = null): array
     {
         return [];
@@ -259,6 +258,21 @@ final class EmptyStoreMediaLibraryRepository implements StoreMediaLibraryReposit
     public function countByStore(string $storeId): int
     {
         return 0;
+    }
+
+    public function persist(string $id, string $storeId, string $key, string $publicUrl, string $originalName, string $mimeType, int $size): \App\FileStorage\Application\Dto\StoreMediaFileView
+    {
+        return $this->files[$id] = new \App\FileStorage\Application\Dto\StoreMediaFileView($id, $key, $publicUrl, $mimeType, 'image', $size, 'Не используется', '2026-04-19 12:00', $originalName, 0);
+    }
+
+    public function findByStore(string $storeId, string $fileId): ?\App\FileStorage\Application\Dto\StoreMediaFileView
+    {
+        return $this->files[$fileId] ?? null;
+    }
+
+    public function deleteIfUnused(string $storeId, string $fileId): ?string
+    {
+        return null;
     }
 }
 

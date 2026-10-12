@@ -11,10 +11,7 @@ interface ProductImageRepository
     public function persist(
         string $id,
         string $productId,
-        string $key,
-        string $publicUrl,
-        string $mimeType,
-        int $size,
+        string $mediaFileId,
     ): ProductImageView;
 
     /**

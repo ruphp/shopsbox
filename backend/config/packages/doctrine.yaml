@@ -38,6 +38,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Sales/Infrastructure/Persistence/Doctrine/Entity'
                 prefix: 'App\Sales\Infrastructure\Persistence\Doctrine\Entity'
                 alias: Sales
+            FileStorage:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/FileStorage/Infrastructure/Persistence/Doctrine/Entity'
+                prefix: 'App\FileStorage\Infrastructure\Persistence\Doctrine\Entity'
+                alias: FileStorage
 
 when@test:
     doctrine:

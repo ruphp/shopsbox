@@ -8,6 +8,7 @@ use App\Catalog\Application\Contracts\ProductImageRepository;
 use App\Catalog\Application\Dto\ProductImageView;
 use App\Catalog\Infrastructure\Persistence\Doctrine\Entity\Product;
 use App\Catalog\Infrastructure\Persistence\Doctrine\Entity\ProductImage;
+use App\FileStorage\Infrastructure\Persistence\Doctrine\Entity\MediaFile;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 
@@ -20,17 +21,22 @@ final readonly class DoctrineProductImageRepository implements ProductImageRepos
     public function persist(
         string $id,
         string $productId,
-        string $key,
-        string $publicUrl,
-        string $mimeType,
-        int $size,
+        string $mediaFileId,
     ): ProductImageView {
+        $existing = $this->entityManager->createQueryBuilder()->select('image')->from(ProductImage::class, 'image')
+            ->where('IDENTITY(image.product) = :productId')->andWhere('IDENTITY(image.mediaFile) = :mediaFileId')
+            ->andWhere('image.deletedAt IS NULL')->setParameter('productId', $productId)->setParameter('mediaFileId', $mediaFileId)
+            ->getQuery()->getOneOrNullResult();
+        if ($existing instanceof ProductImage) {
+            return $this->map($existing);
+        }
         $product = $this->entityManager->getReference(Product::class, $productId);
         if (!$product instanceof Product) {
             throw new LogicException('Product reference must resolve to a Doctrine entity.');
         }
 
-        $image = new ProductImage($id, $product, $key, $publicUrl, $mimeType, $size);
+        $mediaFile = $this->entityManager->getReference(MediaFile::class, $mediaFileId);
+        $image = new ProductImage($id, $product, $mediaFile);
         $image->changePosition($this->nextPosition($productId));
         if ($image->position() === 10) {
             $image->makePrimary();

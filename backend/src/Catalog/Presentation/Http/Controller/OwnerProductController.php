@@ -8,6 +8,7 @@ use App\Catalog\Application\Contracts\CategoryRepository;
 use App\Catalog\Application\Contracts\EntityFlusher;
 use App\Catalog\Application\Contracts\ProductImageRepository;
 use App\Catalog\Application\Contracts\ProductStructureRepository;
+use App\Catalog\Application\Contracts\UuidGenerator;
 use App\Catalog\Application\Dto\ChangeProductStatusInput;
 use App\Catalog\Application\Dto\CreateProductInput;
 use App\Catalog\Application\Dto\ProductView;
@@ -25,6 +26,7 @@ use App\Catalog\Application\UseCase\UploadProductImageUseCase;
 use App\Tenant\Application\Dto\StoreSettingsView;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 use App\Tenant\Application\UseCase\ShowStoreSettingsUseCase;
+use App\FileStorage\Application\Contracts\StoreMediaLibraryRepository;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -50,6 +52,8 @@ final readonly class OwnerProductController
         private ProductImageRepository $productImageRepository,
         private ProductStructureRepository $productStructureRepository,
         private EntityFlusher $entityFlusher,
+        private StoreMediaLibraryRepository $mediaLibraryRepository,
+        private UuidGenerator $uuidGenerator,
         private CsrfTokenManagerInterface $csrfTokenManager,
     ) {
     }
@@ -225,6 +229,25 @@ final readonly class OwnerProductController
             return $this->renderForm($settings, $product, $this->imageError($exception));
         }
 
+        return new RedirectResponse('/owner/products/'.$productId.'?notice=image');
+    }
+
+    #[Route('/{productId}/images/from-media', name: 'owner_product_image_attach', methods: ['POST'])]
+    public function attachImage(Request $request, string $productId): Response
+    {
+        $settings = $this->settings($request);
+        if (!$settings instanceof StoreSettingsView) { return $settings; }
+        $product = $this->ownedProduct($settings->storeId, $productId);
+        if (!$product instanceof ProductView) { return new Response('Товар не найден.', Response::HTTP_NOT_FOUND); }
+        if (!$this->validCsrf($request, 'owner_product_images_'.$productId)) {
+            return $this->renderForm($settings, $product, 'Форма устарела. Обновите страницу.');
+        }
+        $file = $this->mediaLibraryRepository->findByStore($settings->storeId, $request->request->getString('media_file_id'));
+        if ($file === null || $file->mediaType !== 'image') {
+            return $this->renderForm($settings, $product, 'Выберите изображение из медиатеки.');
+        }
+        $this->productImageRepository->persist($this->uuidGenerator->generate(), $productId, $file->id);
+        $this->entityFlusher->flush();
         return new RedirectResponse('/owner/products/'.$productId.'?notice=image');
     }
 
@@ -424,6 +447,9 @@ final readonly class OwnerProductController
             'categories' => $this->categoryRepository->listByStore($settings->storeId),
             'images' => $product instanceof ProductView
                 ? $this->productImageRepository->listByStoreAndProduct($settings->storeId, $product->id)
+                : [],
+            'mediaFiles' => $product instanceof ProductView
+                ? $this->mediaLibraryRepository->listByStore($settings->storeId, 'image')
                 : [],
             'structure' => $product instanceof ProductView
                 ? $this->productStructureRepository->view($settings->storeId, $product->id)

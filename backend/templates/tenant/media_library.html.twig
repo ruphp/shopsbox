@@ -15,6 +15,19 @@
                 <a class="button button-secondary" href="{{ path('owner_products') }}">Перейти к товарам</a>
             </header>
 
+            {% if app.request.query.get('notice') %}<p class="owner-notice">{{ app.request.query.get('notice') == 'deleted' ? 'Файл удалён.' : 'Файл добавлен в медиатеку.' }}</p>{% endif %}
+            {% if app.request.query.get('error') %}<p class="owner-error">{{ app.request.query.get('error') == 'used' ? 'Файл используется. Сначала отвяжите его от товаров и оформления.' : 'Не удалось обработать файл. Проверьте формат, размер и повторите.' }}</p>{% endif %}
+
+            <form class="media-upload" method="post" enctype="multipart/form-data" action="{{ path('owner_media_upload') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('owner_media') }}">
+                <div class="form-field">
+                    <label for="media-file">Загрузить изображение</label>
+                    <input id="media-file" type="file" name="file" accept="image/jpeg,image/png,image/webp,image/gif" required>
+                    <span class="field-hint">JPG, PNG, WebP или GIF, до 5 МБ. После загрузки файл можно выбирать для разных товаров.</span>
+                </div>
+                <button class="button" type="submit">Загрузить</button>
+            </form>
+
             <dl class="media-library-stats">
                 <div><dt>Файлов</dt><dd>{{ library.files|length }}</dd></div>
                 <div><dt>Размер выборки</dt><dd>{{ (library.totalSize / 1024 / 1024)|number_format(2, '.', ' ') }} МБ</dd></div>
@@ -53,15 +66,25 @@
                             </a>
                             <div class="media-file-body">
                                 <div class="media-file-title">
-                                    <h2>{{ file.usage }}</h2>
+                                    <h2>{{ file.originalName ?: file.key }}</h2>
                                     <span>{{ file.mediaType == 'image' ? 'Изображение' : (file.mediaType == 'video' ? 'Видео' : 'Документ') }}</span>
                                 </div>
                                 <p class="media-file-name" title="{{ file.key }}">{{ file.key }}</p>
+                                <p class="media-file-usage {{ file.usageCount ? '' : 'is-unused' }}">{{ file.usage }}</p>
                                 <div class="media-file-meta">
                                     <span>{{ (file.size / 1024)|number_format(1, '.', ' ') }} КБ</span>
                                     <time>{{ file.createdAt|date('d.m.Y') }}</time>
                                 </div>
-                                <a class="button button-secondary" href="{{ file.publicUrl }}" target="_blank" rel="noopener">Открыть файл</a>
+                                <div class="media-file-actions">
+                                    <a class="button button-secondary" href="{{ file.publicUrl }}" target="_blank" rel="noopener">Открыть</a>
+                                    <a class="button button-secondary" href="{{ file.publicUrl }}" download>Скачать</a>
+                                    {% if file.usageCount == 0 %}
+                                        <form method="post" action="{{ path('owner_media_delete', {fileId: file.id}) }}" onsubmit="return confirm('Удалить файл из медиатеки?')">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('owner_media') }}">
+                                            <button class="button button-danger" type="submit">Удалить</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
                             </div>
                         </article>
                     {% endfor %}
