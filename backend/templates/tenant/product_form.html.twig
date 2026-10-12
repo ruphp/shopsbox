@@ -137,7 +137,7 @@
 
                         <section class="structure-section" id="characteristics">
                             <h2>Характеристики</h2>
-                            <p class="muted">Дополнительные поля карточки: материал, состав, размеры, уход и другие свойства.</p>
+                            <p class="muted">Свойства, которые покупатель не выбирает: материал, состав, вес, страна производства, правила ухода.</p>
                             <div class="structure-list">
                                 {% for attribute in structure.attributes %}
                                     <form class="structure-item structure-row" method="post" action="{{ path('owner_product_attribute_update', {productId: product.id, attributeId: attribute.id}) }}">
@@ -175,7 +175,7 @@
 
                         <section class="structure-section" id="options">
                             <h2>Опции товара</h2>
-                            <p class="muted">Создайте группы выбора, например «Размер» и «Цвет», затем добавьте их значения.</p>
+                            <p class="muted">То, что выбирает покупатель: размер, цвет или комплектацию. Сама опция цену не меняет.</p>
                             <div class="structure-list">
                                 {% for group in structure.optionGroups %}
                                     <article class="structure-item">
@@ -224,7 +224,7 @@
 
                         <section class="structure-section" id="variants">
                             <h2>Варианты</h2>
-                            <p class="muted">Объединяйте значения опций в продаваемые варианты. Наценка прибавляется к базовой цене товара.</p>
+                            <p class="muted">Создайте вариант, если выбор влияет на цену, SKU или доступность. Например: «L / красный», SKU RED-L, наценка 300 ₽.</p>
                             <div class="structure-list">
                                 {% for variant in structure.variants %}
                                     <form class="structure-item" method="post" action="{{ path('owner_product_variant_update', {productId: product.id, variantId: variant.id}) }}">
