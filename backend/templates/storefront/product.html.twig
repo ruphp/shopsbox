@@ -20,13 +20,17 @@
                     <div class="product-detail-media">
                         {% if product.imageUrl %}
                             <img src="{{ product.imageUrl }}" alt="{{ product.name }}" data-gallery-main>
-                            <button class="product-gallery-expand" type="button" data-gallery-expand aria-label="Увеличить изображение" title="Увеличить изображение">
+                            <span class="product-gallery-lens" data-gallery-lens aria-hidden="true"></span>
+                            <button class="product-gallery-expand" type="button" data-gallery-expand aria-label="Открыть изображение на весь экран" title="Открыть на весь экран">
                                 <span class="zoom-icon" aria-hidden="true"></span>
                             </button>
                         {% else %}
                             <span>{{ product.name }}</span>
                         {% endif %}
                     </div>
+                    {% if product.imageUrl %}
+                        <div class="product-gallery-zoom" data-gallery-zoom aria-hidden="true"></div>
+                    {% endif %}
                     {% if product.imageUrls|length > 1 %}
                         <div class="product-gallery-thumbnails" aria-label="Фотографии товара">
                             {% for imageUrl in product.imageUrls %}
@@ -133,6 +137,9 @@
         document.querySelectorAll('[data-product-gallery]').forEach(function (gallery) {
             var mainImage = gallery.querySelector('[data-gallery-main]');
             var expandButton = gallery.querySelector('[data-gallery-expand]');
+            var media = gallery.querySelector('.product-detail-media');
+            var lens = gallery.querySelector('[data-gallery-lens]');
+            var zoomPane = gallery.querySelector('[data-gallery-zoom]');
             var lightbox = gallery.querySelector('[data-product-lightbox]');
             var lightboxImage = gallery.querySelector('[data-lightbox-image]');
             var closeButton = gallery.querySelector('[data-lightbox-close]');
@@ -155,9 +162,52 @@
                 });
             }
 
+            function updateZoomImage() {
+                if (zoomPane && mainImage) {
+                    zoomPane.style.backgroundImage = 'url("' + mainImage.src.replace(/"/g, '\\"') + '")';
+                }
+            }
+
+            function moveZoom(event) {
+                if (!media || !lens || !zoomPane || window.matchMedia('(hover: none), (pointer: coarse), (max-width: 979px)').matches) {
+                    return;
+                }
+
+                var rect = media.getBoundingClientRect();
+                var lensWidth = lens.offsetWidth;
+                var lensHeight = lens.offsetHeight;
+                var left = Math.max(0, Math.min(event.clientX - rect.left - lensWidth / 2, rect.width - lensWidth));
+                var top = Math.max(0, Math.min(event.clientY - rect.top - lensHeight / 2, rect.height - lensHeight));
+                var zoom = zoomPane.clientWidth / lensWidth;
+                var naturalWidth = mainImage.naturalWidth || rect.width;
+                var naturalHeight = mainImage.naturalHeight || rect.height;
+                var coverScale = Math.max(rect.width / naturalWidth, rect.height / naturalHeight);
+                var renderedWidth = naturalWidth * coverScale;
+                var renderedHeight = naturalHeight * coverScale;
+                var offsetX = (rect.width - renderedWidth) / 2;
+                var offsetY = (rect.height - renderedHeight) / 2;
+
+                lens.style.transform = 'translate(' + left + 'px, ' + top + 'px)';
+                zoomPane.style.backgroundSize = (renderedWidth * zoom) + 'px ' + (renderedHeight * zoom) + 'px';
+                zoomPane.style.backgroundPosition = ((offsetX - left) * zoom) + 'px ' + ((offsetY - top) * zoom) + 'px';
+            }
+
+            if (media && lens && zoomPane && mainImage) {
+                updateZoomImage();
+                media.addEventListener('mouseenter', function (event) {
+                    gallery.classList.add('is-zooming');
+                    moveZoom(event);
+                });
+                media.addEventListener('mousemove', moveZoom);
+                media.addEventListener('mouseleave', function () {
+                    gallery.classList.remove('is-zooming');
+                });
+            }
+
             gallery.querySelectorAll('[data-gallery-image]').forEach(function (button) {
                 button.addEventListener('click', function () {
                     mainImage.src = button.dataset.galleryImage;
+                    updateZoomImage();
                     gallery.querySelectorAll('[data-gallery-image]').forEach(function (item) {
                         var active = item === button;
                         item.classList.toggle('is-active', active);
