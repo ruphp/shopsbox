@@ -8,10 +8,12 @@ final readonly class StorefrontHomeView
 {
     /**
      * @param list<StorefrontProductView> $featuredProducts
+     * @param list<StorefrontCategoryView> $categories
      */
     public function __construct(
         public StorefrontStoreView $store,
         public array $featuredProducts,
+        public array $categories = [],
     ) {
     }
 }

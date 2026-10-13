@@ -891,6 +891,20 @@
     flex: 0 0 calc((100% - 27px) / 4);
 }
 
+.preview-categories > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.preview-categories span {
+    padding: 8px;
+    border: 1px solid #d9e0e8;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
 .appearance-preview.template-catalog .preview-hero {
     padding-top: 16px;
     padding-bottom: 16px;

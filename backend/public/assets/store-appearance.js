@@ -107,9 +107,11 @@
     const updateSections = () => {
         [...sectionOptions.querySelectorAll('[data-section-control]')]
             .forEach((control, index, controls) => {
+                const isHero = control.dataset.sectionControl === 'hero';
                 control.querySelector('.section-position').value = String(index + 1);
-                control.querySelector('[data-section-up]').disabled = index === 0;
-                control.querySelector('[data-section-down]').disabled = index === controls.length - 1;
+                control.querySelector('.section-drag-handle').draggable = !isHero;
+                control.querySelector('[data-section-up]').disabled = isHero || index <= 1;
+                control.querySelector('[data-section-down]').disabled = isHero || index === controls.length - 1;
                 const section = preview.querySelector(`[data-preview-section="${control.dataset.sectionControl}"]`);
                 section.hidden = !control.querySelector('input[type="checkbox"]').checked;
                 preview.appendChild(section);
@@ -132,7 +134,8 @@
         const sectionAction = event.target.closest('[data-section-up], [data-section-down]');
         if (sectionAction) {
             const control = sectionAction.closest('[data-section-control]');
-            if (sectionAction.matches('[data-section-up]') && control.previousElementSibling) {
+            if (control.dataset.sectionControl === 'hero') return;
+            if (sectionAction.matches('[data-section-up]') && control.previousElementSibling?.dataset.sectionControl !== 'hero') {
                 sectionOptions.insertBefore(control, control.previousElementSibling);
             } else if (sectionAction.matches('[data-section-down]') && control.nextElementSibling) {
                 sectionOptions.insertBefore(control.nextElementSibling, control);
@@ -175,6 +178,8 @@
     const orderedControls = [...sectionOptions.querySelectorAll('[data-section-control]')]
         .sort((left, right) => Number(left.querySelector('.section-position').value) - Number(right.querySelector('.section-position').value));
     orderedControls.forEach((control) => sectionOptions.appendChild(control));
+    const heroControl = sectionOptions.querySelector('[data-section-control="hero"]');
+    if (heroControl) sectionOptions.prepend(heroControl);
 
     sectionOptions.addEventListener('dragstart', (event) => {
         if (!event.target.matches('.section-drag-handle')) return;
@@ -190,6 +195,10 @@
         event.preventDefault();
         const target = event.target.closest('[data-section-control]');
         if (!target || target === dragging) return;
+        if (target.dataset.sectionControl === 'hero') {
+            sectionOptions.insertBefore(dragging, heroControl.nextElementSibling);
+            return;
+        }
         const bounds = target.getBoundingClientRect();
         sectionOptions.insertBefore(dragging, event.clientY < bounds.top + bounds.height / 2 ? target : target.nextElementSibling);
     });

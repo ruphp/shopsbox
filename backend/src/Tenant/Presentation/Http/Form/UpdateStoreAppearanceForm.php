@@ -16,6 +16,10 @@ final readonly class UpdateStoreAppearanceForm
         usort($enabled, static function (string $left, string $right) use ($positions): int {
             return ((int) ($positions[$left] ?? 99)) <=> ((int) ($positions[$right] ?? 99));
         });
+        if (($heroIndex = array_search('hero', $enabled, true)) !== false) {
+            array_splice($enabled, $heroIndex, 1);
+            array_unshift($enabled, 'hero');
+        }
 
         return new UpdateStoreAppearanceInput(
             $ownerEmail,

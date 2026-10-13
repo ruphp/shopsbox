@@ -44,6 +44,7 @@ final readonly class ShowStorefrontHomeUseCase
         return new StorefrontHomeView(
             $store,
             array_slice($products, 0, $featuredLimit),
+            $this->productRepository->listCategoriesByStore($store->id),
         );
     }
 }

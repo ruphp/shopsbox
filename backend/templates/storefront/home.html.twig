@@ -98,6 +98,23 @@
                         {% endif %}
                     </div>
                 </section>
+            {% elseif section == 'categories' %}
+                <section class="section storefront-categories">
+                    <div class="wrap">
+                        <h2>Категории</h2>
+                        {% if view.categories is empty %}
+                            <p class="muted">Категории пока не добавлены.</p>
+                        {% else %}
+                            <nav class="storefront-category-grid" aria-label="Категории товаров">
+                                {% for category in view.categories %}
+                                    <a href="{{ path(storefront_category_route, {storeSlug: store.slug, categorySlug: category.slug}) }}">
+                                        <span>{{ category.name }}</span><span aria-hidden="true">→</span>
+                                    </a>
+                                {% endfor %}
+                            </nav>
+                        {% endif %}
+                    </div>
+                </section>
             {% elseif section == 'contacts' %}
                 <section class="section storefront-contacts">
                     <div class="wrap">

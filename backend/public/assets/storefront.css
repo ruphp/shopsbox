@@ -774,6 +774,30 @@
     background: var(--surface);
 }
 
+.storefront-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+}
+
+.storefront-category-grid a {
+    display: flex;
+    min-height: 72px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #ffffff;
+    font-weight: 800;
+}
+
+.storefront-category-grid a:hover {
+    border-color: var(--storefront-accent);
+    text-decoration: none;
+}
+
 .store-contact-list {
     display: flex;
     flex-wrap: wrap;

@@ -16,7 +16,7 @@ use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 final readonly class UpdateStoreAppearanceUseCase
 {
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
-    private const SECTIONS = ['hero', 'featured', 'contacts'];
+    private const SECTIONS = ['hero', 'categories', 'featured', 'contacts'];
 
     public function __construct(
         private StoreRepository $storeRepository,
@@ -105,6 +105,8 @@ final readonly class UpdateStoreAppearanceUseCase
         if ($sections === []) {
             throw InvalidTenantInput::forField('sections', 'Choose at least one storefront section.');
         }
+        $sections = array_values(array_filter($sections, static fn (string $section): bool => $section !== 'hero'));
+        array_unshift($sections, 'hero');
 
         $images = [];
         foreach ($this->mediaLibraryRepository->listByStore($current->storeId, 'image') as $image) {
