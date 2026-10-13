@@ -668,6 +668,29 @@
     object-fit: cover;
 }
 
+.featured-product-picker {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.featured-product-picker > span {
+    font-weight: 700;
+}
+
+.featured-product-picker label {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.featured-product-picker label:last-child { border-bottom: 0; }
+.featured-product-picker input { width: 18px; height: 18px; }
+.featured-product-picker small { color: var(--muted); }
+
 .preview-eyebrow {
     display: block;
     margin-bottom: 7px;

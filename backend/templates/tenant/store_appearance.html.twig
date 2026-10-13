@@ -31,6 +31,8 @@
     {% set heroOverlay = firstHeroSlide.overlay|default(60) %}
     {% set featuredColumns = theme.featured_columns|default(4) %}
     {% set featuredShowDescription = theme.featured_show_description|default(true) %}
+    {% set featuredSource = theme.featured_source|default('latest') %}
+    {% set featuredProductIds = theme.featured_product_ids|default([]) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'featured': 'Популярные товары', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
@@ -144,6 +146,36 @@
 
                     <fieldset class="appearance-group">
                         <legend>Товары на главной</legend>
+                        <label class="appearance-field" for="featured-source">
+                            <span>Какие товары показывать</span>
+                            <select id="featured-source" name="featured_source" data-featured-source>
+                                <option value="latest" {{ featuredSource == 'latest' ? 'selected' : '' }}>Новинки</option>
+                                <option value="category" {{ featuredSource == 'category' ? 'selected' : '' }}>Из категории</option>
+                                <option value="manual" {{ featuredSource == 'manual' ? 'selected' : '' }}>Выбрать вручную</option>
+                            </select>
+                        </label>
+                        <div data-featured-source-panel="category" {{ featuredSource != 'category' ? 'hidden' : '' }}>
+                            <label class="appearance-field" for="featured-category">
+                                <span>Категория</span>
+                                <select id="featured-category" name="featured_category_slug">
+                                    <option value="">Выберите категорию</option>
+                                    {% for category in categories %}<option value="{{ category.slug }}" {{ theme.featured_category_slug|default('') == category.slug ? 'selected' : '' }}>{{ category.name }}</option>{% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="featured-product-picker" data-featured-source-panel="manual" {{ featuredSource != 'manual' ? 'hidden' : '' }}>
+                            <span>Товары и порядок</span>
+                            <p class="field-hint">Отметьте товары. На витрине они появятся в порядке этого списка.</p>
+                            {% for product in products %}
+                                <label>
+                                    <input type="checkbox" name="featured_product_ids[]" value="{{ product.id }}" {{ product.id in featuredProductIds ? 'checked' : '' }}>
+                                    <span>{{ product.name }}</span>
+                                    <small>{{ product.price|number_format(2, ',', ' ') }} ₽</small>
+                                </label>
+                            {% else %}
+                                <p class="muted">Сначала добавьте товары.</p>
+                            {% endfor %}
+                        </div>
                         <label class="appearance-field" for="featured-title">
                             <span>Заголовок блока</span>
                             <input id="featured-title" name="featured_title" type="text" maxlength="80" value="{{ theme.featured_title|default('Популярное') }}">

@@ -19,6 +19,7 @@
     const featuredLayoutInput = editor.querySelector('[name="featured_layout"]');
     const previewFeaturedTitle = preview.querySelector('[data-preview-featured-title]');
     const previewProductGrid = preview.querySelector('[data-preview-product-grid]');
+    const featuredSourceInput = editor.querySelector('[data-featured-source]');
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
     const field = (slide, name) => slide.querySelector(`[data-slide-field="${name}"]`);
 
@@ -76,6 +77,12 @@
         previewProductGrid.style.setProperty('--preview-columns', columns);
         previewProductGrid.replaceChildren(...Array.from({ length: columns }, () => document.createElement('i')));
         previewProductGrid.classList.toggle('is-carousel', featuredLayoutInput.value === 'carousel');
+    };
+
+    const updateFeaturedSource = () => {
+        editor.querySelectorAll('[data-featured-source-panel]').forEach((panel) => {
+            panel.hidden = panel.dataset.featuredSourcePanel !== featuredSourceInput.value;
+        });
     };
 
     const updateTemplate = () => {
@@ -147,6 +154,7 @@
     showStoreNameWithLogo.addEventListener('change', updateLogo);
     featuredColumnsInput.addEventListener('change', updateProductsPreview);
     featuredLayoutInput.addEventListener('change', updateProductsPreview);
+    featuredSourceInput.addEventListener('change', updateFeaturedSource);
     editor.querySelectorAll('[data-section-control] input[type="checkbox"]')
         .forEach((input) => input.addEventListener('change', updateSections));
 
@@ -168,6 +176,7 @@
     slideElements().forEach(updateSlideImage);
     renumberSlides();
     updateProductsPreview();
+    updateFeaturedSource();
     updateTemplate();
     updateColor();
     updateLogo();

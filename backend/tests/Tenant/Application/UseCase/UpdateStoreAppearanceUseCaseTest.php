@@ -89,6 +89,9 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'hero_interval' => 7,
                     'featured_layout' => 'carousel',
                     'featured_limit' => 10,
+                    'featured_source' => 'category',
+                    'featured_category_slug' => 'new-items',
+                    'featured_product_ids' => [],
                     'sections' => ['hero', 'contacts', 'featured'],
                     'logo_image_id' => 'logo-id',
                     'logo_image_url' => '/media/logo.jpg',
@@ -150,6 +153,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 7,
                 'carousel',
                 10,
+                'category',
+                ' new-items ',
             ),
         );
 

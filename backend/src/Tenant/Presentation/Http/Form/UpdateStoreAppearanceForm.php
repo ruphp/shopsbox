@@ -44,6 +44,9 @@ final readonly class UpdateStoreAppearanceForm
             $request->request->getInt('hero_interval', 5),
             (string) $request->request->get('featured_layout', 'grid'),
             $request->request->getInt('featured_limit', 6),
+            (string) $request->request->get('featured_source', 'latest'),
+            (string) $request->request->get('featured_category_slug', ''),
+            array_values(array_map('strval', $request->request->all('featured_product_ids'))),
         );
     }
 

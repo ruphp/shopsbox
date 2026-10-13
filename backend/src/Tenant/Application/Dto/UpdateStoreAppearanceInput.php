@@ -34,6 +34,9 @@ final readonly class UpdateStoreAppearanceInput
         public int $heroInterval = 5,
         public string $featuredLayout = 'grid',
         public int $featuredLimit = 6,
+        public string $featuredSource = 'latest',
+        public string $featuredCategorySlug = '',
+        public array $featuredProductIds = [],
     ) {
     }
 }

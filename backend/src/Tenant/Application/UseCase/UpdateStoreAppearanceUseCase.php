@@ -83,6 +83,20 @@ final readonly class UpdateStoreAppearanceUseCase
             ? $input->featuredLayout
             : 'grid';
         $featuredLimit = max(4, min(12, $input->featuredLimit));
+        $featuredSource = in_array($input->featuredSource, ['latest', 'category', 'manual'], true)
+            ? $input->featuredSource
+            : 'latest';
+        $featuredCategorySlug = mb_substr(trim($input->featuredCategorySlug), 0, 120);
+        $featuredProductIds = array_values(array_unique(array_slice(array_filter(
+            array_map('trim', $input->featuredProductIds),
+            static fn (string $id): bool => preg_match('/^[0-9a-f-]{20,40}$/i', $id) === 1,
+        ), 0, 20)));
+        if ($featuredSource === 'category' && $featuredCategorySlug === '') {
+            throw InvalidTenantInput::forField('featured_category_slug', 'Choose a category for the product block.');
+        }
+        if ($featuredSource === 'manual' && $featuredProductIds === []) {
+            throw InvalidTenantInput::forField('featured_product_ids', 'Choose at least one product for the product block.');
+        }
 
         $sections = array_values(array_unique(array_filter(
             $input->sections,
@@ -139,6 +153,9 @@ final readonly class UpdateStoreAppearanceUseCase
             'hero_interval' => $heroInterval,
             'featured_layout' => $featuredLayout,
             'featured_limit' => $featuredLimit,
+            'featured_source' => $featuredSource,
+            'featured_category_slug' => $featuredCategorySlug,
+            'featured_product_ids' => $featuredProductIds,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,

@@ -24,11 +24,26 @@ final readonly class ShowStorefrontHomeUseCase
             throw StorefrontStoreNotFound::bySlug($storeSlug);
         }
 
-        $featuredLimit = max(4, min(12, (int) ($store->themeSettings['featured_limit'] ?? 6)));
+        $theme = $store->themeSettings;
+        $featuredLimit = max(4, min(12, (int) ($theme['featured_limit'] ?? 6)));
+        $source = (string) ($theme['featured_source'] ?? 'latest');
+        $products = $source === 'category' && ($theme['featured_category_slug'] ?? '') !== ''
+            ? $this->productRepository->listActiveByStoreAndCategory($store->id, (string) $theme['featured_category_slug'])
+            : $this->productRepository->listActiveByStore($store->id);
+        if ($source === 'manual') {
+            $byId = [];
+            foreach ($products as $product) {
+                $byId[$product->id] = $product;
+            }
+            $products = array_values(array_filter(array_map(
+                static fn (string $id) => $byId[$id] ?? null,
+                array_map('strval', (array) ($theme['featured_product_ids'] ?? [])),
+            )));
+        }
 
         return new StorefrontHomeView(
             $store,
-            array_slice($this->productRepository->listActiveByStore($store->id), 0, $featuredLimit),
+            array_slice($products, 0, $featuredLimit),
         );
     }
 }

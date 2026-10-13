@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tenant\Presentation\Http\Controller;
 
+use App\Catalog\Application\Contracts\CategoryRepository;
+use App\Catalog\Application\UseCase\ListProductsUseCase;
 use App\FileStorage\Application\UseCase\ListStoreMediaLibraryUseCase;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
@@ -29,6 +31,8 @@ final readonly class StoreAppearanceController
         private UpdateStoreAppearanceForm $form,
         private CsrfTokenManagerInterface $csrfTokenManager,
         private ListStoreMediaLibraryUseCase $listMediaLibrary,
+        private CategoryRepository $categoryRepository,
+        private ListProductsUseCase $listProducts,
     ) {
     }
 
@@ -50,6 +54,8 @@ final readonly class StoreAppearanceController
             'settings' => $settings,
             'saved' => $request->query->getBoolean('saved'),
             'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
+            'categories' => $this->categoryRepository->listByStore($settings->storeId),
+            'products' => $this->listProducts->execute($settings->storeId),
         ]));
     }
 
@@ -67,10 +73,13 @@ final readonly class StoreAppearanceController
         try {
             $this->updateAppearance->execute($this->form->fromRequest($request, $ownerEmail));
         } catch (InvalidTenantInput $exception) {
+            $settings = $this->showStoreSettings->execute($ownerEmail);
             return new Response($this->twig->render('tenant/store_appearance.html.twig', [
-                'settings' => $this->showStoreSettings->execute($ownerEmail),
+                'settings' => $settings,
                 'error' => $exception->getMessage(),
                 'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
+                'categories' => $this->categoryRepository->listByStore($settings->storeId),
+                'products' => $this->listProducts->execute($settings->storeId),
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (StoreSettingsAccessDenied $exception) {
             return new Response($exception->getMessage(), Response::HTTP_FORBIDDEN);
