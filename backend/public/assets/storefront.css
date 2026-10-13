@@ -652,6 +652,19 @@
     object-position: left center;
 }
 
+.storefront-header-row {
+    position: relative;
+    flex-wrap: nowrap;
+}
+
+.storefront-header-row .brand {
+    min-width: 0;
+}
+
+.storefront-menu-toggle {
+    display: none;
+}
+
 .storefront-brand-name {
     margin-left: 10px;
     overflow-wrap: anywhere;
@@ -896,6 +909,92 @@
 }
 
 @media (max-width: 760px) {
+    .storefront-header-row {
+        min-height: 58px;
+    }
+
+    .storefront-header-row .brand {
+        max-width: calc(100% - 54px);
+    }
+
+    .storefront-logo {
+        max-width: 128px;
+        height: 38px;
+    }
+
+    .storefront-brand-name {
+        max-width: min(48vw, 190px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .storefront-menu-toggle {
+        display: grid;
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        place-content: center;
+        gap: 4px;
+        background: #ffffff;
+        cursor: pointer;
+    }
+
+    .storefront-menu-toggle span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: var(--ink);
+        transition: transform 160ms ease, opacity 160ms ease;
+    }
+
+    .storefront-header.is-menu-open .storefront-menu-toggle span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+    }
+
+    .storefront-header.is-menu-open .storefront-menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .storefront-header.is-menu-open .storefront-menu-toggle span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .storefront-header .storefront-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        z-index: 30;
+        display: none;
+        padding: 10px 16px 14px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        background: #ffffff;
+        box-shadow: 0 14px 24px rgba(16, 38, 61, 0.14);
+    }
+
+    .storefront-header.is-menu-open .storefront-menu {
+        display: flex;
+    }
+
+    .storefront-header .storefront-menu a {
+        display: block;
+        min-height: 44px;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .storefront-header .storefront-menu a:last-child {
+        border-bottom: 0;
+    }
+
     .storefront-catalog .catalog-head,
     .product-detail,
     .variant-row,

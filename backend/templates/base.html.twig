@@ -153,6 +153,21 @@
                 flex-wrap: wrap;
             }
 
+            .responsive-header-row {
+                position: relative;
+                min-height: 72px;
+                padding: 7px 0;
+                flex-wrap: nowrap;
+            }
+
+            .responsive-header-row .brand {
+                min-width: 0;
+            }
+
+            .responsive-menu-toggle {
+                display: none;
+            }
+
             .main {
                 flex: 1;
             }
@@ -801,6 +816,87 @@
                 }
             }
 
+            @media (max-width: 900px) {
+                .responsive-header-row {
+                    min-height: 64px;
+                    padding: 8px 0;
+                }
+
+                .responsive-header-row .brand {
+                    max-width: calc(100% - 58px);
+                }
+
+                .responsive-menu-toggle {
+                    display: grid;
+                    flex: 0 0 44px;
+                    width: 44px;
+                    height: 44px;
+                    padding: 10px;
+                    border: 1px solid var(--line);
+                    border-radius: 8px;
+                    place-content: center;
+                    gap: 5px;
+                    background: #ffffff;
+                    cursor: pointer;
+                }
+
+                .responsive-menu-toggle span {
+                    display: block;
+                    width: 21px;
+                    height: 2px;
+                    background: var(--ink);
+                    transition: transform 160ms ease, opacity 160ms ease;
+                }
+
+                .responsive-header.is-menu-open .responsive-menu-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+                .responsive-header.is-menu-open .responsive-menu-toggle span:nth-child(2) { opacity: 0; }
+                .responsive-header.is-menu-open .responsive-menu-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+                .responsive-header .responsive-menu {
+                    position: absolute;
+                    top: 100%;
+                    right: 0;
+                    left: 0;
+                    z-index: 40;
+                    display: none;
+                    max-height: calc(100vh - 64px);
+                    padding: 10px 16px 14px;
+                    border-top: 1px solid var(--line);
+                    border-bottom: 1px solid var(--line);
+                    overflow-y: auto;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 0;
+                    background: #ffffff;
+                    box-shadow: 0 14px 24px rgba(16, 38, 61, 0.14);
+                }
+
+                .responsive-header.is-menu-open .responsive-menu { display: flex; }
+
+                .responsive-header .responsive-menu > a,
+                .responsive-header .responsive-menu > .nav-form {
+                    width: 100%;
+                    min-height: 46px;
+                    margin: 0;
+                    padding: 11px 0;
+                    border: 0;
+                    border-bottom: 1px solid var(--line);
+                    border-radius: 0;
+                    flex: 0 0 auto;
+                    white-space: normal;
+                    background: transparent;
+                    color: var(--accent-dark);
+                    font-weight: 700;
+                    text-align: left;
+                }
+
+                .responsive-header .responsive-menu > .nav-form button {
+                    width: 100%;
+                    min-height: 24px;
+                    text-align: left;
+                }
+            }
+
             @media (max-width: 720px) {
                 .site-hero {
                     min-height: 560px;
@@ -849,6 +945,7 @@
         <div class="page">
             {% block body %}{% endblock %}
         </div>
+        <script src="/assets/responsive-menu.js?v=20261013"></script>
         <div class="cookie-banner" data-cookie-banner>
             <p>ShopsBox использует файлы cookie (куки) для анализа статистики сайта, оптимизации работы и удобства сервиса. Продолжая пользоваться сайтом shopsbox.ru, вы даете согласие на использование cookie. Подробнее: <a href="{{ path('site_static', {page: 'cookies'}) }}">Политика cookie</a>.</p>
             <button type="button" data-cookie-accept>Понятно</button>

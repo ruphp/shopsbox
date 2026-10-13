@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/storefront.css?v=20261013-slider">
+    <link rel="stylesheet" href="/assets/storefront.css?v=20261013-mobile-nav">
 {% endblock %}
 
 {% block body %}
@@ -18,15 +18,18 @@
     {% set currency_symbol = store.currency == 'RUB' ? '₽' : store.currency %}
     {% set storefront_logo = store.themeSettings.logo_image_url|default('') %}
     {% set show_store_name_with_logo = store.themeSettings.show_store_name_with_logo|default(false) %}
-    <header class="header">
-        <div class="wrap nav">
+    <header class="header storefront-header responsive-header" data-responsive-header>
+        <div class="wrap nav storefront-header-row responsive-header-row">
             <a class="brand" href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">
                 {% if storefront_logo %}
                     <img class="storefront-logo" src="{{ storefront_logo }}" alt="{{ store.name }}">
                 {% endif %}
                 {% if not storefront_logo or show_store_name_with_logo %}<span class="storefront-brand-name">{{ store.name }}</span>{% endif %}
             </a>
-            <nav class="links" aria-label="Навигация витрины">
+            <button class="responsive-menu-toggle" type="button" aria-expanded="false" aria-controls="storefront-menu" aria-label="Открыть меню" data-responsive-menu-toggle>
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="links storefront-menu responsive-menu" id="storefront-menu" aria-label="Навигация витрины" data-responsive-menu>
                 <a href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">Главная</a>
                 <a href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Товары</a>
                 {% set cart_count = app.session.get('shopsbox_cart_' ~ store.slug)|default([])|length %}

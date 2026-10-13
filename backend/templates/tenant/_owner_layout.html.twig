@@ -7,10 +7,11 @@
 {% endblock %}
 
 {% block body %}
-    <header class="header owner-header">
-        <div class="wrap nav">
+    <header class="header owner-header responsive-header" data-responsive-header>
+        <div class="wrap nav responsive-header-row">
             <a class="brand" href="{{ path('owner_dashboard') }}">Кабинет ShopsBox</a>
-            <nav class="links" aria-label="Навигация кабинета">
+            <button class="responsive-menu-toggle" type="button" aria-expanded="false" aria-controls="owner-menu" aria-label="Открыть меню" data-responsive-menu-toggle><span></span><span></span><span></span></button>
+            <nav class="links responsive-menu" id="owner-menu" aria-label="Навигация кабинета" data-responsive-menu>
                 <a href="{{ path('owner_dashboard') }}">Обзор</a>
                 <a href="{{ path('owner_products') }}">Товары</a>
                 <a href="{{ path('owner_media_library') }}">Медиатека</a>

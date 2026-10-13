@@ -1,9 +1,10 @@
-<header class="header">
-    <div class="wrap nav">
+<header class="header responsive-header" data-responsive-header>
+    <div class="wrap nav responsive-header-row">
         <a class="brand" href="{{ path('site_home') }}" aria-label="ShopsBox.ru">
             <img class="brand-logo" src="/assets/brand/shopsbox-logo-header.png" alt="ShopsBox.ru">
         </a>
-        <nav class="links" aria-label="Навигация">
+        <button class="responsive-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Открыть меню" data-responsive-menu-toggle><span></span><span></span><span></span></button>
+        <nav class="links responsive-menu" id="site-menu" aria-label="Навигация" data-responsive-menu>
             <a href="{{ path('site_pricing') }}">Прайс</a>
             <a class="button button-secondary" href="{{ path('auth_login_form') }}">Вход</a>
             <a class="button" href="{{ path('owner_register_form') }}">Регистрация</a>
