@@ -147,6 +147,21 @@
                         </div>
                     </div>
                 </section>
+            {% elseif section == 'content' %}
+                <section class="section storefront-content-band image-{{ theme.content_image_position|default('left') }}">
+                    <div class="wrap storefront-content-layout {{ theme.content_image_url|default('') ? 'has-image' : '' }}">
+                        {% if theme.content_image_url|default('') %}
+                            <img src="{{ theme.content_image_url }}" alt="{{ theme.content_title|default('О магазине') }}" loading="lazy">
+                        {% endif %}
+                        <div>
+                            <h2>{{ theme.content_title|default('О магазине') }}</h2>
+                            {% if theme.content_text|default('') %}<p>{{ theme.content_text|nl2br }}</p>{% endif %}
+                            {% if theme.content_button_label|default('') and theme.content_button_url|default('') %}
+                                <a class="button" href="{{ theme.content_button_url }}">{{ theme.content_button_label }}</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
             {% endif %}
         {% endfor %}
     </div>

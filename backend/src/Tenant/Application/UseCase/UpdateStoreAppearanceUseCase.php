@@ -16,7 +16,7 @@ use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 final readonly class UpdateStoreAppearanceUseCase
 {
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
-    private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'contacts'];
+    private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'content', 'contacts'];
 
     public function __construct(
         private StoreRepository $storeRepository,
@@ -114,6 +114,25 @@ final readonly class UpdateStoreAppearanceUseCase
             }
             $benefits[] = ['title' => $title, 'text' => $text];
         }
+        $contentTitle = trim($input->contentTitle);
+        $contentText = trim($input->contentText);
+        $contentButtonLabel = trim($input->contentButtonLabel);
+        $contentButtonUrl = $this->normalizeSlideUrl($input->contentButtonUrl, 'content_button_url');
+        if ($contentTitle === '' || mb_strlen($contentTitle) > 120) {
+            throw InvalidTenantInput::forField('content_title', 'Content title must contain up to 120 characters.');
+        }
+        if (mb_strlen($contentText) > 1500) {
+            throw InvalidTenantInput::forField('content_text', 'Content text must be up to 1500 characters.');
+        }
+        if (mb_strlen($contentButtonLabel) > 40) {
+            throw InvalidTenantInput::forField('content_button_label', 'Content button label must be up to 40 characters.');
+        }
+        if ($contentButtonLabel !== '' && $contentButtonUrl === '') {
+            throw InvalidTenantInput::forField('content_button_url', 'Choose a link for the content button.');
+        }
+        $contentImagePosition = in_array($input->contentImagePosition, ['left', 'right'], true)
+            ? $input->contentImagePosition
+            : 'left';
 
         $sections = array_values(array_unique(array_filter(
             $input->sections,
@@ -131,6 +150,7 @@ final readonly class UpdateStoreAppearanceUseCase
         }
         $logo = $this->selectedImage($input->logoImageId, $images, 'logo_image_id');
         $heroImage = $this->selectedImage($input->heroImageId, $images, 'hero_image_id');
+        $contentImage = $this->selectedImage($input->contentImageId, $images, 'content_image_id');
         $categoryImages = [];
         foreach ($input->categoryImageIds as $categorySlug => $imageId) {
             $categorySlug = trim((string) $categorySlug);
@@ -194,6 +214,13 @@ final readonly class UpdateStoreAppearanceUseCase
             'category_images' => $categoryImages,
             'benefits_title' => $benefitsTitle,
             'benefits' => $benefits,
+            'content_title' => $contentTitle,
+            'content_text' => $contentText,
+            'content_image_id' => $contentImage?->id,
+            'content_image_url' => $contentImage?->publicUrl,
+            'content_image_position' => $contentImagePosition,
+            'content_button_label' => $contentButtonLabel,
+            'content_button_url' => $contentButtonUrl,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,

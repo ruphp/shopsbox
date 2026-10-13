@@ -182,6 +182,13 @@
             if (imageUrl !== '') thumb.querySelector('img').src = imageUrl;
         });
     });
+    const contentImageSelect = editor.querySelector('[data-content-image-select]');
+    contentImageSelect?.addEventListener('change', () => {
+        const thumb = editor.querySelector('[data-content-image-thumb]');
+        const imageUrl = contentImageSelect.selectedOptions[0]?.dataset.imageUrl || '';
+        thumb.hidden = imageUrl === '';
+        if (imageUrl !== '') thumb.querySelector('img').src = imageUrl;
+    });
 
     const orderedControls = [...sectionOptions.querySelectorAll('[data-section-control]')]
         .sort((left, right) => Number(left.querySelector('.section-position').value) - Number(right.querySelector('.section-position').value));

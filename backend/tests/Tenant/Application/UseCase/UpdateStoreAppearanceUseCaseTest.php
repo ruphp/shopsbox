@@ -97,6 +97,13 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     ],
                     'benefits_title' => 'Почему мы',
                     'benefits' => [['title' => 'Быстро', 'text' => 'Отправим заказ завтра.']],
+                    'content_title' => 'Наша мастерская',
+                    'content_text' => 'Делаем товары сами.',
+                    'content_image_id' => 'content-id',
+                    'content_image_url' => '/media/content.jpg',
+                    'content_image_position' => 'right',
+                    'content_button_label' => 'Подробнее',
+                    'content_button_url' => '/about',
                     'sections' => ['hero', 'contacts', 'featured'],
                     'logo_image_id' => 'logo-id',
                     'logo_image_url' => '/media/logo.jpg',
@@ -114,6 +121,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
             $this->image('logo-id', '/media/logo.jpg'),
             $this->image('hero-id', '/media/hero.jpg'),
             $this->image('category-id', '/media/category.jpg'),
+            $this->image('content-id', '/media/content.jpg'),
         ]);
 
         $result = (new UpdateStoreAppearanceUseCase($repository, $flusher, $media))->execute(
@@ -165,6 +173,12 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 ['new-items' => 'category-id'],
                 ' Почему мы ',
                 [['title' => ' Быстро ', 'text' => ' Отправим заказ завтра. ']],
+                ' Наша мастерская ',
+                ' Делаем товары сами. ',
+                'content-id',
+                'right',
+                ' Подробнее ',
+                ' /about ',
             ),
         );
 

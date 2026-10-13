@@ -42,6 +42,12 @@ final readonly class UpdateStoreAppearanceInput
         public array $categoryImageIds = [],
         public string $benefitsTitle = 'Почему выбирают нас',
         public array $benefits = [],
+        public string $contentTitle = 'О магазине',
+        public string $contentText = '',
+        public ?string $contentImageId = null,
+        public string $contentImagePosition = 'left',
+        public string $contentButtonLabel = '',
+        public string $contentButtonUrl = '',
     ) {
     }
 }

@@ -105,6 +105,7 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
                 $usage[] = 'Категория: '.(string) $categorySlug;
             }
         }
+        if (($theme['content_image_id'] ?? null) === $file->id()) { $usage[] = 'Текстовый блок'; }
         return $usage;
     }
 }

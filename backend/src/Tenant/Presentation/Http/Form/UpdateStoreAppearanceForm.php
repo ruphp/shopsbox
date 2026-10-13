@@ -57,6 +57,12 @@ final readonly class UpdateStoreAppearanceForm
                 $request->request->all('benefits'),
                 static fn (mixed $benefit): bool => is_array($benefit),
             )),
+            (string) $request->request->get('content_title', 'О магазине'),
+            (string) $request->request->get('content_text', ''),
+            $this->emptyToNull($request->request->getString('content_image_id')),
+            (string) $request->request->get('content_image_position', 'left'),
+            (string) $request->request->get('content_button_label', ''),
+            (string) $request->request->get('content_button_url', ''),
         );
     }
 

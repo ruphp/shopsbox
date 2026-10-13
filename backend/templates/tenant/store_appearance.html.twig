@@ -36,7 +36,7 @@
     {% set categoryImages = theme.category_images|default({}) %}
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
-    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'contacts': 'Контакты'} %}
+    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
         {% set sectionPositions = sectionPositions|merge({(enabledSection): loop.index}) %}
@@ -259,10 +259,54 @@
                     </fieldset>
 
                     <fieldset class="appearance-group">
+                        <legend>Текст и изображение</legend>
+                        <p class="field-hint">Подходит для рассказа о магазине, производстве, доставке или отдельном предложении.</p>
+                        <label class="appearance-field">
+                            <span>Заголовок</span>
+                            <input name="content_title" type="text" maxlength="120" value="{{ theme.content_title|default('О магазине') }}">
+                        </label>
+                        <label class="appearance-field">
+                            <span>Текст</span>
+                            <textarea name="content_text" maxlength="1500" rows="5">{{ theme.content_text|default('') }}</textarea>
+                        </label>
+                        <div class="appearance-field-row">
+                            <label class="appearance-field">
+                                <span>Изображение</span>
+                                <select name="content_image_id" data-content-image-select>
+                                    <option value="" data-image-url="">Без изображения</option>
+                                    {% for image in mediaImages %}
+                                        <option value="{{ image.id }}" data-image-url="{{ image.publicUrl }}" {{ theme.content_image_id|default('') == image.id ? 'selected' : '' }}>{{ image.originalName ?: image.key }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <label class="appearance-field">
+                                <span>Расположение изображения</span>
+                                <select name="content_image_position">
+                                    <option value="left" {{ theme.content_image_position|default('left') == 'left' ? 'selected' : '' }}>Слева</option>
+                                    <option value="right" {{ theme.content_image_position|default('left') == 'right' ? 'selected' : '' }}>Справа</option>
+                                </select>
+                            </label>
+                        </div>
+                        <span class="content-image-thumb" data-content-image-thumb {{ theme.content_image_url|default('') ? '' : 'hidden' }}>
+                            <img src="{{ theme.content_image_url|default('') }}" alt="" loading="lazy">
+                        </span>
+                        <div class="appearance-field-row">
+                            <label class="appearance-field">
+                                <span>Текст кнопки</span>
+                                <input name="content_button_label" type="text" maxlength="40" value="{{ theme.content_button_label|default('') }}" placeholder="Подробнее">
+                            </label>
+                            <label class="appearance-field">
+                                <span>Ссылка кнопки</span>
+                                <input name="content_button_url" type="text" maxlength="500" value="{{ theme.content_button_url|default('') }}" placeholder="/s/магазин/products или https://">
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
                         <legend>Блоки на главной</legend>
                         <p class="field-hint">Включите нужные блоки и задайте их порядок.</p>
                         <div class="section-options">
-                            {% for section in ['hero', 'categories', 'featured', 'benefits', 'contacts'] %}
+                            {% for section in ['hero', 'categories', 'featured', 'benefits', 'content', 'contacts'] %}
                                 {% set position = sectionPositions[section]|default(loop.index) %}
                                 <div class="section-option" data-section-control="{{ section }}">
                                     <span class="section-drag-handle" draggable="true" title="Перетащить блок" aria-label="Перетащить блок">↕</span>
@@ -276,7 +320,7 @@
                                         <span>{{ sectionLabels[section] }}</span>
                                     </label>
                                     <select class="section-position" name="section_positions[{{ section }}]" aria-label="Порядок блока {{ sectionLabels[section] }}">
-                                        {% for number in 1..5 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
+                                        {% for number in 1..6 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
                                     </select>
                                     <button type="button" class="icon-button" data-section-up aria-label="Переместить {{ sectionLabels[section] }} выше">↑</button>
                                     <button type="button" class="icon-button" data-section-down aria-label="Переместить {{ sectionLabels[section] }} ниже">↓</button>
