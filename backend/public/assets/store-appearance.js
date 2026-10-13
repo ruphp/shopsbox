@@ -115,7 +115,7 @@
                 text: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[text]')}"]`)?.value.trim() || '',
             }))
             .filter((benefit) => benefit.title || benefit.text)
-            .slice(0, 3);
+            .slice(0, 6);
         const benefitsList = preview.querySelector('[data-preview-benefits-list]');
         preview.querySelector('[data-preview-benefits-title]').textContent = value('benefits_title') || 'Почему выбирают нас';
         benefitsList.replaceChildren(...benefits.map((benefit) => {
@@ -140,12 +140,27 @@
         contentImage.style.backgroundImage = contentImageUrl === '' ? '' : `url("${contentImageUrl.replaceAll('"', '%22')}")`;
 
         preview.querySelector('[data-preview-reviews-title]').textContent = value('reviews_title') || 'Отзывы покупателей';
-        preview.querySelector('[data-preview-review-author]').textContent = value('reviews[0][author]') || 'Имя покупателя';
-        preview.querySelector('[data-preview-review-text]').textContent = value('reviews[0][text]') || 'Здесь появится отзыв покупателя.';
+        const reviews = [...editor.querySelectorAll('[name^="reviews"][name$="[author]"]')]
+            .map((authorInput) => ({
+                author: authorInput.value.trim(),
+                text: editor.querySelector(`[name="${authorInput.name.replace('[author]', '[text]')}"]`)?.value.trim() || '',
+            }))
+            .filter((review) => review.author || review.text)
+            .slice(0, 8);
+        const reviewItems = reviews.length > 0 ? reviews : [{ author: 'Имя покупателя', text: 'Здесь появится отзыв покупателя.' }];
+        preview.querySelector('[data-preview-reviews-list]').replaceChildren(...reviewItems.map((review) => {
+            const item = document.createElement('article');
+            const text = document.createElement('blockquote');
+            const author = document.createElement('strong');
+            text.textContent = review.text || 'Отзыв покупателя';
+            author.textContent = review.author || 'Покупатель';
+            item.append(text, author);
+            return item;
+        }));
 
         preview.querySelector('[data-preview-faq-title]').textContent = value('faq_title') || 'Частые вопросы';
         const questions = [...editor.querySelectorAll('[name^="faqs"][name$="[question]"]')]
-            .map((input) => input.value.trim()).filter(Boolean).slice(0, 3);
+            .map((input) => input.value.trim()).filter(Boolean).slice(0, 10);
         preview.querySelector('[data-preview-faq-list]').replaceChildren(...questions.map((question) => {
             const item = document.createElement('span');
             item.textContent = question;

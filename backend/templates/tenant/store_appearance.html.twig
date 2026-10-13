@@ -47,7 +47,6 @@
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
     {% set reviews = theme.reviews|default([]) %}
-    {% set firstReview = reviews|first|default({}) %}
     {% set faqs = theme.faqs|default([]) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'reviews': 'Отзывы', 'faq': 'Частые вопросы', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
@@ -79,6 +78,14 @@
                 <input type="hidden" name="_token" value="{{ csrf_token('store_appearance') }}">
 
                 <div class="appearance-controls">
+                    <div class="appearance-actions appearance-actions-top">
+                        <div>
+                            <strong>{{ hasAppearanceDraft|default(false) ? 'Открыт черновик' : 'Изменения ещё не сохранены' }}</strong>
+                            <span>{{ hasAppearanceDraft|default(false) ? 'Покупатели не увидят его до публикации.' : 'Сохраните черновик или сразу опубликуйте оформление.' }}</span>
+                        </div>
+                        <button class="button button-secondary" type="submit" name="appearance_action" value="draft">Сохранить черновик</button>
+                        <button class="button" type="submit" name="appearance_action" value="publish">Опубликовать</button>
+                    </div>
                     <fieldset class="appearance-group">
                         <legend>Шаблон</legend>
                         <div class="template-options">
@@ -446,7 +453,7 @@
                             {{ _self.preview_tools('benefits', sectionLabels.benefits) }}
                             <h3 data-preview-benefits-title>{{ theme.benefits_title|default('Почему выбирают нас') }}</h3>
                             <div data-preview-benefits-list>
-                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default(''))|slice(0, 3) %}<span><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
+                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default('')) %}<span><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
                             </div>
                         </div>
                         <div class="preview-section preview-content" data-preview-section="content">
@@ -459,8 +466,13 @@
                         <div class="preview-section preview-reviews" data-preview-section="reviews">
                             {{ _self.preview_tools('reviews', sectionLabels.reviews) }}
                             <h3 data-preview-reviews-title>{{ theme.reviews_title|default('Отзывы покупателей') }}</h3>
-                            <blockquote data-preview-review-text>{{ firstReview.text|default('Здесь появится отзыв покупателя.') }}</blockquote>
-                            <strong data-preview-review-author>{{ firstReview.author|default('Имя покупателя') }}</strong>
+                            <div class="preview-review-list" data-preview-reviews-list>
+                                {% for review in reviews|filter(item => item.author|default('') or item.text|default('')) %}
+                                    <article><blockquote>{{ review.text }}</blockquote><strong>{{ review.author }}</strong></article>
+                                {% else %}
+                                    <article><blockquote>Здесь появится отзыв покупателя.</blockquote><strong>Имя покупателя</strong></article>
+                                {% endfor %}
+                            </div>
                         </div>
                         <div class="preview-section preview-contacts" data-preview-section="contacts">
                             {{ _self.preview_tools('contacts', sectionLabels.contacts) }}
@@ -479,7 +491,7 @@
                         <div class="preview-section preview-faq" data-preview-section="faq">
                             {{ _self.preview_tools('faq', sectionLabels.faq) }}
                             <h3 data-preview-faq-title>{{ theme.faq_title|default('Частые вопросы') }}</h3>
-                            <div data-preview-faq-list>{% for faq in faqs|filter(item => item.question|default(''))|slice(0, 3) %}<span>{{ faq.question }}</span>{% endfor %}</div>
+                            <div data-preview-faq-list>{% for faq in faqs|filter(item => item.question|default('')) %}<span>{{ faq.question }}</span>{% endfor %}</div>
                         </div>
                     </div>
                 </aside>
@@ -487,5 +499,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261013-visual-blocks" defer></script>
+    <script src="/assets/store-appearance.js?v=20261013-full-preview-items" defer></script>
 {% endblock %}
