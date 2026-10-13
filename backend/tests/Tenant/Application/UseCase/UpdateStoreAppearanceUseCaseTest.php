@@ -207,6 +207,45 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
         );
     }
 
+    public function testItKeepsPublishedAppearanceWhenSavingDraft(): void
+    {
+        $publishedTheme = [
+            'configured' => true,
+            'template' => 'classic',
+            'primary_color' => '#0077b6',
+            'hero_title' => 'Опубликованный заголовок',
+        ];
+        $current = $this->settings($publishedTheme);
+        $repository = $this->createMock(StoreRepository::class);
+        $repository->method('findSettingsByOwnerEmail')->willReturn($current);
+        $repository->expects(self::once())
+            ->method('updateSettingsForOwnerEmail')
+            ->willReturnCallback(function (...$arguments) use ($publishedTheme, $current): StoreSettingsView {
+                $savedTheme = $arguments[14];
+                self::assertSame($publishedTheme, array_diff_key($savedTheme, ['appearance_draft' => true]));
+                self::assertSame('accent', $savedTheme['appearance_draft']['template']);
+                self::assertSame('Черновик', $savedTheme['appearance_draft']['hero_title']);
+
+                return $current;
+            });
+        $flusher = $this->createMock(EntityFlusher::class);
+        $flusher->expects(self::once())->method('flush');
+        $media = $this->createStub(StoreMediaLibraryRepository::class);
+        $media->method('listByStore')->willReturn([]);
+
+        (new UpdateStoreAppearanceUseCase($repository, $flusher, $media))->execute(
+            new UpdateStoreAppearanceInput(
+                ownerEmail: 'owner@example.test',
+                template: 'accent',
+                primaryColor: '#ff5a3c',
+                heroTitle: 'Черновик',
+                heroText: '',
+                sections: ['hero'],
+                action: 'draft',
+            ),
+        );
+    }
+
     public function testItRejectsImageFromAnotherStore(): void
     {
         $repository = $this->createStub(StoreRepository::class);
@@ -230,7 +269,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
         );
     }
 
-    private function settings(): StoreSettingsView
+    /** @param array<string, mixed> $themeSettings */
+    private function settings(array $themeSettings = []): StoreSettingsView
     {
         return new StoreSettingsView(
             tenantId: 'tenant-id',
@@ -244,6 +284,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
             publicDescription: 'Описание',
             contactEmail: 'shop@example.test',
             contactPhone: '+79990000000',
+            themeSettings: $themeSettings,
         );
     }
 

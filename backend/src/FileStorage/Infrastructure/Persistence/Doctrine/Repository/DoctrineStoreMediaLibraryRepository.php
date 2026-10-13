@@ -93,19 +93,37 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
             ->setParameter('fileId', $file->id())->getQuery()->getSingleColumnResult();
         $usage = array_map(static fn (string $name): string => 'Товар: '.$name, $names);
         $theme = $file->store()->themeSettings();
-        if (($theme['logo_image_id'] ?? null) === $file->id()) { $usage[] = 'Логотип'; }
-        if (($theme['hero_image_id'] ?? null) === $file->id()) { $usage[] = 'Баннер'; }
+        $usage = [...$usage, ...$this->themeUsageLabels($file->id(), $theme)];
+        $draft = $theme['appearance_draft'] ?? null;
+        if (is_array($draft)) {
+            $usage = [...$usage, ...$this->themeUsageLabels($file->id(), $draft, 'Черновик: ')];
+        }
+
+        return array_values(array_unique($usage));
+    }
+
+    /**
+     * @param array<string, mixed> $theme
+     *
+     * @return list<string>
+     */
+    private function themeUsageLabels(string $fileId, array $theme, string $prefix = ''): array
+    {
+        $usage = [];
+        if (($theme['logo_image_id'] ?? null) === $fileId) { $usage[] = $prefix.'Логотип'; }
+        if (($theme['hero_image_id'] ?? null) === $fileId) { $usage[] = $prefix.'Баннер'; }
         foreach ((array) ($theme['hero_slides'] ?? []) as $index => $slide) {
-            if (is_array($slide) && ($slide['image_id'] ?? null) === $file->id()) {
-                $usage[] = 'Баннер: слайд '.($index + 1);
+            if (is_array($slide) && ($slide['image_id'] ?? null) === $fileId) {
+                $usage[] = $prefix.'Баннер: слайд '.($index + 1);
             }
         }
         foreach ((array) ($theme['category_images'] ?? []) as $categorySlug => $categoryImage) {
-            if (is_array($categoryImage) && ($categoryImage['image_id'] ?? null) === $file->id()) {
-                $usage[] = 'Категория: '.(string) $categorySlug;
+            if (is_array($categoryImage) && ($categoryImage['image_id'] ?? null) === $fileId) {
+                $usage[] = $prefix.'Категория: '.(string) $categorySlug;
             }
         }
-        if (($theme['content_image_id'] ?? null) === $file->id()) { $usage[] = 'Текстовый блок'; }
+        if (($theme['content_image_id'] ?? null) === $fileId) { $usage[] = $prefix.'Текстовый блок'; }
+
         return $usage;
     }
 }

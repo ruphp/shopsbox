@@ -33,6 +33,10 @@ final readonly class UpdateStoreAppearanceUseCase
             throw new StoreSettingsAccessDenied('Store settings are not available for this user.');
         }
 
+        if (!in_array($input->action, ['draft', 'publish'], true)) {
+            throw InvalidTenantInput::forField('appearance_action', 'Unknown appearance action.');
+        }
+
         $template = trim($input->template);
         if (!in_array($template, self::TEMPLATES, true)) {
             throw InvalidTenantInput::forField('template', 'Unknown storefront template.');
@@ -258,6 +262,13 @@ final readonly class UpdateStoreAppearanceUseCase
             'hero_image_id' => $heroImage?->id,
             'hero_image_url' => $heroImage?->publicUrl,
         ];
+
+        if ($input->action === 'draft') {
+            $publishedTheme = $current->themeSettings;
+            unset($publishedTheme['appearance_draft']);
+            $publishedTheme['appearance_draft'] = $themeSettings;
+            $themeSettings = $publishedTheme;
+        }
 
         $view = $this->storeRepository->updateSettingsForOwnerEmail(
             $email,

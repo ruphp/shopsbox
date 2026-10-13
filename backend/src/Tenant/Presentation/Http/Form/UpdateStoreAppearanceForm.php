@@ -67,6 +67,7 @@ final readonly class UpdateStoreAppearanceForm
             array_values(array_filter($request->request->all('reviews'), static fn (mixed $review): bool => is_array($review))),
             (string) $request->request->get('faq_title', 'Частые вопросы'),
             array_values(array_filter($request->request->all('faqs'), static fn (mixed $faq): bool => is_array($faq))),
+            (string) $request->request->get('appearance_action', 'draft'),
         );
     }
 

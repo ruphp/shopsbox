@@ -54,6 +54,7 @@ final readonly class UpdateStoreAppearanceInput
         public array $reviews = [],
         public string $faqTitle = 'Частые вопросы',
         public array $faqs = [],
+        public string $action = 'publish',
     ) {
     }
 }

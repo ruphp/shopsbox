@@ -52,7 +52,10 @@ final readonly class StoreAppearanceController
 
         return new Response($this->twig->render('tenant/store_appearance.html.twig', [
             'settings' => $settings,
-            'saved' => $request->query->getBoolean('saved'),
+            'appearanceTheme' => $this->appearanceTheme($settings->themeSettings),
+            'hasAppearanceDraft' => isset($settings->themeSettings['appearance_draft']),
+            'draftSaved' => $request->query->getBoolean('draft_saved'),
+            'published' => $request->query->getBoolean('published'),
             'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
             'categories' => $this->categoryRepository->listByStore($settings->storeId),
             'products' => $this->listProducts->execute($settings->storeId),
@@ -70,12 +73,16 @@ final readonly class StoreAppearanceController
             throw new AccessDeniedHttpException('Invalid CSRF token.');
         }
 
+        $input = $this->form->fromRequest($request, $ownerEmail);
+
         try {
-            $this->updateAppearance->execute($this->form->fromRequest($request, $ownerEmail));
+            $this->updateAppearance->execute($input);
         } catch (InvalidTenantInput $exception) {
             $settings = $this->showStoreSettings->execute($ownerEmail);
             return new Response($this->twig->render('tenant/store_appearance.html.twig', [
                 'settings' => $settings,
+                'appearanceTheme' => $this->appearanceTheme($settings->themeSettings),
+                'hasAppearanceDraft' => isset($settings->themeSettings['appearance_draft']),
                 'error' => $exception->getMessage(),
                 'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
                 'categories' => $this->categoryRepository->listByStore($settings->storeId),
@@ -85,7 +92,9 @@ final readonly class StoreAppearanceController
             return new Response($exception->getMessage(), Response::HTTP_FORBIDDEN);
         }
 
-        return new RedirectResponse('/owner/store/appearance?saved=1');
+        $result = $input->action === 'publish' ? 'published=1' : 'draft_saved=1';
+
+        return new RedirectResponse('/owner/store/appearance?'.$result);
     }
 
     private function ownerEmail(Request $request): ?string
@@ -93,5 +102,17 @@ final readonly class StoreAppearanceController
         $email = $request->getSession()->get('shopsbox_auth_email');
 
         return is_string($email) && $email !== '' ? $email : null;
+    }
+
+    /**
+     * @param array<string, mixed> $themeSettings
+     *
+     * @return array<string, mixed>
+     */
+    private function appearanceTheme(array $themeSettings): array
+    {
+        $draft = $themeSettings['appearance_draft'] ?? null;
+
+        return is_array($draft) ? $draft : $themeSettings;
     }
 }
