@@ -46,6 +46,8 @@
     {% set categoryImages = theme.category_images|default({}) %}
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
+    {% set benefitIcons = {'delivery': 'Доставка', 'quality': 'Качество', 'support': 'Поддержка', 'payment': 'Удобная оплата', 'return': 'Возврат', 'secure': 'Безопасность', 'gift': 'Подарок', 'stock': 'В наличии', 'pickup': 'Самовывоз', 'custom': 'Индивидуальный подход'} %}
+    {% set benefitIconKeys = benefitIcons|keys %}
     {% set reviews = theme.reviews|default([]) %}
     {% set faqs = theme.faqs|default([]) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'reviews': 'Отзывы', 'faq': 'Частые вопросы', 'contacts': 'Контакты'} %}
@@ -275,8 +277,18 @@
                         <div class="benefit-settings">
                             {% for index in 0..5 %}
                                 {% set benefit = benefits[index]|default({}) %}
+                                {% set benefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : benefitIconKeys[index] %}
                                 <div class="benefit-setting">
-                                    <strong>Пункт {{ index + 1 }}</strong>
+                                    <div class="benefit-setting-heading">
+                                        <strong>Пункт {{ index + 1 }}</strong>
+                                        <span class="benefit-icon-swatch"><img src="/assets/benefit-icons/{{ benefitIcon }}.svg" alt="" data-benefit-icon-preview></span>
+                                    </div>
+                                    <label>
+                                        <span>Иконка</span>
+                                        <select name="benefits[{{ index }}][icon]" data-benefit-icon-select>
+                                            {% for iconKey, iconLabel in benefitIcons %}<option value="{{ iconKey }}" {{ benefitIcon == iconKey ? 'selected' : '' }}>{{ iconLabel }}</option>{% endfor %}
+                                        </select>
+                                    </label>
                                     <input name="benefits[{{ index }}][title]" type="text" maxlength="60" value="{{ benefit.title|default('') }}" placeholder="Например, быстрая доставка">
                                     <textarea name="benefits[{{ index }}][text]" maxlength="240" rows="2" placeholder="Короткое пояснение">{{ benefit.text|default('') }}</textarea>
                                 </div>
@@ -453,7 +465,7 @@
                             {{ _self.preview_tools('benefits', sectionLabels.benefits) }}
                             <h3 data-preview-benefits-title>{{ theme.benefits_title|default('Почему выбирают нас') }}</h3>
                             <div data-preview-benefits-list>
-                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default('')) %}<span><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
+                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default('')) %}{% set previewBenefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : benefitIconKeys[loop.index0] %}<span><img src="/assets/benefit-icons/{{ previewBenefitIcon }}.svg" alt=""><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
                             </div>
                         </div>
                         <div class="preview-section preview-content" data-preview-section="content">
@@ -468,9 +480,9 @@
                             <h3 data-preview-reviews-title>{{ theme.reviews_title|default('Отзывы покупателей') }}</h3>
                             <div class="preview-review-list" data-preview-reviews-list>
                                 {% for review in reviews|filter(item => item.author|default('') or item.text|default('')) %}
-                                    <article><blockquote>{{ review.text }}</blockquote><strong>{{ review.author }}</strong></article>
+                                    <article><blockquote>{{ review.text }}</blockquote><div class="preview-review-author"><span>{{ review.author|slice(0, 1)|upper }}</span><strong>{{ review.author }}</strong></div></article>
                                 {% else %}
-                                    <article><blockquote>Здесь появится отзыв покупателя.</blockquote><strong>Имя покупателя</strong></article>
+                                    <article><blockquote>Здесь появится отзыв покупателя.</blockquote><div class="preview-review-author"><span>И</span><strong>Имя покупателя</strong></div></article>
                                 {% endfor %}
                             </div>
                         </div>
@@ -499,5 +511,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261013-full-preview-items" defer></script>
+    <script src="/assets/store-appearance.js?v=20261013-benefit-icons" defer></script>
 {% endblock %}

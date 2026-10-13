@@ -879,17 +879,21 @@
     background: #ffffff;
 }
 
-.storefront-benefit-grid article > span {
+.storefront-benefit-icon {
     display: inline-flex;
-    width: 30px;
-    height: 30px;
+    width: 42px;
+    height: 42px;
     align-items: center;
     justify-content: center;
     margin-bottom: 14px;
     border-radius: 50%;
     color: #ffffff;
     background: var(--storefront-accent);
-    font-weight: 800;
+}
+
+.storefront-benefit-icon img {
+    width: 24px;
+    height: 24px;
 }
 
 .storefront-benefit-grid h3,
@@ -962,6 +966,25 @@
 .storefront-review-grid blockquote {
     margin: 0 0 16px;
     color: var(--muted);
+}
+
+.storefront-review-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.storefront-review-author > span {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--storefront-accent);
+    font-weight: 800;
 }
 
 .storefront-faq-list {

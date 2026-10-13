@@ -17,6 +17,7 @@ final readonly class UpdateStoreAppearanceUseCase
 {
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
     private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'];
+    private const BENEFIT_ICONS = ['delivery', 'quality', 'support', 'payment', 'return', 'secure', 'gift', 'stock', 'pickup', 'custom'];
 
     public function __construct(
         private StoreRepository $storeRepository,
@@ -107,7 +108,7 @@ final readonly class UpdateStoreAppearanceUseCase
             throw InvalidTenantInput::forField('benefits_title', 'Benefits title must contain up to 80 characters.');
         }
         $benefits = [];
-        foreach (array_slice($input->benefits, 0, 6) as $benefit) {
+        foreach (array_slice($input->benefits, 0, 6) as $benefitIndex => $benefit) {
             $title = trim((string) ($benefit['title'] ?? ''));
             $text = trim((string) ($benefit['text'] ?? ''));
             if ($title === '' && $text === '') {
@@ -116,7 +117,11 @@ final readonly class UpdateStoreAppearanceUseCase
             if ($title === '' || mb_strlen($title) > 60 || mb_strlen($text) > 240) {
                 throw InvalidTenantInput::forField('benefits', 'Each benefit needs a title up to 60 characters and text up to 240 characters.');
             }
-            $benefits[] = ['title' => $title, 'text' => $text];
+            $icon = trim((string) ($benefit['icon'] ?? ''));
+            if (!in_array($icon, self::BENEFIT_ICONS, true)) {
+                $icon = self::BENEFIT_ICONS[$benefitIndex % count(self::BENEFIT_ICONS)];
+            }
+            $benefits[] = ['title' => $title, 'text' => $text, 'icon' => $icon];
         }
         $contentTitle = trim($input->contentTitle);
         $contentText = trim($input->contentText);

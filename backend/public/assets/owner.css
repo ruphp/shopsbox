@@ -679,13 +679,36 @@
 }
 
 .benefit-setting input,
-.benefit-setting textarea {
+.benefit-setting textarea,
+.benefit-setting select {
     width: 100%;
     padding: 9px 11px;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: #fff;
     font: inherit;
+}
+
+.benefit-setting-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.benefit-icon-swatch {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--preview-accent, var(--accent));
+}
+
+.benefit-icon-swatch img {
+    width: 20px;
+    height: 20px;
 }
 
 .content-image-thumb {
@@ -1161,6 +1184,17 @@
     display: block;
 }
 
+.preview-benefits img {
+    display: block;
+    width: 34px;
+    height: 34px;
+    box-sizing: border-box;
+    margin-bottom: 7px;
+    padding: 7px;
+    border-radius: 50%;
+    background: var(--preview-accent);
+}
+
 .preview-benefits small {
     margin-top: 4px;
     color: #66717f;
@@ -1205,6 +1239,26 @@
 
 .preview-review-list strong {
     font-size: 12px;
+}
+
+.preview-review-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.preview-review-author > span {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--preview-accent);
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .preview-faq > div:last-child {

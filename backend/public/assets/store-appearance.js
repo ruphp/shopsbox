@@ -113,6 +113,7 @@
             .map((titleInput) => ({
                 title: titleInput.value.trim(),
                 text: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[text]')}"]`)?.value.trim() || '',
+                icon: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[icon]')}"]`)?.value || 'delivery',
             }))
             .filter((benefit) => benefit.title || benefit.text)
             .slice(0, 6);
@@ -120,11 +121,14 @@
         preview.querySelector('[data-preview-benefits-title]').textContent = value('benefits_title') || 'Почему выбирают нас';
         benefitsList.replaceChildren(...benefits.map((benefit) => {
             const item = document.createElement('span');
+            const icon = document.createElement('img');
             const title = document.createElement('strong');
             const text = document.createElement('small');
+            icon.src = `/assets/benefit-icons/${benefit.icon}.svg`;
+            icon.alt = '';
             title.textContent = benefit.title || 'Преимущество';
             text.textContent = benefit.text;
-            item.append(title, text);
+            item.append(icon, title, text);
             return item;
         }));
 
@@ -151,10 +155,15 @@
         preview.querySelector('[data-preview-reviews-list]').replaceChildren(...reviewItems.map((review) => {
             const item = document.createElement('article');
             const text = document.createElement('blockquote');
+            const authorRow = document.createElement('div');
+            const avatar = document.createElement('span');
             const author = document.createElement('strong');
             text.textContent = review.text || 'Отзыв покупателя';
             author.textContent = review.author || 'Покупатель';
-            item.append(text, author);
+            avatar.textContent = author.textContent.slice(0, 1).toLocaleUpperCase('ru-RU');
+            authorRow.className = 'preview-review-author';
+            authorRow.append(avatar, author);
+            item.append(text, authorRow);
             return item;
         }));
 
@@ -217,7 +226,14 @@
             if (event.target.matches('[data-slide-field="image_id"]')) updateSlideImage(slide);
             updateHeroPreview();
         }
-        if (event.target.closest('[data-config-section="content"]')) updateRichPreviews();
+        if (event.target.closest('[data-config-section="benefits"]')) {
+            const setting = event.target.closest('.benefit-setting');
+            if (event.target.matches('[data-benefit-icon-select]')) {
+                setting.querySelector('[data-benefit-icon-preview]').src = `/assets/benefit-icons/${event.target.value}.svg`;
+            }
+            updateRichPreviews();
+        }
+        if (event.target.closest('[data-config-section="content"], [data-config-section="reviews"], [data-config-section="faq"]')) updateRichPreviews();
     });
 
     editor.addEventListener('click', (event) => {

@@ -96,7 +96,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                         'new-items' => ['image_id' => 'category-id', 'image_url' => '/media/category.jpg'],
                     ],
                     'benefits_title' => 'Почему мы',
-                    'benefits' => [['title' => 'Быстро', 'text' => 'Отправим заказ завтра.']],
+                    'benefits' => [['title' => 'Быстро', 'text' => 'Отправим заказ завтра.', 'icon' => 'delivery']],
                     'content_title' => 'Наша мастерская',
                     'content_text' => 'Делаем товары сами.',
                     'content_image_id' => 'content-id',
