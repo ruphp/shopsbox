@@ -52,6 +52,11 @@ final readonly class UpdateStoreAppearanceForm
             (string) $request->request->get('featured_category_slug', ''),
             array_values(array_map('strval', $request->request->all('featured_product_ids'))),
             array_map('strval', $request->request->all('category_image_ids')),
+            (string) $request->request->get('benefits_title', 'Почему выбирают нас'),
+            array_values(array_filter(
+                $request->request->all('benefits'),
+                static fn (mixed $benefit): bool => is_array($benefit),
+            )),
         );
     }
 

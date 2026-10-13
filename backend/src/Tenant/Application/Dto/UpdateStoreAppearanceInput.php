@@ -10,6 +10,7 @@ final readonly class UpdateStoreAppearanceInput
      * @param list<string> $sections
      * @param list<array<string, mixed>> $heroSlides
      * @param array<string, string> $categoryImageIds
+     * @param list<array<string, mixed>> $benefits
      */
     public function __construct(
         public string $ownerEmail,
@@ -39,6 +40,8 @@ final readonly class UpdateStoreAppearanceInput
         public string $featuredCategorySlug = '',
         public array $featuredProductIds = [],
         public array $categoryImageIds = [],
+        public string $benefitsTitle = 'Почему выбирают нас',
+        public array $benefits = [],
     ) {
     }
 }

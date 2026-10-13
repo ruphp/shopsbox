@@ -95,6 +95,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'category_images' => [
                         'new-items' => ['image_id' => 'category-id', 'image_url' => '/media/category.jpg'],
                     ],
+                    'benefits_title' => 'Почему мы',
+                    'benefits' => [['title' => 'Быстро', 'text' => 'Отправим заказ завтра.']],
                     'sections' => ['hero', 'contacts', 'featured'],
                     'logo_image_id' => 'logo-id',
                     'logo_image_url' => '/media/logo.jpg',
@@ -161,6 +163,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 ' new-items ',
                 [],
                 ['new-items' => 'category-id'],
+                ' Почему мы ',
+                [['title' => ' Быстро ', 'text' => ' Отправим заказ завтра. ']],
             ),
         );
 

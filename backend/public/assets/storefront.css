@@ -819,6 +819,46 @@
     text-decoration: none;
 }
 
+.storefront-benefits {
+    background: var(--surface);
+}
+
+.storefront-benefit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.storefront-benefit-grid article {
+    position: relative;
+    padding: 20px;
+    border-left: 4px solid var(--storefront-accent);
+    background: #ffffff;
+}
+
+.storefront-benefit-grid article > span {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--storefront-accent);
+    font-weight: 800;
+}
+
+.storefront-benefit-grid h3,
+.storefront-benefit-grid p {
+    margin: 0;
+}
+
+.storefront-benefit-grid p {
+    margin-top: 8px;
+    color: var(--muted);
+}
+
 .store-contact-list {
     display: flex;
     flex-wrap: wrap;

@@ -16,7 +16,7 @@ use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 final readonly class UpdateStoreAppearanceUseCase
 {
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
-    private const SECTIONS = ['hero', 'categories', 'featured', 'contacts'];
+    private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'contacts'];
 
     public function __construct(
         private StoreRepository $storeRepository,
@@ -98,6 +98,23 @@ final readonly class UpdateStoreAppearanceUseCase
             throw InvalidTenantInput::forField('featured_product_ids', 'Choose at least one product for the product block.');
         }
 
+        $benefitsTitle = trim($input->benefitsTitle);
+        if ($benefitsTitle === '' || mb_strlen($benefitsTitle) > 80) {
+            throw InvalidTenantInput::forField('benefits_title', 'Benefits title must contain up to 80 characters.');
+        }
+        $benefits = [];
+        foreach (array_slice($input->benefits, 0, 6) as $benefit) {
+            $title = trim((string) ($benefit['title'] ?? ''));
+            $text = trim((string) ($benefit['text'] ?? ''));
+            if ($title === '' && $text === '') {
+                continue;
+            }
+            if ($title === '' || mb_strlen($title) > 60 || mb_strlen($text) > 240) {
+                throw InvalidTenantInput::forField('benefits', 'Each benefit needs a title up to 60 characters and text up to 240 characters.');
+            }
+            $benefits[] = ['title' => $title, 'text' => $text];
+        }
+
         $sections = array_values(array_unique(array_filter(
             $input->sections,
             static fn (string $section): bool => in_array($section, self::SECTIONS, true),
@@ -175,6 +192,8 @@ final readonly class UpdateStoreAppearanceUseCase
             'featured_category_slug' => $featuredCategorySlug,
             'featured_product_ids' => $featuredProductIds,
             'category_images' => $categoryImages,
+            'benefits_title' => $benefitsTitle,
+            'benefits' => $benefits,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,

@@ -132,6 +132,21 @@
                         </div>
                     </div>
                 </section>
+            {% elseif section == 'benefits' and theme.benefits|default([]) is not empty %}
+                <section class="section storefront-benefits">
+                    <div class="wrap">
+                        <h2>{{ theme.benefits_title|default('Почему выбирают нас') }}</h2>
+                        <div class="storefront-benefit-grid">
+                            {% for benefit in theme.benefits %}
+                                <article>
+                                    <span aria-hidden="true">{{ loop.index }}</span>
+                                    <h3>{{ benefit.title }}</h3>
+                                    {% if benefit.text %}<p>{{ benefit.text }}</p>{% endif %}
+                                </article>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
             {% endif %}
         {% endfor %}
     </div>

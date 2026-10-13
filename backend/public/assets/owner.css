@@ -637,6 +637,31 @@
     object-fit: cover;
 }
 
+.benefit-settings {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.benefit-setting {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.benefit-setting input,
+.benefit-setting textarea {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+}
+
 .appearance-slider-settings {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 140px;

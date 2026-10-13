@@ -34,7 +34,9 @@
     {% set featuredSource = theme.featured_source|default('latest') %}
     {% set featuredProductIds = theme.featured_product_ids|default([]) %}
     {% set categoryImages = theme.category_images|default({}) %}
-    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'contacts': 'Контакты'} %}
+    {% set benefits = theme.benefits|default([]) %}
+    {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
+    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
         {% set sectionPositions = sectionPositions|merge({(enabledSection): loop.index}) %}
@@ -238,10 +240,29 @@
                     </fieldset>
 
                     <fieldset class="appearance-group">
+                        <legend>Преимущества</legend>
+                        <p class="field-hint">Коротко объясните покупателю, почему стоит заказать именно у вас. Пустые пункты не выводятся.</p>
+                        <label class="appearance-field">
+                            <span>Заголовок блока</span>
+                            <input name="benefits_title" type="text" maxlength="80" value="{{ theme.benefits_title|default('Почему выбирают нас') }}">
+                        </label>
+                        <div class="benefit-settings">
+                            {% for index in 0..5 %}
+                                {% set benefit = benefits[index]|default({}) %}
+                                <div class="benefit-setting">
+                                    <strong>Пункт {{ index + 1 }}</strong>
+                                    <input name="benefits[{{ index }}][title]" type="text" maxlength="60" value="{{ benefit.title|default('') }}" placeholder="Например, быстрая доставка">
+                                    <textarea name="benefits[{{ index }}][text]" maxlength="240" rows="2" placeholder="Короткое пояснение">{{ benefit.text|default('') }}</textarea>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
                         <legend>Блоки на главной</legend>
                         <p class="field-hint">Включите нужные блоки и задайте их порядок.</p>
                         <div class="section-options">
-                            {% for section in ['hero', 'categories', 'featured', 'contacts'] %}
+                            {% for section in ['hero', 'categories', 'featured', 'benefits', 'contacts'] %}
                                 {% set position = sectionPositions[section]|default(loop.index) %}
                                 <div class="section-option" data-section-control="{{ section }}">
                                     <span class="section-drag-handle" draggable="true" title="Перетащить блок" aria-label="Перетащить блок">↕</span>
@@ -255,7 +276,7 @@
                                         <span>{{ sectionLabels[section] }}</span>
                                     </label>
                                     <select class="section-position" name="section_positions[{{ section }}]" aria-label="Порядок блока {{ sectionLabels[section] }}">
-                                        {% for number in 1..4 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
+                                        {% for number in 1..5 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
                                     </select>
                                     <button type="button" class="icon-button" data-section-up aria-label="Переместить {{ sectionLabels[section] }} выше">↑</button>
                                     <button type="button" class="icon-button" data-section-down aria-label="Переместить {{ sectionLabels[section] }} ниже">↓</button>
