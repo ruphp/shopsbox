@@ -27,6 +27,15 @@ final readonly class UpdateStoreAppearanceForm
             $this->emptyToNull($request->request->getString('logo_image_id')),
             $this->emptyToNull($request->request->getString('hero_image_id')),
             $request->request->getBoolean('show_store_name_with_logo'),
+            (string) $request->request->get('hero_eyebrow', ''),
+            (string) $request->request->get('hero_button_label', 'Смотреть товары'),
+            (string) $request->request->get('hero_alignment', 'left'),
+            $request->request->getInt('hero_overlay', 60),
+            (string) $request->request->get('featured_title', 'Популярное'),
+            $request->request->getInt('featured_columns', 4),
+            $request->request->getBoolean('featured_show_description'),
+            (string) $request->request->get('seo_title', ''),
+            (string) $request->request->get('seo_description', ''),
         );
     }
 

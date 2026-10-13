@@ -19,6 +19,15 @@ final readonly class UpdateStoreAppearanceInput
         public ?string $logoImageId = null,
         public ?string $heroImageId = null,
         public bool $showStoreNameWithLogo = false,
+        public string $heroEyebrow = '',
+        public string $heroButtonLabel = 'Смотреть товары',
+        public string $heroAlignment = 'left',
+        public int $heroOverlay = 60,
+        public string $featuredTitle = 'Популярное',
+        public int $featuredColumns = 4,
+        public bool $featuredShowDescription = true,
+        public string $seoTitle = '',
+        public string $seoDescription = '',
     ) {
     }
 }

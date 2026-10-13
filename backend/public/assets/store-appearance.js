@@ -7,8 +7,18 @@
 
     const titleInput = editor.querySelector('[name="hero_title"]');
     const textInput = editor.querySelector('[name="hero_text"]');
+    const eyebrowInput = editor.querySelector('[name="hero_eyebrow"]');
+    const buttonInput = editor.querySelector('[name="hero_button_label"]');
+    const alignmentInput = editor.querySelector('[name="hero_alignment"]');
+    const overlayInput = editor.querySelector('[name="hero_overlay"]');
+    const featuredTitleInput = editor.querySelector('[name="featured_title"]');
+    const featuredColumnsInput = editor.querySelector('[name="featured_columns"]');
     const previewTitle = preview.querySelector('[data-preview-title]');
     const previewText = preview.querySelector('[data-preview-text]');
+    const previewEyebrow = preview.querySelector('[data-preview-eyebrow]');
+    const previewButton = preview.querySelector('[data-preview-button]');
+    const previewFeaturedTitle = preview.querySelector('[data-preview-featured-title]');
+    const previewProductGrid = preview.querySelector('[data-preview-product-grid]');
     const storeName = preview.querySelector('header strong')?.textContent?.trim() || 'Ваш магазин';
     const previewLogo = preview.querySelector('[data-preview-logo]');
     const previewStoreName = preview.querySelector('[data-preview-store-name]');
@@ -18,6 +28,20 @@
     const updateText = () => {
         previewTitle.textContent = titleInput.value.trim() || storeName;
         previewText.textContent = textInput.value.trim() || 'Описание вашего магазина и его главного предложения.';
+        previewEyebrow.textContent = eyebrowInput.value.trim();
+        previewEyebrow.hidden = eyebrowInput.value.trim() === '';
+        previewButton.textContent = buttonInput.value.trim() || 'Смотреть товары';
+        previewFeaturedTitle.textContent = featuredTitleInput.value.trim() || 'Популярное';
+    };
+
+    const updateLayout = () => {
+        previewHero.classList.remove('align-left', 'align-center', 'align-right');
+        previewHero.classList.add(`align-${alignmentInput.value}`);
+        previewHero.style.setProperty('--preview-overlay', Number(overlayInput.value) / 100);
+
+        const columns = Number(featuredColumnsInput.value);
+        previewProductGrid.style.setProperty('--preview-columns', columns);
+        previewProductGrid.replaceChildren(...Array.from({ length: columns }, () => document.createElement('i')));
     };
 
     const updateTemplate = () => {
@@ -64,6 +88,12 @@
 
     titleInput.addEventListener('input', updateText);
     textInput.addEventListener('input', updateText);
+    eyebrowInput.addEventListener('input', updateText);
+    buttonInput.addEventListener('input', updateText);
+    featuredTitleInput.addEventListener('input', updateText);
+    alignmentInput.addEventListener('change', updateLayout);
+    overlayInput.addEventListener('change', updateLayout);
+    featuredColumnsInput.addEventListener('change', updateLayout);
     editor.querySelectorAll('[name="template"]').forEach((input) => input.addEventListener('change', updateTemplate));
     editor.querySelectorAll('[name="primary_color"]').forEach((input) => input.addEventListener('change', updateColor));
     editor.querySelectorAll('[name="logo_image_id"], [name="hero_image_id"]')
@@ -88,6 +118,7 @@
     });
 
     updateText();
+    updateLayout();
     updateTemplate();
     updateColor();
     updateImages();

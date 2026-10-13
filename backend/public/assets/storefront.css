@@ -583,9 +583,31 @@
     align-items: center;
     color: #ffffff;
     background:
-        linear-gradient(90deg, rgba(11, 25, 38, 0.84), rgba(11, 25, 38, 0.28)),
+        linear-gradient(rgba(11, 25, 38, var(--storefront-hero-overlay)), rgba(11, 25, 38, var(--storefront-hero-overlay))),
         var(--storefront-hero-image) center / cover no-repeat;
 }
+
+.storefront-hero.align-center { text-align: center; }
+.storefront-hero.align-right { text-align: right; }
+.storefront-hero.align-center p { margin-right: auto; margin-left: auto; }
+.storefront-hero.align-right p { margin-left: auto; }
+
+.storefront-hero-eyebrow {
+    margin-bottom: 8px;
+    color: var(--storefront-accent);
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.storefront-hero.has-image .storefront-hero-eyebrow,
+.storefront-template-accent .storefront-hero-eyebrow {
+    color: #ffffff;
+}
+
+.storefront-product-grid.columns-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.storefront-product-grid.columns-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.storefront-product-grid.columns-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 
 .storefront-hero.has-image p {
     max-width: 680px;
@@ -608,7 +630,7 @@
 
 .storefront-template-accent .storefront-hero.has-image {
     background:
-        linear-gradient(90deg, rgba(11, 25, 38, 0.78), rgba(11, 25, 38, 0.24)),
+        linear-gradient(rgba(11, 25, 38, var(--storefront-hero-overlay)), rgba(11, 25, 38, var(--storefront-hero-overlay))),
         var(--storefront-hero-image) center / cover no-repeat;
 }
 
@@ -654,6 +676,13 @@
     border-bottom: 0;
 }
 
+@media (min-width: 761px) and (max-width: 1100px) {
+    .storefront-product-grid.columns-4,
+    .storefront-product-grid.columns-5 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 760px) {
     .storefront-catalog .catalog-head,
     .product-detail,
@@ -696,5 +725,11 @@
         align-items: flex-start;
         flex-direction: column;
         gap: 5px;
+    }
+
+    .storefront-product-grid.columns-3,
+    .storefront-product-grid.columns-4,
+    .storefront-product-grid.columns-5 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }

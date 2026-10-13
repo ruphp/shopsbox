@@ -582,6 +582,7 @@
 
 .appearance-field input,
 .appearance-field textarea,
+.appearance-field select,
 .section-option select {
     width: 100%;
     min-height: 42px;
@@ -591,6 +592,26 @@
     background: #ffffff;
     font: inherit;
 }
+
+.appearance-field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.preview-eyebrow {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--preview-accent);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.preview-hero.align-center { text-align: center; }
+.preview-hero.align-right { text-align: right; }
+.preview-hero.align-center p { margin-right: auto; margin-left: auto; }
+.preview-hero.align-right p { margin-left: auto; }
 
 .section-options {
     display: grid;
@@ -726,7 +747,7 @@
 .preview-hero.has-image {
     color: #ffffff;
     background:
-        linear-gradient(90deg, rgba(11, 25, 38, 0.8), rgba(11, 25, 38, 0.28)),
+        linear-gradient(rgba(11, 25, 38, var(--preview-overlay)), rgba(11, 25, 38, var(--preview-overlay))),
         var(--preview-image) center / cover no-repeat;
 }
 
@@ -736,7 +757,7 @@
 
 .preview-products > div {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(var(--preview-columns, 4), 1fr);
     gap: 9px;
 }
 
@@ -869,7 +890,8 @@
     }
 
     .appearance-layout,
-    .template-options {
+    .template-options,
+    .appearance-field-row {
         grid-template-columns: 1fr;
     }
 

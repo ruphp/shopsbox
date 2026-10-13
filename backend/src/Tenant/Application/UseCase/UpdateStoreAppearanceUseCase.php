@@ -52,6 +52,34 @@ final readonly class UpdateStoreAppearanceUseCase
             throw InvalidTenantInput::forField('hero_text', 'Hero text must be up to 500 characters.');
         }
 
+        $heroEyebrow = trim($input->heroEyebrow);
+        $heroButtonLabel = trim($input->heroButtonLabel);
+        $featuredTitle = trim($input->featuredTitle);
+        $seoTitle = trim($input->seoTitle);
+        $seoDescription = trim($input->seoDescription);
+        if (mb_strlen($heroEyebrow) > 60) {
+            throw InvalidTenantInput::forField('hero_eyebrow', 'Banner eyebrow must be up to 60 characters.');
+        }
+        if ($heroButtonLabel === '' || mb_strlen($heroButtonLabel) > 40) {
+            throw InvalidTenantInput::forField('hero_button_label', 'Banner button label must contain up to 40 characters.');
+        }
+        if ($featuredTitle === '' || mb_strlen($featuredTitle) > 80) {
+            throw InvalidTenantInput::forField('featured_title', 'Product block title must contain up to 80 characters.');
+        }
+        if (mb_strlen($seoTitle) > 70) {
+            throw InvalidTenantInput::forField('seo_title', 'SEO title must be up to 70 characters.');
+        }
+        if (mb_strlen($seoDescription) > 180) {
+            throw InvalidTenantInput::forField('seo_description', 'SEO description must be up to 180 characters.');
+        }
+        $heroAlignment = in_array($input->heroAlignment, ['left', 'center', 'right'], true)
+            ? $input->heroAlignment
+            : 'left';
+        $heroOverlay = max(0, min(90, $input->heroOverlay));
+        $featuredColumns = in_array($input->featuredColumns, [3, 4, 5], true)
+            ? $input->featuredColumns
+            : 4;
+
         $sections = array_values(array_unique(array_filter(
             $input->sections,
             static fn (string $section): bool => in_array($section, self::SECTIONS, true),
@@ -74,6 +102,15 @@ final readonly class UpdateStoreAppearanceUseCase
             'accent' => $this->legacyAccent($primaryColor),
             'hero_title' => $heroTitle,
             'hero_text' => $heroText,
+            'hero_eyebrow' => $heroEyebrow,
+            'hero_button_label' => $heroButtonLabel,
+            'hero_alignment' => $heroAlignment,
+            'hero_overlay' => $heroOverlay,
+            'featured_title' => $featuredTitle,
+            'featured_columns' => $featuredColumns,
+            'featured_show_description' => $input->featuredShowDescription,
+            'seo_title' => $seoTitle,
+            'seo_description' => $seoDescription,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,

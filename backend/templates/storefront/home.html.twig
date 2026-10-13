@@ -8,33 +8,44 @@
 {% set template = theme.template|default('classic') %}
 {% set primary_color = theme.primary_color|default('#0077b6') %}
 {% set hero_image = theme.hero_image_url|default('') %}
+{% set hero_eyebrow = theme.hero_eyebrow|default('') %}
+{% set hero_button_label = theme.hero_button_label|default('Смотреть товары') %}
+{% set hero_alignment = theme.hero_alignment|default('left') %}
+{% set hero_overlay = theme.hero_overlay|default(60) %}
+{% set featured_title = theme.featured_title|default('Популярное') %}
+{% set featured_columns = theme.featured_columns|default(4) %}
+{% set featured_show_description = theme.featured_show_description|default(true) %}
+{% set seo_title = theme.seo_title|default('') ?: store.name %}
+{% set seo_description = theme.seo_description|default('') ?: (store.publicDescription|default('') ?: 'Открытая витрина магазина ' ~ store.name ~ ' с опубликованными товарами.') %}
 
-{% block title %}{{ store.name }}{% endblock %}
-{% block og_title %}{{ store.name }}{% endblock %}
-{% block meta_description %}{{ store.name }} - публичная витрина магазина на ShopsBox.{% endblock %}
-{% block og_description %}Открытая витрина магазина {{ store.name }} с опубликованными товарами.{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block og_title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block og_description %}{{ seo_description }}{% endblock %}
+{% block og_image %}{{ hero_image ? (hero_image starts with 'http' ? hero_image : site_public_base_url ~ hero_image) : parent() }}{% endblock %}
 {% block canonical_url %}{{ site_public_base_url ~ path('storefront_home', {storeSlug: store.slug}) }}{% endblock %}
 
 {% block storefront_content %}
     <div class="storefront-page storefront-template-{{ template }}" style="--storefront-accent: {{ primary_color }}">
         {% for section in sections %}
             {% if section == 'hero' %}
-                <section class="hero storefront-hero {{ hero_image ? 'has-image' : '' }}"{% if hero_image %} style="--storefront-hero-image: url('{{ hero_image }}')"{% endif %}>
+                <section class="hero storefront-hero align-{{ hero_alignment }} {{ hero_image ? 'has-image' : '' }}" style="--storefront-hero-overlay: {{ hero_overlay / 100 }}{% if hero_image %}; --storefront-hero-image: url('{{ hero_image }}'){% endif %}">
                     <div class="wrap">
+                        {% if hero_eyebrow %}<p class="storefront-hero-eyebrow">{{ hero_eyebrow }}</p>{% endif %}
                         <h1>{{ hero_title }}</h1>
                         <p>{{ hero_text }}</p>
-                        <a class="button" href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">Смотреть товары</a>
+                        <a class="button" href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">{{ hero_button_label }}</a>
                     </div>
                 </section>
             {% elseif section == 'featured' %}
                 <section class="section storefront-featured">
                     <div class="wrap">
-                        <h2>Популярное</h2>
+                        <h2>{{ featured_title }}</h2>
 
                         {% if view.featuredProducts is empty %}
                             <p class="muted">Пока нет опубликованных товаров.</p>
                         {% else %}
-                            <div class="product-grid">
+                            <div class="product-grid storefront-product-grid columns-{{ featured_columns }}">
                                 {% for product in view.featuredProducts %}
                                     <article class="product-card">
                                         <a class="product-media" href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: product.slug}) }}">
@@ -46,7 +57,7 @@
                                         </a>
                                         <div class="product-card-body">
                                             <h3><a href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: product.slug}) }}">{{ product.name }}</a></h3>
-                                            <p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>
+                                            {% if featured_show_description %}<p class="muted">{{ product.description ?: 'Описание появится позже.' }}</p>{% endif %}
                                             <p class="product-price product-price-small">{{ product.price|number_format(2, ',', ' ') }} {{ currency_symbol }}</p>
                                         </div>
                                     </article>

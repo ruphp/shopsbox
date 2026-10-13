@@ -11,6 +11,10 @@
     {% set logoImageId = theme.logo_image_id|default('') %}
     {% set showStoreNameWithLogo = theme.show_store_name_with_logo|default(false) %}
     {% set heroImageId = theme.hero_image_id|default('') %}
+    {% set heroAlignment = theme.hero_alignment|default('left') %}
+    {% set heroOverlay = theme.hero_overlay|default(60) %}
+    {% set featuredColumns = theme.featured_columns|default(4) %}
+    {% set featuredShowDescription = theme.featured_show_description|default(true) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'featured': 'Популярные товары', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
@@ -114,6 +118,11 @@
 
                     <fieldset class="appearance-group">
                         <legend>Главный блок</legend>
+                        <p class="field-hint">Главный заголовок страницы всегда остаётся единственным H1 — это важно для понятной SEO-структуры.</p>
+                        <label class="appearance-field" for="appearance-eyebrow">
+                            <span>Надзаголовок</span>
+                            <input id="appearance-eyebrow" name="hero_eyebrow" type="text" maxlength="60" value="{{ theme.hero_eyebrow|default('') }}" placeholder="Например: Новая коллекция">
+                        </label>
                         <label class="appearance-field" for="appearance-title">
                             <span>Заголовок</span>
                             <input id="appearance-title" name="hero_title" type="text" maxlength="120" value="{{ theme.hero_title|default('') }}" placeholder="{{ settings.name }}">
@@ -121,6 +130,46 @@
                         <label class="appearance-field" for="appearance-text">
                             <span>Короткое описание</span>
                             <textarea id="appearance-text" name="hero_text" rows="4" maxlength="500" placeholder="Расскажите, что продаёт ваш магазин">{{ theme.hero_text|default('') }}</textarea>
+                        </label>
+                        <label class="appearance-field" for="appearance-button-label">
+                            <span>Текст кнопки</span>
+                            <input id="appearance-button-label" name="hero_button_label" type="text" maxlength="40" value="{{ theme.hero_button_label|default('Смотреть товары') }}">
+                        </label>
+                        <div class="appearance-field-row">
+                            <label class="appearance-field" for="appearance-alignment">
+                                <span>Выравнивание</span>
+                                <select id="appearance-alignment" name="hero_alignment">
+                                    {% for value, label in {'left': 'Слева', 'center': 'По центру', 'right': 'Справа'} %}
+                                        <option value="{{ value }}" {{ heroAlignment == value ? 'selected' : '' }}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <label class="appearance-field" for="appearance-overlay">
+                                <span>Затемнение фона</span>
+                                <select id="appearance-overlay" name="hero_overlay">
+                                    {% for value, label in {20: 'Слабое', 40: 'Лёгкое', 60: 'Среднее', 75: 'Сильное'} %}
+                                        <option value="{{ value }}" {{ heroOverlay == value ? 'selected' : '' }}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
+                        <legend>Товары на главной</legend>
+                        <label class="appearance-field" for="featured-title">
+                            <span>Заголовок блока</span>
+                            <input id="featured-title" name="featured_title" type="text" maxlength="80" value="{{ theme.featured_title|default('Популярное') }}">
+                        </label>
+                        <label class="appearance-field" for="featured-columns">
+                            <span>Колонок на большом экране</span>
+                            <select id="featured-columns" name="featured_columns">
+                                {% for columns in [3, 4, 5] %}<option value="{{ columns }}" {{ featuredColumns == columns ? 'selected' : '' }}>{{ columns }}</option>{% endfor %}
+                            </select>
+                        </label>
+                        <label class="active-check">
+                            <input type="checkbox" name="featured_show_description" value="1" {{ featuredShowDescription ? 'checked' : '' }}>
+                            Показывать краткое описание товара
                         </label>
                     </fieldset>
 
@@ -143,6 +192,21 @@
                         </div>
                     </fieldset>
 
+                    <fieldset class="appearance-group">
+                        <legend>SEO главной страницы</legend>
+                        <p class="field-hint">Если оставить поля пустыми, ShopsBox подставит название и описание магазина. Адрес страницы и canonical формируются автоматически.</p>
+                        <label class="appearance-field" for="seo-title">
+                            <span>Заголовок для поиска</span>
+                            <input id="seo-title" name="seo_title" type="text" maxlength="70" value="{{ theme.seo_title|default('') }}" placeholder="{{ settings.name }}">
+                            <small class="field-hint">Желательно до 60–70 символов.</small>
+                        </label>
+                        <label class="appearance-field" for="seo-description">
+                            <span>Описание для поиска</span>
+                            <textarea id="seo-description" name="seo_description" rows="3" maxlength="180" placeholder="Кратко опишите ассортимент и преимущества магазина">{{ theme.seo_description|default('') }}</textarea>
+                            <small class="field-hint">Обычно достаточно 120–160 символов.</small>
+                        </label>
+                    </fieldset>
+
                     <div class="appearance-actions">
                         <button class="button" type="submit">Сохранить оформление</button>
                         <a href="{{ path('owner_dashboard') }}">Вернуться к плану запуска</a>
@@ -162,14 +226,15 @@
                             </div>
                             <span>Товары&nbsp;&nbsp; Корзина</span>
                         </header>
-                        <div class="preview-section preview-hero {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero"{% if heroImageId != '' %} style="--preview-image: url('{{ theme.hero_image_url }}')"{% endif %}>
+                        <div class="preview-section preview-hero align-{{ heroAlignment }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}{% if heroImageId != '' %}; --preview-image: url('{{ theme.hero_image_url }}'){% endif %}">
+                            <small class="preview-eyebrow" data-preview-eyebrow {{ theme.hero_eyebrow|default('') == '' ? 'hidden' : '' }}>{{ theme.hero_eyebrow|default('') }}</small>
                             <h2 data-preview-title>{{ theme.hero_title|default('') ?: settings.name }}</h2>
                             <p data-preview-text>{{ theme.hero_text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
-                            <span class="preview-button">Смотреть товары</span>
+                            <span class="preview-button" data-preview-button>{{ theme.hero_button_label|default('Смотреть товары') }}</span>
                         </div>
                         <div class="preview-section preview-products" data-preview-section="featured">
-                            <h3>Популярное</h3>
-                            <div><i></i><i></i><i></i></div>
+                            <h3 data-preview-featured-title>{{ theme.featured_title|default('Популярное') }}</h3>
+                            <div data-preview-product-grid style="--preview-columns: {{ featuredColumns }}">{% for item in 1..featuredColumns %}<i></i>{% endfor %}</div>
                         </div>
                         <div class="preview-section preview-contacts" data-preview-section="contacts">
                             <h3>Контакты магазина</h3>
@@ -190,5 +255,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261013-brand-name" defer></script>
+    <script src="/assets/store-appearance.js?v=20261013-builder-foundation" defer></script>
 {% endblock %}
