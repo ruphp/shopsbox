@@ -22,9 +22,16 @@ interface StorefrontProductRepository
     /**
      * @return list<StorefrontProductView>
      */
+    public function listPopularByStore(string $storeId): array;
+
+    /**
+     * @return list<StorefrontProductView>
+     */
     public function listActiveByStoreAndCategory(string $storeId, string $categorySlug): array;
 
     public function findCategoryByStoreAndSlug(string $storeId, string $categorySlug): ?StorefrontCategoryView;
 
     public function findActiveByStoreAndSlug(string $storeId, string $productSlug): ?StorefrontProductView;
+
+    public function incrementViewCount(string $productId): void;
 }

@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_products_store', columns: ['store_id'])]
 #[ORM\Index(name: 'idx_products_category', columns: ['category_id'])]
 #[ORM\Index(name: 'idx_products_status', columns: ['status'])]
+#[ORM\Index(name: 'idx_products_store_views', columns: ['store_id', 'view_count'])]
 class Product
 {
     #[ORM\Id]
@@ -75,6 +76,9 @@ class Product
 
     #[ORM\Column]
     private DateTimeImmutable $updatedAt;
+
+    #[ORM\Column(options: ['default' => 0])]
+    private int $viewCount = 0;
 
     public function __construct(
         string $id,
@@ -170,6 +174,11 @@ class Product
     public function updatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    public function viewCount(): int
+    {
+        return $this->viewCount;
     }
 
     public function updateDetails(?Category $category, string $name, string $slug, ?string $description, string $price): void

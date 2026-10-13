@@ -61,6 +61,17 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
         return array_map(fn (Product $product): StorefrontProductView => $this->map($product), $products);
     }
 
+    public function listPopularByStore(string $storeId): array
+    {
+        $products = $this->activeProductsQuery($storeId)
+            ->orderBy('product.viewCount', 'DESC')
+            ->addOrderBy('product.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (Product $product): StorefrontProductView => $this->map($product), $products);
+    }
+
     public function listActiveByStoreAndCategory(string $storeId, string $categorySlug): array
     {
         $products = $this->entityManager->createQueryBuilder()
@@ -114,6 +125,30 @@ final readonly class DoctrineStorefrontProductRepository implements StorefrontPr
             ->getOneOrNullResult();
 
         return $product instanceof Product ? $this->map($product) : null;
+    }
+
+    public function incrementViewCount(string $productId): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->update(Product::class, 'product')
+            ->set('product.viewCount', 'product.viewCount + 1')
+            ->where('product.id = :productId')
+            ->setParameter('productId', $productId)
+            ->getQuery()
+            ->execute();
+    }
+
+    private function activeProductsQuery(string $storeId): \Doctrine\ORM\QueryBuilder
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('product')
+            ->from(Product::class, 'product')
+            ->where('IDENTITY(product.store) = :storeId')
+            ->andWhere('product.status = :status')
+            ->andWhere('product.publicationStatus = :publicationStatus')
+            ->setParameter('storeId', $storeId)
+            ->setParameter('status', ProductStatus::ACTIVE)
+            ->setParameter('publicationStatus', ProductPublicationStatus::PUBLISHED);
     }
 
     private function map(Product $product): StorefrontProductView

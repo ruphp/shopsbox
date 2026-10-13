@@ -27,9 +27,11 @@ final readonly class ShowStorefrontHomeUseCase
         $theme = $store->themeSettings;
         $featuredLimit = max(4, min(12, (int) ($theme['featured_limit'] ?? 6)));
         $source = (string) ($theme['featured_source'] ?? 'latest');
-        $products = $source === 'category' && ($theme['featured_category_slug'] ?? '') !== ''
-            ? $this->productRepository->listActiveByStoreAndCategory($store->id, (string) $theme['featured_category_slug'])
-            : $this->productRepository->listActiveByStore($store->id);
+        $products = match (true) {
+            $source === 'popular' => $this->productRepository->listPopularByStore($store->id),
+            $source === 'category' && ($theme['featured_category_slug'] ?? '') !== '' => $this->productRepository->listActiveByStoreAndCategory($store->id, (string) $theme['featured_category_slug']),
+            default => $this->productRepository->listActiveByStore($store->id),
+        };
         if ($source === 'manual') {
             $byId = [];
             foreach ($products as $product) {

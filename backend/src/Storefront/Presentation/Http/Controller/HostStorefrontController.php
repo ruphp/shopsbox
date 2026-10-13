@@ -8,9 +8,11 @@ use App\Storefront\Application\Exception\StorefrontCategoryNotFound;
 use App\Storefront\Application\Exception\StorefrontProductNotFound;
 use App\Storefront\Application\Exception\StorefrontStoreNotFound;
 use App\Storefront\Application\UseCase\ListStorefrontProductsUseCase;
+use App\Storefront\Presentation\Http\ProductViewSessionRecorder;
 use App\Storefront\Application\UseCase\ShowStorefrontHomeUseCase;
 use App\Storefront\Application\UseCase\ShowStorefrontProductUseCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
@@ -22,6 +24,7 @@ final readonly class HostStorefrontController
         private ShowStorefrontHomeUseCase $showHome,
         private ListStorefrontProductsUseCase $listProducts,
         private ShowStorefrontProductUseCase $showProduct,
+        private ProductViewSessionRecorder $productViewRecorder,
     ) {
     }
 
@@ -72,10 +75,11 @@ final readonly class HostStorefrontController
 
     #[Route('/products/{productSlug}', name: 'host_storefront_product', host: '{storeSlug}.shopsbox.ru', methods: ['GET'])]
     #[Route('/products/{productSlug}', name: 'local_host_storefront_product', host: '{storeSlug}.shopsbox.local', methods: ['GET'])]
-    public function product(string $storeSlug, string $productSlug): Response
+    public function product(string $storeSlug, string $productSlug, Request $request): Response
     {
         try {
             $view = $this->showProduct->execute($storeSlug, $productSlug);
+            $this->productViewRecorder->record($request, $view->product->id);
         } catch (StorefrontStoreNotFound|StorefrontProductNotFound $exception) {
             throw new NotFoundHttpException($exception->getMessage(), $exception);
         }
@@ -84,4 +88,5 @@ final readonly class HostStorefrontController
             'view' => $view,
         ]));
     }
+
 }

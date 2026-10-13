@@ -83,7 +83,7 @@ final readonly class UpdateStoreAppearanceUseCase
             ? $input->featuredLayout
             : 'grid';
         $featuredLimit = max(4, min(12, $input->featuredLimit));
-        $featuredSource = in_array($input->featuredSource, ['latest', 'category', 'manual'], true)
+        $featuredSource = in_array($input->featuredSource, ['latest', 'popular', 'category', 'manual'], true)
             ? $input->featuredSource
             : 'latest';
         $featuredCategorySlug = mb_substr(trim($input->featuredCategorySlug), 0, 120);

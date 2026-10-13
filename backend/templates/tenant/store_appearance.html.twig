@@ -179,6 +179,7 @@
                             <span>Какие товары показывать</span>
                             <select id="featured-source" name="featured_source" data-featured-source>
                                 <option value="latest" {{ featuredSource == 'latest' ? 'selected' : '' }}>Новинки</option>
+                                <option value="popular" {{ featuredSource == 'popular' ? 'selected' : '' }}>Популярные по просмотрам</option>
                                 <option value="category" {{ featuredSource == 'category' ? 'selected' : '' }}>Из категории</option>
                                 <option value="manual" {{ featuredSource == 'manual' ? 'selected' : '' }}>Выбрать вручную</option>
                             </select>
