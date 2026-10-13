@@ -100,6 +100,11 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
                 $usage[] = 'Баннер: слайд '.($index + 1);
             }
         }
+        foreach ((array) ($theme['category_images'] ?? []) as $categorySlug => $categoryImage) {
+            if (is_array($categoryImage) && ($categoryImage['image_id'] ?? null) === $file->id()) {
+                $usage[] = 'Категория: '.(string) $categorySlug;
+            }
+        }
         return $usage;
     }
 }

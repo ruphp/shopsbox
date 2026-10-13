@@ -51,6 +51,7 @@ final readonly class UpdateStoreAppearanceForm
             (string) $request->request->get('featured_source', 'latest'),
             (string) $request->request->get('featured_category_slug', ''),
             array_values(array_map('strval', $request->request->all('featured_product_ids'))),
+            array_map('strval', $request->request->all('category_image_ids')),
         );
     }
 

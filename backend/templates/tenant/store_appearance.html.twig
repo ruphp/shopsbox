@@ -33,6 +33,7 @@
     {% set featuredShowDescription = theme.featured_show_description|default(true) %}
     {% set featuredSource = theme.featured_source|default('latest') %}
     {% set featuredProductIds = theme.featured_product_ids|default([]) %}
+    {% set categoryImages = theme.category_images|default({}) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
@@ -73,6 +74,34 @@
                                 <span><strong>Акцентный</strong><small>Выразительный главный блок</small></span>
                             </label>
                         </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
+                        <legend>Категории на главной</legend>
+                        <p class="field-hint">Назначьте обложки категориям. Файл останется защищённым от удаления, пока используется на витрине.</p>
+                        {% if categories is empty %}
+                            <p class="muted">Категории появятся здесь после добавления товаров с категориями.</p>
+                        {% elseif mediaImages is empty %}
+                            <p class="muted">Сначала загрузите изображения в медиатеку.</p>
+                        {% else %}
+                            <div class="category-image-settings">
+                                {% for category in categories %}
+                                    {% set selectedCategoryImage = categoryImages[category.slug]|default({}) %}
+                                    <label class="category-image-setting">
+                                        <strong>{{ category.name }}</strong>
+                                        <select name="category_image_ids[{{ category.slug }}]" data-category-image-select data-category-slug="{{ category.slug }}">
+                                            <option value="" data-image-url="">Без изображения</option>
+                                            {% for image in mediaImages %}
+                                                <option value="{{ image.id }}" data-image-url="{{ image.publicUrl }}" {{ selectedCategoryImage.image_id|default('') == image.id ? 'selected' : '' }}>{{ image.originalName ?: image.key }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <span class="category-image-thumb" data-category-image-thumb {{ selectedCategoryImage.image_url|default('') ? '' : 'hidden' }}>
+                                            <img src="{{ selectedCategoryImage.image_url|default('') }}" alt="" loading="lazy">
+                                        </span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </fieldset>
 
                     <fieldset class="appearance-group">

@@ -114,6 +114,22 @@ final readonly class UpdateStoreAppearanceUseCase
         }
         $logo = $this->selectedImage($input->logoImageId, $images, 'logo_image_id');
         $heroImage = $this->selectedImage($input->heroImageId, $images, 'hero_image_id');
+        $categoryImages = [];
+        foreach ($input->categoryImageIds as $categorySlug => $imageId) {
+            $categorySlug = trim((string) $categorySlug);
+            $imageId = trim((string) $imageId);
+            if ($imageId === '') {
+                continue;
+            }
+            if (!preg_match('/^[a-z0-9][a-z0-9-]{0,119}$/', $categorySlug)) {
+                throw InvalidTenantInput::forField('category_image_ids', 'Unknown category in image settings.');
+            }
+            $image = $this->selectedImage($imageId, $images, 'category_image_ids');
+            $categoryImages[$categorySlug] = [
+                'image_id' => $image?->id,
+                'image_url' => $image?->publicUrl,
+            ];
+        }
 
         $heroSlides = [];
         if ($input->heroSlides !== []) {
@@ -158,6 +174,7 @@ final readonly class UpdateStoreAppearanceUseCase
             'featured_source' => $featuredSource,
             'featured_category_slug' => $featuredCategorySlug,
             'featured_product_ids' => $featuredProductIds,
+            'category_images' => $categoryImages,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,

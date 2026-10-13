@@ -107,8 +107,9 @@
                         {% else %}
                             <nav class="storefront-category-grid" aria-label="Категории товаров">
                                 {% for category in view.categories %}
-                                    <a href="{{ path(storefront_category_route, {storeSlug: store.slug, categorySlug: category.slug}) }}">
-                                        <span>{{ category.name }}</span><span aria-hidden="true">→</span>
+                                    {% set category_image = theme.category_images[category.slug]|default({}) %}
+                                    <a class="{{ category_image.image_url|default('') ? 'has-image' : '' }}" href="{{ path(storefront_category_route, {storeSlug: store.slug, categorySlug: category.slug}) }}"{% if category_image.image_url|default('') %} style="--category-image: url('{{ category_image.image_url }}')"{% endif %}>
+                                        <span>{{ category.name }}</span><span class="storefront-category-arrow" aria-hidden="true">→</span>
                                     </a>
                                 {% endfor %}
                             </nav>

@@ -92,6 +92,9 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'featured_source' => 'category',
                     'featured_category_slug' => 'new-items',
                     'featured_product_ids' => [],
+                    'category_images' => [
+                        'new-items' => ['image_id' => 'category-id', 'image_url' => '/media/category.jpg'],
+                    ],
                     'sections' => ['hero', 'contacts', 'featured'],
                     'logo_image_id' => 'logo-id',
                     'logo_image_url' => '/media/logo.jpg',
@@ -108,6 +111,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
         $media->method('listByStore')->willReturn([
             $this->image('logo-id', '/media/logo.jpg'),
             $this->image('hero-id', '/media/hero.jpg'),
+            $this->image('category-id', '/media/category.jpg'),
         ]);
 
         $result = (new UpdateStoreAppearanceUseCase($repository, $flusher, $media))->execute(
@@ -155,6 +159,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 10,
                 'category',
                 ' new-items ',
+                [],
+                ['new-items' => 'category-id'],
             ),
         );
 

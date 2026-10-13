@@ -174,6 +174,14 @@
     featuredSourceInput.addEventListener('change', updateFeaturedSource);
     editor.querySelectorAll('[data-section-control] input[type="checkbox"]')
         .forEach((input) => input.addEventListener('change', updateSections));
+    editor.querySelectorAll('[data-category-image-select]').forEach((select) => {
+        select.addEventListener('change', () => {
+            const thumb = select.closest('.category-image-setting').querySelector('[data-category-image-thumb]');
+            const imageUrl = select.selectedOptions[0]?.dataset.imageUrl || '';
+            thumb.hidden = imageUrl === '';
+            if (imageUrl !== '') thumb.querySelector('img').src = imageUrl;
+        });
+    });
 
     const orderedControls = [...sectionOptions.querySelectorAll('[data-section-control]')]
         .sort((left, right) => Number(left.querySelector('.section-position').value) - Number(right.querySelector('.section-position').value));

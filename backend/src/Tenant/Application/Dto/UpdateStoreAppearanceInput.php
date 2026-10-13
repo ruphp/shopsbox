@@ -9,6 +9,7 @@ final readonly class UpdateStoreAppearanceInput
     /**
      * @param list<string> $sections
      * @param list<array<string, mixed>> $heroSlides
+     * @param array<string, string> $categoryImageIds
      */
     public function __construct(
         public string $ownerEmail,
@@ -37,6 +38,7 @@ final readonly class UpdateStoreAppearanceInput
         public string $featuredSource = 'latest',
         public string $featuredCategorySlug = '',
         public array $featuredProductIds = [],
+        public array $categoryImageIds = [],
     ) {
     }
 }
