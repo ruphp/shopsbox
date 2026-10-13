@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/storefront.css?v=20261013-mobile-nav">
+    <link rel="stylesheet" href="/assets/storefront.css?v=20261013-draft-preview">
 {% endblock %}
 
 {% block body %}
@@ -18,6 +18,14 @@
     {% set currency_symbol = store.currency == 'RUB' ? '₽' : store.currency %}
     {% set storefront_logo = store.themeSettings.logo_image_url|default('') %}
     {% set show_store_name_with_logo = store.themeSettings.show_store_name_with_logo|default(false) %}
+    {% if appearancePreview|default(false) %}
+        <div class="storefront-preview-bar">
+            <div class="wrap">
+                <div><strong>Предпросмотр черновика</strong><span>Эту версию видите только вы.</span></div>
+                <a href="{{ path('owner_store_appearance') }}">Вернуться к редактору</a>
+            </div>
+        </div>
+    {% endif %}
     <header class="header storefront-header responsive-header" data-responsive-header>
         <div class="wrap nav storefront-header-row responsive-header-row">
             <a class="brand" href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">

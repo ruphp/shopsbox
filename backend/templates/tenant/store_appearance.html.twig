@@ -52,12 +52,16 @@
                     <h1>Оформление витрины</h1>
                     <p class="muted">Настройте главную страницу магазина и сразу посмотрите результат.</p>
                 </div>
-                <a class="button button-secondary" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть опубликованную витрину</a>
+                <div class="appearance-heading-actions">
+                    {% if hasAppearanceDraft|default(false) %}<a class="button" href="{{ path('owner_store_appearance_preview') }}">Предпросмотр черновика</a>{% endif %}
+                    <a class="button button-secondary" href="{{ path('storefront_home', {storeSlug: settings.slug}) }}">Открыть опубликованную витрину</a>
+                </div>
             </header>
 
             {% if error is defined %}<p class="appearance-message is-error" role="alert">{{ error }}</p>{% endif %}
             {% if draftSaved|default(false) %}<p class="appearance-message is-success">Черновик сохранён. Покупатели пока видят прежнее оформление.</p>{% endif %}
             {% if published|default(false) %}<p class="appearance-message is-success">Оформление опубликовано и уже применяется на витрине.</p>{% endif %}
+            {% if previewMissing|default(false) %}<p class="appearance-message is-error">Сначала сохраните оформление как черновик.</p>{% endif %}
             {% if hasAppearanceDraft|default(false) and not draftSaved|default(false) %}<p class="appearance-message">Открыт сохранённый черновик. Изменения попадут на витрину только после публикации.</p>{% endif %}
 
             <form class="appearance-layout" method="post" action="{{ path('owner_store_appearance_update') }}">

@@ -7,6 +7,8 @@ namespace App\Tenant\Presentation\Http\Controller;
 use App\Catalog\Application\Contracts\CategoryRepository;
 use App\Catalog\Application\UseCase\ListProductsUseCase;
 use App\FileStorage\Application\UseCase\ListStoreMediaLibraryUseCase;
+use App\Storefront\Application\Dto\StorefrontStoreView;
+use App\Storefront\Application\UseCase\ShowStorefrontHomeUseCase;
 use App\Tenant\Application\Exception\InvalidTenantInput;
 use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 use App\Tenant\Application\UseCase\ShowStoreSettingsUseCase;
@@ -33,6 +35,7 @@ final readonly class StoreAppearanceController
         private ListStoreMediaLibraryUseCase $listMediaLibrary,
         private CategoryRepository $categoryRepository,
         private ListProductsUseCase $listProducts,
+        private ShowStorefrontHomeUseCase $showStorefrontHome,
     ) {
     }
 
@@ -56,10 +59,55 @@ final readonly class StoreAppearanceController
             'hasAppearanceDraft' => isset($settings->themeSettings['appearance_draft']),
             'draftSaved' => $request->query->getBoolean('draft_saved'),
             'published' => $request->query->getBoolean('published'),
+            'previewMissing' => $request->query->getBoolean('preview_missing'),
             'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
             'categories' => $this->categoryRepository->listByStore($settings->storeId),
             'products' => $this->listProducts->execute($settings->storeId),
         ]));
+    }
+
+    #[Route('/preview', name: 'owner_store_appearance_preview', methods: ['GET'])]
+    public function preview(Request $request): Response
+    {
+        $ownerEmail = $this->ownerEmail($request);
+        if ($ownerEmail === null) {
+            return new RedirectResponse('/auth/login');
+        }
+
+        try {
+            $settings = $this->showStoreSettings->execute($ownerEmail);
+        } catch (StoreSettingsAccessDenied $exception) {
+            return new Response($exception->getMessage(), Response::HTTP_FORBIDDEN);
+        }
+
+        $draft = $settings->themeSettings['appearance_draft'] ?? null;
+        if (!is_array($draft)) {
+            return new RedirectResponse('/owner/store/appearance?preview_missing=1');
+        }
+
+        $store = new StorefrontStoreView(
+            $settings->storeId,
+            $settings->tenantId,
+            $settings->name,
+            $settings->slug,
+            $settings->domain,
+            $draft,
+            $settings->defaultCurrency,
+            $settings->contactEmail,
+            $settings->contactPhone,
+            $settings->contactCity,
+            $settings->contactAddress,
+        );
+        $view = $this->showStorefrontHome->forStore($store);
+        $response = new Response($this->twig->render('storefront/home.html.twig', [
+            'view' => $view,
+            'appearancePreview' => true,
+        ]));
+        $response->setPrivate();
+        $response->headers->set('Cache-Control', 'no-store, private');
+        $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+        return $response;
     }
 
     #[Route('', name: 'owner_store_appearance_update', methods: ['POST'])]

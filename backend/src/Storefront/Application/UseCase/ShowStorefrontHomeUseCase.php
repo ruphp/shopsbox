@@ -7,6 +7,7 @@ namespace App\Storefront\Application\UseCase;
 use App\Storefront\Application\Contracts\StorefrontProductRepository;
 use App\Storefront\Application\Contracts\StorefrontStoreRepository;
 use App\Storefront\Application\Dto\StorefrontHomeView;
+use App\Storefront\Application\Dto\StorefrontStoreView;
 use App\Storefront\Application\Exception\StorefrontStoreNotFound;
 
 final readonly class ShowStorefrontHomeUseCase
@@ -24,6 +25,11 @@ final readonly class ShowStorefrontHomeUseCase
             throw StorefrontStoreNotFound::bySlug($storeSlug);
         }
 
+        return $this->forStore($store);
+    }
+
+    public function forStore(StorefrontStoreView $store): StorefrontHomeView
+    {
         $theme = $store->themeSettings;
         $featuredLimit = max(4, min(12, (int) ($theme['featured_limit'] ?? 6)));
         $source = (string) ($theme['featured_source'] ?? 'latest');

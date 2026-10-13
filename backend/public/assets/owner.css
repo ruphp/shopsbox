@@ -870,6 +870,14 @@
     flex-wrap: wrap;
 }
 
+.appearance-heading-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 .appearance-preview-wrap {
     position: sticky;
     top: 88px;
