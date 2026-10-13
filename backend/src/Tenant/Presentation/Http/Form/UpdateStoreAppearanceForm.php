@@ -63,6 +63,10 @@ final readonly class UpdateStoreAppearanceForm
             (string) $request->request->get('content_image_position', 'left'),
             (string) $request->request->get('content_button_label', ''),
             (string) $request->request->get('content_button_url', ''),
+            (string) $request->request->get('reviews_title', 'Отзывы покупателей'),
+            array_values(array_filter($request->request->all('reviews'), static fn (mixed $review): bool => is_array($review))),
+            (string) $request->request->get('faq_title', 'Частые вопросы'),
+            array_values(array_filter($request->request->all('faqs'), static fn (mixed $faq): bool => is_array($faq))),
         );
     }
 

@@ -17,6 +17,7 @@
         <meta name="twitter:title" content="{% block twitter_title %}{% block twitter_title_fallback %}{{ block('og_title') }}{% endblock %}{% endblock %}">
         <meta name="twitter:description" content="{% block twitter_description %}{% block twitter_description_fallback %}{{ block('og_description') }}{% endblock %}{% endblock %}">
         <meta name="twitter:image" content="{% block twitter_image %}{{ block('og_image') }}{% endblock %}">
+        {% block structured_data %}{% endblock %}
         <link rel="icon" href="/assets/brand/favicon-square.ico" sizes="any">
         <link rel="icon" href="/assets/brand/shopsbox-icon-square.svg" type="image/svg+xml">
         <link rel="icon" type="image/png" sizes="16x16" href="/assets/brand/shopsbox-icon-square-16.png">

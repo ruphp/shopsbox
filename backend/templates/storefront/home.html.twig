@@ -32,6 +32,15 @@
 {% block og_description %}{{ seo_description }}{% endblock %}
 {% block og_image %}{{ hero_image ? (hero_image starts with 'http' ? hero_image : site_public_base_url ~ hero_image) : parent() }}{% endblock %}
 {% block canonical_url %}{{ site_public_base_url ~ path('storefront_home', {storeSlug: store.slug}) }}{% endblock %}
+{% block structured_data %}
+    {% if theme.faqs|default([]) is not empty %}
+        {% set faq_entities = [] %}
+        {% for faq in theme.faqs %}
+            {% set faq_entities = faq_entities|merge([{'@type': 'Question', name: faq.question, acceptedAnswer: {'@type': 'Answer', text: faq.answer}}]) %}
+        {% endfor %}
+        <script type="application/ld+json">{{ {'@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq_entities}|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+    {% endif %}
+{% endblock %}
 
 {% block storefront_content %}
     <div class="storefront-page storefront-template-{{ template }}" style="--storefront-accent: {{ primary_color }}">
@@ -159,6 +168,32 @@
                             {% if theme.content_button_label|default('') and theme.content_button_url|default('') %}
                                 <a class="button" href="{{ theme.content_button_url }}">{{ theme.content_button_label }}</a>
                             {% endif %}
+                        </div>
+                    </div>
+                </section>
+            {% elseif section == 'reviews' and theme.reviews|default([]) is not empty %}
+                <section class="section storefront-reviews">
+                    <div class="wrap">
+                        <h2>{{ theme.reviews_title|default('Отзывы покупателей') }}</h2>
+                        <div class="storefront-review-grid">
+                            {% for review in theme.reviews %}
+                                <article>
+                                    <div class="storefront-review-rating" aria-label="Оценка {{ review.rating }} из 5">{% for star in 1..5 %}<span class="{{ star <= review.rating ? 'is-filled' : '' }}" aria-hidden="true">★</span>{% endfor %}</div>
+                                    <blockquote>{{ review.text }}</blockquote>
+                                    <strong>{{ review.author }}</strong>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            {% elseif section == 'faq' and theme.faqs|default([]) is not empty %}
+                <section class="section storefront-faq">
+                    <div class="wrap">
+                        <h2>{{ theme.faq_title|default('Частые вопросы') }}</h2>
+                        <div class="storefront-faq-list">
+                            {% for faq in theme.faqs %}
+                                <details><summary>{{ faq.question }}</summary><div>{{ faq.answer|nl2br }}</div></details>
+                            {% endfor %}
                         </div>
                     </div>
                 </section>

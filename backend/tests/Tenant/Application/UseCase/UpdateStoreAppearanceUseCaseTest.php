@@ -104,6 +104,10 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'content_image_position' => 'right',
                     'content_button_label' => 'Подробнее',
                     'content_button_url' => '/about',
+                    'reviews_title' => 'Нас рекомендуют',
+                    'reviews' => [['author' => 'Анна', 'text' => 'Всё понравилось.', 'rating' => 5]],
+                    'faq_title' => 'Вопросы о заказе',
+                    'faqs' => [['question' => 'Есть доставка?', 'answer' => 'Да, по России.']],
                     'sections' => ['hero', 'contacts', 'featured'],
                     'logo_image_id' => 'logo-id',
                     'logo_image_url' => '/media/logo.jpg',
@@ -179,6 +183,10 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 'right',
                 ' Подробнее ',
                 ' /about ',
+                ' Нас рекомендуют ',
+                [['author' => ' Анна ', 'text' => ' Всё понравилось. ', 'rating' => 5]],
+                ' Вопросы о заказе ',
+                [['question' => ' Есть доставка? ', 'answer' => ' Да, по России. ']],
             ),
         );
 

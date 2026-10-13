@@ -36,7 +36,9 @@
     {% set categoryImages = theme.category_images|default({}) %}
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
-    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'contacts': 'Контакты'} %}
+    {% set reviews = theme.reviews|default([]) %}
+    {% set faqs = theme.faqs|default([]) %}
+    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'reviews': 'Отзывы', 'faq': 'Частые вопросы', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
         {% set sectionPositions = sectionPositions|merge({(enabledSection): loop.index}) %}
@@ -303,10 +305,43 @@
                     </fieldset>
 
                     <fieldset class="appearance-group">
+                        <legend>Отзывы</legend>
+                        <p class="field-hint">Добавляйте только реальные отзывы, которые можно подтвердить при необходимости.</p>
+                        <label class="appearance-field"><span>Заголовок блока</span><input name="reviews_title" type="text" maxlength="80" value="{{ theme.reviews_title|default('Отзывы покупателей') }}"></label>
+                        <div class="editor-item-list">
+                            {% for index in 0..5 %}
+                                {% set review = reviews[index]|default({}) %}
+                                <div class="editor-item">
+                                    <strong>Отзыв {{ index + 1 }}</strong>
+                                    <input name="reviews[{{ index }}][author]" type="text" maxlength="80" value="{{ review.author|default('') }}" placeholder="Имя покупателя">
+                                    <textarea name="reviews[{{ index }}][text]" maxlength="600" rows="3" placeholder="Текст отзыва">{{ review.text|default('') }}</textarea>
+                                    <label><span>Оценка</span><select name="reviews[{{ index }}][rating]">{% for rating in 5..1 %}<option value="{{ rating }}" {{ review.rating|default(5) == rating ? 'selected' : '' }}>{{ rating }} из 5</option>{% endfor %}</select></label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
+                        <legend>Частые вопросы</legend>
+                        <p class="field-hint">Ответы выводятся раскрывающимся списком и получают SEO-разметку FAQPage.</p>
+                        <label class="appearance-field"><span>Заголовок блока</span><input name="faq_title" type="text" maxlength="80" value="{{ theme.faq_title|default('Частые вопросы') }}"></label>
+                        <div class="editor-item-list">
+                            {% for index in 0..7 %}
+                                {% set faq = faqs[index]|default({}) %}
+                                <div class="editor-item">
+                                    <strong>Вопрос {{ index + 1 }}</strong>
+                                    <input name="faqs[{{ index }}][question]" type="text" maxlength="180" value="{{ faq.question|default('') }}" placeholder="Вопрос покупателя">
+                                    <textarea name="faqs[{{ index }}][answer]" maxlength="1000" rows="3" placeholder="Ответ">{{ faq.answer|default('') }}</textarea>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group">
                         <legend>Блоки на главной</legend>
                         <p class="field-hint">Включите нужные блоки и задайте их порядок.</p>
                         <div class="section-options">
-                            {% for section in ['hero', 'categories', 'featured', 'benefits', 'content', 'contacts'] %}
+                            {% for section in ['hero', 'categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
                                 {% set position = sectionPositions[section]|default(loop.index) %}
                                 <div class="section-option" data-section-control="{{ section }}">
                                     <span class="section-drag-handle" draggable="true" title="Перетащить блок" aria-label="Перетащить блок">↕</span>
@@ -320,7 +355,7 @@
                                         <span>{{ sectionLabels[section] }}</span>
                                     </label>
                                     <select class="section-position" name="section_positions[{{ section }}]" aria-label="Порядок блока {{ sectionLabels[section] }}">
-                                        {% for number in 1..6 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
+                                        {% for number in 1..8 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
                                     </select>
                                     <button type="button" class="icon-button" data-section-up aria-label="Переместить {{ sectionLabels[section] }} выше">↑</button>
                                     <button type="button" class="icon-button" data-section-down aria-label="Переместить {{ sectionLabels[section] }} ниже">↓</button>

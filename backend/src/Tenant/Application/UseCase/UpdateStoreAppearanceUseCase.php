@@ -16,7 +16,7 @@ use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 final readonly class UpdateStoreAppearanceUseCase
 {
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
-    private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'content', 'contacts'];
+    private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'];
 
     public function __construct(
         private StoreRepository $storeRepository,
@@ -133,6 +133,32 @@ final readonly class UpdateStoreAppearanceUseCase
         $contentImagePosition = in_array($input->contentImagePosition, ['left', 'right'], true)
             ? $input->contentImagePosition
             : 'left';
+        $reviewsTitle = $this->requiredHeading($input->reviewsTitle, 'reviews_title');
+        $reviews = [];
+        foreach (array_slice($input->reviews, 0, 8) as $review) {
+            $author = trim((string) ($review['author'] ?? ''));
+            $text = trim((string) ($review['text'] ?? ''));
+            if ($author === '' && $text === '') {
+                continue;
+            }
+            if ($author === '' || mb_strlen($author) > 80 || $text === '' || mb_strlen($text) > 600) {
+                throw InvalidTenantInput::forField('reviews', 'Each review needs an author up to 80 characters and text up to 600 characters.');
+            }
+            $reviews[] = ['author' => $author, 'text' => $text, 'rating' => max(1, min(5, (int) ($review['rating'] ?? 5)))];
+        }
+        $faqTitle = $this->requiredHeading($input->faqTitle, 'faq_title');
+        $faqs = [];
+        foreach (array_slice($input->faqs, 0, 10) as $faq) {
+            $question = trim((string) ($faq['question'] ?? ''));
+            $answer = trim((string) ($faq['answer'] ?? ''));
+            if ($question === '' && $answer === '') {
+                continue;
+            }
+            if ($question === '' || mb_strlen($question) > 180 || $answer === '' || mb_strlen($answer) > 1000) {
+                throw InvalidTenantInput::forField('faqs', 'Each FAQ item needs a question up to 180 characters and an answer up to 1000 characters.');
+            }
+            $faqs[] = ['question' => $question, 'answer' => $answer];
+        }
 
         $sections = array_values(array_unique(array_filter(
             $input->sections,
@@ -221,6 +247,10 @@ final readonly class UpdateStoreAppearanceUseCase
             'content_image_position' => $contentImagePosition,
             'content_button_label' => $contentButtonLabel,
             'content_button_url' => $contentButtonUrl,
+            'reviews_title' => $reviewsTitle,
+            'reviews' => $reviews,
+            'faq_title' => $faqTitle,
+            'faqs' => $faqs,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,
@@ -341,5 +371,15 @@ final readonly class UpdateStoreAppearanceUseCase
         }
 
         return mb_substr($url, 0, 500);
+    }
+
+    private function requiredHeading(string $heading, string $field): string
+    {
+        $heading = trim($heading);
+        if ($heading === '' || mb_strlen($heading) > 80) {
+            throw InvalidTenantInput::forField($field, 'Section title must contain up to 80 characters.');
+        }
+
+        return $heading;
     }
 }

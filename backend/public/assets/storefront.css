@@ -903,6 +903,60 @@
     margin-top: 10px;
 }
 
+.storefront-reviews {
+    background: var(--surface);
+}
+
+.storefront-review-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.storefront-review-grid article {
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.storefront-review-rating {
+    margin-bottom: 12px;
+    color: #b8c0ca;
+}
+
+.storefront-review-rating .is-filled {
+    color: #e5a100;
+}
+
+.storefront-review-grid blockquote {
+    margin: 0 0 16px;
+    color: var(--muted);
+}
+
+.storefront-faq-list {
+    display: grid;
+    max-width: 860px;
+    gap: 10px;
+}
+
+.storefront-faq-list details {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.storefront-faq-list summary {
+    padding: 16px 48px 16px 18px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.storefront-faq-list details > div {
+    padding: 0 18px 18px;
+    color: var(--muted);
+}
+
 .storefront-benefit-grid p {
     margin-top: 8px;
     color: var(--muted);

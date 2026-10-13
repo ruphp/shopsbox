@@ -11,6 +11,8 @@ final readonly class UpdateStoreAppearanceInput
      * @param list<array<string, mixed>> $heroSlides
      * @param array<string, string> $categoryImageIds
      * @param list<array<string, mixed>> $benefits
+     * @param list<array<string, mixed>> $reviews
+     * @param list<array<string, mixed>> $faqs
      */
     public function __construct(
         public string $ownerEmail,
@@ -48,6 +50,10 @@ final readonly class UpdateStoreAppearanceInput
         public string $contentImagePosition = 'left',
         public string $contentButtonLabel = '',
         public string $contentButtonUrl = '',
+        public string $reviewsTitle = 'Отзывы покупателей',
+        public array $reviews = [],
+        public string $faqTitle = 'Частые вопросы',
+        public array $faqs = [],
     ) {
     }
 }
