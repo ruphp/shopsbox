@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/storefront.css?v=20261012-contact-sync">
+    <link rel="stylesheet" href="/assets/storefront.css?v=20261013-brand-name">
 {% endblock %}
 
 {% block body %}
@@ -17,14 +17,14 @@
     {% set storefront_checkout_route = route_prefix ~ 'storefront_checkout' %}
     {% set currency_symbol = store.currency == 'RUB' ? '₽' : store.currency %}
     {% set storefront_logo = store.themeSettings.logo_image_url|default('') %}
+    {% set show_store_name_with_logo = store.themeSettings.show_store_name_with_logo|default(false) %}
     <header class="header">
         <div class="wrap nav">
             <a class="brand" href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">
                 {% if storefront_logo %}
                     <img class="storefront-logo" src="{{ storefront_logo }}" alt="{{ store.name }}">
-                {% else %}
-                    {{ store.name }}
                 {% endif %}
+                {% if not storefront_logo or show_store_name_with_logo %}<span class="storefront-brand-name">{{ store.name }}</span>{% endif %}
             </a>
             <nav class="links" aria-label="Навигация витрины">
                 <a href="{{ path(storefront_home_route, {storeSlug: store.slug}) }}">Главная</a>

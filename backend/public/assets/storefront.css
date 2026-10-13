@@ -568,6 +568,11 @@
     object-position: left center;
 }
 
+.storefront-brand-name {
+    margin-left: 10px;
+    overflow-wrap: anywhere;
+}
+
 .storefront-hero .button {
     background: var(--storefront-accent);
 }

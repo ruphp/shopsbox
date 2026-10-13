@@ -219,6 +219,9 @@
 .media-file-usage.is-unused { color: #8a1c13; }
 .media-file-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .media-file-actions form { margin: 0; }
+.media-library-note { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--text-muted); }
+.media-library-note strong { color: var(--text); }
+.media-library-note p { margin: 6px 0 0; }
 
 .media-library-heading {
     display: flex;
@@ -672,6 +675,9 @@
     object-fit: contain;
     object-position: left center;
 }
+
+.preview-brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.preview-brand strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .appearance-preview > header span {
     margin-left: auto;

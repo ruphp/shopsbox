@@ -12,6 +12,7 @@
     const storeName = preview.querySelector('header strong')?.textContent?.trim() || 'Ваш магазин';
     const previewLogo = preview.querySelector('[data-preview-logo]');
     const previewStoreName = preview.querySelector('[data-preview-store-name]');
+    const showStoreNameWithLogo = editor.querySelector('[name="show_store_name_with_logo"]');
     const previewHero = preview.querySelector('[data-preview-section="hero"]');
 
     const updateText = () => {
@@ -35,7 +36,7 @@
         const heroUrl = editor.querySelector('[name="hero_image_id"]:checked')?.dataset.imageUrl || '';
 
         previewLogo.hidden = logoUrl === '';
-        previewStoreName.hidden = logoUrl !== '';
+        previewStoreName.hidden = logoUrl !== '' && !showStoreNameWithLogo.checked;
         if (logoUrl !== '') {
             previewLogo.src = logoUrl;
         }
@@ -67,6 +68,7 @@
     editor.querySelectorAll('[name="primary_color"]').forEach((input) => input.addEventListener('change', updateColor));
     editor.querySelectorAll('[name="logo_image_id"], [name="hero_image_id"]')
         .forEach((input) => input.addEventListener('change', updateImages));
+    showStoreNameWithLogo.addEventListener('change', updateImages);
     editor.querySelectorAll('[data-section-control] input[type="checkbox"]')
         .forEach((input) => input.addEventListener('change', updateSections));
 

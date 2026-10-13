@@ -26,6 +26,7 @@ final readonly class UpdateStoreAppearanceForm
             $enabled,
             $this->emptyToNull($request->request->getString('logo_image_id')),
             $this->emptyToNull($request->request->getString('hero_image_id')),
+            $request->request->getBoolean('show_store_name_with_logo'),
         );
     }
 

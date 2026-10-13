@@ -51,6 +51,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'sections' => ['hero', 'contacts', 'featured'],
                     'logo_image_id' => 'logo-id',
                     'logo_image_url' => '/media/logo.jpg',
+                    'show_store_name_with_logo' => true,
                     'hero_image_id' => 'hero-id',
                     'hero_image_url' => '/media/hero.jpg',
                 ]),
@@ -75,6 +76,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 ['hero', 'contacts', 'featured', 'hero', 'unknown'],
                 'logo-id',
                 'hero-id',
+                true,
             ),
         );
 

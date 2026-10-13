@@ -77,6 +77,7 @@ final readonly class UpdateStoreAppearanceUseCase
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,
+            'show_store_name_with_logo' => $input->showStoreNameWithLogo,
             'hero_image_id' => $heroImage?->id,
             'hero_image_url' => $heroImage?->publicUrl,
         ];

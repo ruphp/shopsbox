@@ -9,6 +9,7 @@
     {% set primaryColor = theme.primary_color|default('#0077b6') %}
     {% set sections = theme.sections|default(['hero', 'featured']) %}
     {% set logoImageId = theme.logo_image_id|default('') %}
+    {% set showStoreNameWithLogo = theme.show_store_name_with_logo|default(false) %}
     {% set heroImageId = theme.hero_image_id|default('') %}
     {% set sectionLabels = {'hero': 'Главный блок', 'featured': 'Популярные товары', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
@@ -86,6 +87,10 @@
                                         </label>
                                     {% endfor %}
                                 </div>
+                                <label class="active-check">
+                                    <input type="checkbox" name="show_store_name_with_logo" value="1" {{ showStoreNameWithLogo ? 'checked' : '' }}>
+                                    Показывать название магазина рядом с логотипом
+                                </label>
                             </div>
 
                             <div class="media-picker">
@@ -151,8 +156,10 @@
                     </div>
                     <div class="appearance-preview template-{{ template }}" style="--preview-accent: {{ primaryColor }}" data-appearance-preview>
                         <header>
-                            <img data-preview-logo src="{{ theme.logo_image_url|default('') }}" alt="" {{ logoImageId == '' ? 'hidden' : '' }}>
-                            <strong data-preview-store-name {{ logoImageId != '' ? 'hidden' : '' }}>{{ settings.name }}</strong>
+                            <div class="preview-brand">
+                                <img data-preview-logo src="{{ theme.logo_image_url|default('') }}" alt="" {{ logoImageId == '' ? 'hidden' : '' }}>
+                                <strong data-preview-store-name {{ logoImageId != '' and not showStoreNameWithLogo ? 'hidden' : '' }}>{{ settings.name }}</strong>
+                            </div>
                             <span>Товары&nbsp;&nbsp; Корзина</span>
                         </header>
                         <div class="preview-section preview-hero {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero"{% if heroImageId != '' %} style="--preview-image: url('{{ theme.hero_image_url }}')"{% endif %}>
@@ -183,5 +190,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261012-media" defer></script>
+    <script src="/assets/store-appearance.js?v=20261013-brand-name" defer></script>
 {% endblock %}

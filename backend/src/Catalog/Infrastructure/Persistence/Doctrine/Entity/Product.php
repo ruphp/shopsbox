@@ -185,6 +185,9 @@ class Product
     public function changeStatus(ProductStatus $status): void
     {
         $this->status = $status;
+        if ($status === ProductStatus::ACTIVE && $this->publicationStatus === ProductPublicationStatus::DRAFT) {
+            $this->approvePublication(null);
+        }
         $this->updatedAt = new DateTimeImmutable();
     }
 
