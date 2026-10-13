@@ -837,6 +837,15 @@
     background: #e1e7ed;
 }
 
+.preview-products > div.is-carousel {
+    display: flex;
+    overflow: hidden;
+}
+
+.preview-products > div.is-carousel i {
+    flex: 0 0 calc((100% - 27px) / 4);
+}
+
 .appearance-preview.template-catalog .preview-hero {
     padding-top: 16px;
     padding-bottom: 16px;

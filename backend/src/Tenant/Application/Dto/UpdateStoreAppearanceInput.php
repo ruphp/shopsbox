@@ -32,6 +32,8 @@ final readonly class UpdateStoreAppearanceInput
         public array $heroSlides = [],
         public bool $heroAutoplay = true,
         public int $heroInterval = 5,
+        public string $featuredLayout = 'grid',
+        public int $featuredLimit = 6,
     ) {
     }
 }

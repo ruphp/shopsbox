@@ -87,6 +87,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     ],
                     'hero_autoplay' => false,
                     'hero_interval' => 7,
+                    'featured_layout' => 'carousel',
+                    'featured_limit' => 10,
                     'sections' => ['hero', 'contacts', 'featured'],
                     'logo_image_id' => 'logo-id',
                     'logo_image_url' => '/media/logo.jpg',
@@ -146,6 +148,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                 ],
                 false,
                 7,
+                'carousel',
+                10,
             ),
         );
 

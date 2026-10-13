@@ -79,6 +79,10 @@ final readonly class UpdateStoreAppearanceUseCase
         $featuredColumns = in_array($input->featuredColumns, [3, 4, 5], true)
             ? $input->featuredColumns
             : 4;
+        $featuredLayout = in_array($input->featuredLayout, ['grid', 'carousel'], true)
+            ? $input->featuredLayout
+            : 'grid';
+        $featuredLimit = max(4, min(12, $input->featuredLimit));
 
         $sections = array_values(array_unique(array_filter(
             $input->sections,
@@ -133,6 +137,8 @@ final readonly class UpdateStoreAppearanceUseCase
             'hero_slides' => $heroSlides,
             'hero_autoplay' => $input->heroAutoplay,
             'hero_interval' => $heroInterval,
+            'featured_layout' => $featuredLayout,
+            'featured_limit' => $featuredLimit,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,

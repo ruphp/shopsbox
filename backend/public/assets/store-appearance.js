@@ -16,6 +16,7 @@
     const showStoreNameWithLogo = editor.querySelector('[name="show_store_name_with_logo"]');
     const featuredTitleInput = editor.querySelector('[name="featured_title"]');
     const featuredColumnsInput = editor.querySelector('[name="featured_columns"]');
+    const featuredLayoutInput = editor.querySelector('[name="featured_layout"]');
     const previewFeaturedTitle = preview.querySelector('[data-preview-featured-title]');
     const previewProductGrid = preview.querySelector('[data-preview-product-grid]');
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
@@ -74,6 +75,7 @@
         const columns = Number(featuredColumnsInput.value);
         previewProductGrid.style.setProperty('--preview-columns', columns);
         previewProductGrid.replaceChildren(...Array.from({ length: columns }, () => document.createElement('i')));
+        previewProductGrid.classList.toggle('is-carousel', featuredLayoutInput.value === 'carousel');
     };
 
     const updateTemplate = () => {
@@ -144,6 +146,7 @@
     editor.querySelectorAll('[name="logo_image_id"]').forEach((input) => input.addEventListener('change', updateLogo));
     showStoreNameWithLogo.addEventListener('change', updateLogo);
     featuredColumnsInput.addEventListener('change', updateProductsPreview);
+    featuredLayoutInput.addEventListener('change', updateProductsPreview);
     editor.querySelectorAll('[data-section-control] input[type="checkbox"]')
         .forEach((input) => input.addEventListener('change', updateSections));
 

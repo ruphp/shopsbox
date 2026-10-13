@@ -42,6 +42,8 @@ final readonly class UpdateStoreAppearanceForm
             )),
             $request->request->getBoolean('hero_autoplay'),
             $request->request->getInt('hero_interval', 5),
+            (string) $request->request->get('featured_layout', 'grid'),
+            $request->request->getInt('featured_limit', 6),
         );
     }
 

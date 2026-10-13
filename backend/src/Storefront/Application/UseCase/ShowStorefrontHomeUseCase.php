@@ -24,9 +24,11 @@ final readonly class ShowStorefrontHomeUseCase
             throw StorefrontStoreNotFound::bySlug($storeSlug);
         }
 
+        $featuredLimit = max(4, min(12, (int) ($store->themeSettings['featured_limit'] ?? 6)));
+
         return new StorefrontHomeView(
             $store,
-            array_slice($this->productRepository->listActiveByStore($store->id), 0, 6),
+            array_slice($this->productRepository->listActiveByStore($store->id), 0, $featuredLimit),
         );
     }
 }

@@ -22,6 +22,7 @@
 {% set featured_title = theme.featured_title|default('Популярное') %}
 {% set featured_columns = theme.featured_columns|default(4) %}
 {% set featured_show_description = theme.featured_show_description|default(true) %}
+{% set featured_layout = theme.featured_layout|default('grid') %}
 {% set seo_title = theme.seo_title|default('') ?: store.name %}
 {% set seo_description = theme.seo_description|default('') ?: (store.publicDescription|default('') ?: 'Открытая витрина магазина ' ~ store.name ~ ' с опубликованными товарами.') %}
 
@@ -72,7 +73,9 @@
                         {% if view.featuredProducts is empty %}
                             <p class="muted">Пока нет опубликованных товаров.</p>
                         {% else %}
-                            <div class="product-grid storefront-product-grid columns-{{ featured_columns }}">
+                            <div class="storefront-product-block {{ featured_layout == 'carousel' ? 'is-carousel' : '' }}"{% if featured_layout == 'carousel' %} data-product-carousel{% endif %}>
+                                {% if featured_layout == 'carousel' %}<button type="button" class="product-carousel-arrow is-prev" data-carousel-prev aria-label="Показать предыдущие товары">‹</button>{% endif %}
+                                <div class="product-grid storefront-product-grid columns-{{ featured_columns }}"{% if featured_layout == 'carousel' %} data-carousel-track tabindex="0"{% endif %}>
                                 {% for product in view.featuredProducts %}
                                     <article class="product-card">
                                         <a class="product-media" href="{{ path(storefront_product_route, {storeSlug: store.slug, productSlug: product.slug}) }}">
@@ -89,6 +92,8 @@
                                         </div>
                                     </article>
                                 {% endfor %}
+                                </div>
+                                {% if featured_layout == 'carousel' %}<button type="button" class="product-carousel-arrow is-next" data-carousel-next aria-label="Показать следующие товары">›</button>{% endif %}
                             </div>
                         {% endif %}
                     </div>
@@ -113,4 +118,5 @@
         {% endfor %}
     </div>
     {% if hero_slides|length > 1 %}<script src="/assets/storefront-slider.js?v=20261013" defer></script>{% endif %}
+    {% if featured_layout == 'carousel' %}<script src="/assets/storefront-carousel.js?v=20261013" defer></script>{% endif %}
 {% endblock %}

@@ -154,6 +154,21 @@
                                 {% for columns in [3, 4, 5] %}<option value="{{ columns }}" {{ featuredColumns == columns ? 'selected' : '' }}>{{ columns }}</option>{% endfor %}
                             </select>
                         </label>
+                        <div class="appearance-field-row">
+                            <label class="appearance-field" for="featured-layout">
+                                <span>Отображение</span>
+                                <select id="featured-layout" name="featured_layout">
+                                    <option value="grid" {{ theme.featured_layout|default('grid') == 'grid' ? 'selected' : '' }}>Сетка</option>
+                                    <option value="carousel" {{ theme.featured_layout|default('grid') == 'carousel' ? 'selected' : '' }}>Карусель</option>
+                                </select>
+                            </label>
+                            <label class="appearance-field" for="featured-limit">
+                                <span>Количество товаров</span>
+                                <select id="featured-limit" name="featured_limit">
+                                    {% for limit in [4, 6, 8, 10, 12] %}<option value="{{ limit }}" {{ theme.featured_limit|default(6) == limit ? 'selected' : '' }}>{{ limit }}</option>{% endfor %}
+                                </select>
+                            </label>
+                        </div>
                         <label class="active-check">
                             <input type="checkbox" name="featured_show_description" value="1" {{ featuredShowDescription ? 'checked' : '' }}>
                             Показывать краткое описание товара
@@ -221,7 +236,7 @@
                         </div>
                         <div class="preview-section preview-products" data-preview-section="featured">
                             <h3 data-preview-featured-title>{{ theme.featured_title|default('Популярное') }}</h3>
-                            <div data-preview-product-grid style="--preview-columns: {{ featuredColumns }}">{% for item in 1..featuredColumns %}<i></i>{% endfor %}</div>
+                            <div class="{{ theme.featured_layout|default('grid') == 'carousel' ? 'is-carousel' : '' }}" data-preview-product-grid style="--preview-columns: {{ featuredColumns }}">{% for item in 1..featuredColumns %}<i></i>{% endfor %}</div>
                         </div>
                         <div class="preview-section preview-contacts" data-preview-section="contacts">
                             <h3>Контакты магазина</h3>
