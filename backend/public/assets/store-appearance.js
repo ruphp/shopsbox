@@ -20,6 +20,7 @@
     const previewFeaturedTitle = preview.querySelector('[data-preview-featured-title]');
     const previewProductGrid = preview.querySelector('[data-preview-product-grid]');
     const featuredSourceInput = editor.querySelector('[data-featured-source]');
+    const sectionOptions = editor.querySelector('.section-options');
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
     const field = (slide, name) => slide.querySelector(`[data-slide-field="${name}"]`);
 
@@ -104,9 +105,11 @@
     };
 
     const updateSections = () => {
-        [...editor.querySelectorAll('[data-section-control]')]
-            .sort((left, right) => Number(left.querySelector('select').value) - Number(right.querySelector('select').value))
-            .forEach((control) => {
+        [...sectionOptions.querySelectorAll('[data-section-control]')]
+            .forEach((control, index, controls) => {
+                control.querySelector('.section-position').value = String(index + 1);
+                control.querySelector('[data-section-up]').disabled = index === 0;
+                control.querySelector('[data-section-down]').disabled = index === controls.length - 1;
                 const section = preview.querySelector(`[data-preview-section="${control.dataset.sectionControl}"]`);
                 section.hidden = !control.querySelector('input[type="checkbox"]').checked;
                 preview.appendChild(section);
@@ -126,6 +129,17 @@
     });
 
     editor.addEventListener('click', (event) => {
+        const sectionAction = event.target.closest('[data-section-up], [data-section-down]');
+        if (sectionAction) {
+            const control = sectionAction.closest('[data-section-control]');
+            if (sectionAction.matches('[data-section-up]') && control.previousElementSibling) {
+                sectionOptions.insertBefore(control, control.previousElementSibling);
+            } else if (sectionAction.matches('[data-section-down]') && control.nextElementSibling) {
+                sectionOptions.insertBefore(control.nextElementSibling, control);
+            }
+            updateSections();
+            return;
+        }
         const action = event.target.closest('[data-slide-up], [data-slide-down], [data-slide-remove]');
         if (!action) return;
         const slide = action.closest('[data-hero-slide]');
@@ -158,19 +172,26 @@
     editor.querySelectorAll('[data-section-control] input[type="checkbox"]')
         .forEach((input) => input.addEventListener('change', updateSections));
 
-    const positionSelects = [...editor.querySelectorAll('[data-section-control] select')];
-    positionSelects.forEach((select) => {
-        select.dataset.previousValue = select.value;
-        select.addEventListener('change', () => {
-            const previousValue = select.dataset.previousValue;
-            const occupied = positionSelects.find((candidate) => candidate !== select && candidate.value === select.value);
-            if (occupied) {
-                occupied.value = previousValue;
-                occupied.dataset.previousValue = previousValue;
-            }
-            select.dataset.previousValue = select.value;
-            updateSections();
-        });
+    const orderedControls = [...sectionOptions.querySelectorAll('[data-section-control]')]
+        .sort((left, right) => Number(left.querySelector('.section-position').value) - Number(right.querySelector('.section-position').value));
+    orderedControls.forEach((control) => sectionOptions.appendChild(control));
+
+    sectionOptions.addEventListener('dragstart', (event) => {
+        if (!event.target.matches('.section-drag-handle')) return;
+        event.target.closest('[data-section-control]').classList.add('is-dragging');
+    });
+    sectionOptions.addEventListener('dragend', () => {
+        sectionOptions.querySelector('.is-dragging')?.classList.remove('is-dragging');
+        updateSections();
+    });
+    sectionOptions.addEventListener('dragover', (event) => {
+        const dragging = sectionOptions.querySelector('.is-dragging');
+        if (!dragging) return;
+        event.preventDefault();
+        const target = event.target.closest('[data-section-control]');
+        if (!target || target === dragging) return;
+        const bounds = target.getBoundingClientRect();
+        sectionOptions.insertBefore(dragging, event.clientY < bounds.top + bounds.height / 2 ? target : target.nextElementSibling);
     });
 
     slideElements().forEach(updateSlideImage);

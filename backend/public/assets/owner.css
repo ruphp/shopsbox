@@ -713,11 +713,33 @@
 
 .section-option {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 72px;
+    grid-template-columns: 28px minmax(0, 1fr) 34px 34px;
     gap: 12px;
     align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid var(--line);
+}
+
+.section-option.is-dragging { opacity: 0.45; }
+
+.section-drag-handle {
+    color: var(--muted);
+    font-size: 20px;
+    cursor: grab;
+    user-select: none;
+}
+
+.section-drag-handle:active { cursor: grabbing; }
+
+.section-position {
+    position: absolute;
+    width: 1px !important;
+    height: 1px;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
 }
 
 .section-option:last-child {
