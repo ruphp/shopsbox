@@ -1,0 +1,82 @@
+{% set imageId = slide.image_id|default('') %}
+<article class="appearance-slide" data-hero-slide>
+    <header class="appearance-slide-header">
+        <div>
+            <span class="appearance-slide-handle" aria-hidden="true">↕</span>
+            <strong data-slide-number>Слайд {{ index + 1 }}</strong>
+        </div>
+        <div class="appearance-slide-actions">
+            <button type="button" class="icon-button" data-slide-up title="Переместить выше" aria-label="Переместить слайд выше">↑</button>
+            <button type="button" class="icon-button" data-slide-down title="Переместить ниже" aria-label="Переместить слайд ниже">↓</button>
+            <button type="button" class="icon-button is-danger" data-slide-remove title="Удалить слайд" aria-label="Удалить слайд">×</button>
+        </div>
+    </header>
+
+    <label class="appearance-field">
+        <span>Изображение</span>
+        <select name="hero_slides[{{ index }}][image_id]" data-slide-field="image_id">
+            <option value="">Без изображения</option>
+            {% for image in mediaImages %}
+                <option value="{{ image.id }}" data-image-url="{{ image.publicUrl }}" {{ imageId == image.id ? 'selected' : '' }}>{{ image.originalName ?: image.key }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <div class="appearance-slide-image" data-slide-image {{ imageId == '' ? 'hidden' : '' }}>
+        <img src="{{ slide.image_url|default('') }}" alt="">
+    </div>
+
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Надзаголовок</span>
+            <input name="hero_slides[{{ index }}][eyebrow]" data-slide-field="eyebrow" type="text" maxlength="60" value="{{ slide.eyebrow|default('') }}" placeholder="Новая коллекция">
+        </label>
+        <label class="appearance-field">
+            <span>Заголовок</span>
+            <input name="hero_slides[{{ index }}][title]" data-slide-field="title" type="text" maxlength="120" value="{{ slide.title|default('') }}" required>
+        </label>
+    </div>
+    <label class="appearance-field">
+        <span>Описание</span>
+        <textarea name="hero_slides[{{ index }}][text]" data-slide-field="text" rows="3" maxlength="500">{{ slide.text|default('') }}</textarea>
+    </label>
+
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Основная кнопка</span>
+            <input name="hero_slides[{{ index }}][button_label]" data-slide-field="button_label" type="text" maxlength="40" value="{{ slide.button_label|default('Смотреть товары') }}">
+        </label>
+        <label class="appearance-field">
+            <span>Ссылка основной кнопки</span>
+            <input name="hero_slides[{{ index }}][button_url]" data-slide-field="button_url" type="text" maxlength="500" value="{{ slide.button_url|default('') }}" placeholder="Пусто — открыть каталог">
+        </label>
+    </div>
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Вторая кнопка</span>
+            <input name="hero_slides[{{ index }}][secondary_label]" data-slide-field="secondary_label" type="text" maxlength="40" value="{{ slide.secondary_label|default('') }}" placeholder="Необязательно">
+        </label>
+        <label class="appearance-field">
+            <span>Ссылка второй кнопки</span>
+            <input name="hero_slides[{{ index }}][secondary_url]" data-slide-field="secondary_url" type="text" maxlength="500" value="{{ slide.secondary_url|default('') }}" placeholder="https:// или /страница">
+        </label>
+    </div>
+
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Выравнивание</span>
+            <select name="hero_slides[{{ index }}][alignment]" data-slide-field="alignment">
+                {% for value, label in {'left': 'Слева', 'center': 'По центру', 'right': 'Справа'} %}
+                    <option value="{{ value }}" {{ slide.alignment|default('left') == value ? 'selected' : '' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="appearance-field">
+            <span>Затемнение фона</span>
+            <select name="hero_slides[{{ index }}][overlay]" data-slide-field="overlay">
+                {% for value, label in {20: 'Слабое', 40: 'Лёгкое', 60: 'Среднее', 75: 'Сильное'} %}
+                    <option value="{{ value }}" {{ slide.overlay|default(60) == value ? 'selected' : '' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+</article>

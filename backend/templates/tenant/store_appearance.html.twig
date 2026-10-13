@@ -11,8 +11,24 @@
     {% set logoImageId = theme.logo_image_id|default('') %}
     {% set showStoreNameWithLogo = theme.show_store_name_with_logo|default(false) %}
     {% set heroImageId = theme.hero_image_id|default('') %}
-    {% set heroAlignment = theme.hero_alignment|default('left') %}
-    {% set heroOverlay = theme.hero_overlay|default(60) %}
+    {% set heroSlides = theme.hero_slides|default([]) %}
+    {% if heroSlides is empty %}
+        {% set heroSlides = [{
+            eyebrow: theme.hero_eyebrow|default(''),
+            title: theme.hero_title|default('') ?: settings.name,
+            text: theme.hero_text|default(''),
+            button_label: theme.hero_button_label|default('Смотреть товары'),
+            button_url: '', secondary_label: '', secondary_url: '',
+            alignment: theme.hero_alignment|default('left'),
+            overlay: theme.hero_overlay|default(60),
+            image_id: heroImageId,
+            image_url: theme.hero_image_url|default('')
+        }] %}
+    {% endif %}
+    {% set firstHeroSlide = heroSlides|first %}
+    {% set heroImageId = firstHeroSlide.image_id|default('') %}
+    {% set heroAlignment = firstHeroSlide.alignment|default('left') %}
+    {% set heroOverlay = firstHeroSlide.overlay|default(60) %}
     {% set featuredColumns = theme.featured_columns|default(4) %}
     {% set featuredShowDescription = theme.featured_show_description|default(true) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'featured': 'Популярные товары', 'contacts': 'Контакты'} %}
@@ -71,7 +87,7 @@
                     </fieldset>
 
                     <fieldset class="appearance-group">
-                        <legend>Логотип и баннер</legend>
+                        <legend>Логотип</legend>
                         {% if mediaImages is empty %}
                             <p class="muted">В медиатеке пока нет изображений.</p>
                             <a href="{{ path('owner_products') }}">Загрузить изображения к товарам</a>
@@ -97,62 +113,33 @@
                                 </label>
                             </div>
 
-                            <div class="media-picker">
-                                <h3>Баннер</h3>
-                                <p class="field-hint">Выбирайте широкое изображение без текста: заголовок будет расположен поверх него.</p>
-                                <div class="media-options" role="radiogroup" aria-label="Баннер магазина">
-                                    <label class="media-option media-option-none">
-                                        <input type="radio" name="hero_image_id" value="" data-image-url="" {{ heroImageId == '' ? 'checked' : '' }}>
-                                        <span>Без баннера</span>
-                                    </label>
-                                    {% for image in mediaImages|slice(0, 12) %}
-                                        <label class="media-option" title="{{ image.usage }}">
-                                            <input type="radio" name="hero_image_id" value="{{ image.id }}" data-image-url="{{ image.publicUrl }}" {{ heroImageId == image.id ? 'checked' : '' }}>
-                                            <span><img src="{{ image.publicUrl }}" alt="" loading="lazy"></span>
-                                        </label>
-                                    {% endfor %}
-                                </div>
-                            </div>
                         {% endif %}
                     </fieldset>
 
                     <fieldset class="appearance-group">
-                        <legend>Главный блок</legend>
-                        <p class="field-hint">Главный заголовок страницы всегда остаётся единственным H1 — это важно для понятной SEO-структуры.</p>
-                        <label class="appearance-field" for="appearance-eyebrow">
-                            <span>Надзаголовок</span>
-                            <input id="appearance-eyebrow" name="hero_eyebrow" type="text" maxlength="60" value="{{ theme.hero_eyebrow|default('') }}" placeholder="Например: Новая коллекция">
-                        </label>
-                        <label class="appearance-field" for="appearance-title">
-                            <span>Заголовок</span>
-                            <input id="appearance-title" name="hero_title" type="text" maxlength="120" value="{{ theme.hero_title|default('') }}" placeholder="{{ settings.name }}">
-                        </label>
-                        <label class="appearance-field" for="appearance-text">
-                            <span>Короткое описание</span>
-                            <textarea id="appearance-text" name="hero_text" rows="4" maxlength="500" placeholder="Расскажите, что продаёт ваш магазин">{{ theme.hero_text|default('') }}</textarea>
-                        </label>
-                        <label class="appearance-field" for="appearance-button-label">
-                            <span>Текст кнопки</span>
-                            <input id="appearance-button-label" name="hero_button_label" type="text" maxlength="40" value="{{ theme.hero_button_label|default('Смотреть товары') }}">
-                        </label>
-                        <div class="appearance-field-row">
-                            <label class="appearance-field" for="appearance-alignment">
-                                <span>Выравнивание</span>
-                                <select id="appearance-alignment" name="hero_alignment">
-                                    {% for value, label in {'left': 'Слева', 'center': 'По центру', 'right': 'Справа'} %}
-                                        <option value="{{ value }}" {{ heroAlignment == value ? 'selected' : '' }}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
+                        <legend>Баннеры</legend>
+                        <p class="field-hint">Первый слайд содержит единственный H1 страницы. Остальные заголовки выводятся как H2, чтобы сохранить правильную SEO-структуру.</p>
+                        <div class="appearance-slider-settings">
+                            <label class="active-check">
+                                <input type="checkbox" name="hero_autoplay" value="1" {{ theme.hero_autoplay|default(true) ? 'checked' : '' }}>
+                                Переключать слайды автоматически
                             </label>
-                            <label class="appearance-field" for="appearance-overlay">
-                                <span>Затемнение фона</span>
-                                <select id="appearance-overlay" name="hero_overlay">
-                                    {% for value, label in {20: 'Слабое', 40: 'Лёгкое', 60: 'Среднее', 75: 'Сильное'} %}
-                                        <option value="{{ value }}" {{ heroOverlay == value ? 'selected' : '' }}>{{ label }}</option>
-                                    {% endfor %}
+                            <label class="appearance-field">
+                                <span>Интервал</span>
+                                <select name="hero_interval">
+                                    {% for seconds in [3, 5, 7, 10] %}<option value="{{ seconds }}" {{ theme.hero_interval|default(5) == seconds ? 'selected' : '' }}>{{ seconds }} сек.</option>{% endfor %}
                                 </select>
                             </label>
                         </div>
+                        <div class="appearance-slides" data-hero-slides>
+                            {% for slide in heroSlides %}
+                                {% include 'tenant/_appearance_slide.html.twig' with {slide: slide, index: loop.index0, mediaImages: mediaImages} only %}
+                            {% endfor %}
+                        </div>
+                        <button class="button button-secondary" type="button" data-slide-add>Добавить слайд</button>
+                        <template data-slide-template>
+                            {% include 'tenant/_appearance_slide.html.twig' with {slide: {title: settings.name}, index: 0, mediaImages: mediaImages} only %}
+                        </template>
                     </fieldset>
 
                     <fieldset class="appearance-group">
@@ -226,11 +213,11 @@
                             </div>
                             <span>Товары&nbsp;&nbsp; Корзина</span>
                         </header>
-                        <div class="preview-section preview-hero align-{{ heroAlignment }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}{% if heroImageId != '' %}; --preview-image: url('{{ theme.hero_image_url }}'){% endif %}">
-                            <small class="preview-eyebrow" data-preview-eyebrow {{ theme.hero_eyebrow|default('') == '' ? 'hidden' : '' }}>{{ theme.hero_eyebrow|default('') }}</small>
-                            <h2 data-preview-title>{{ theme.hero_title|default('') ?: settings.name }}</h2>
-                            <p data-preview-text>{{ theme.hero_text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
-                            <span class="preview-button" data-preview-button>{{ theme.hero_button_label|default('Смотреть товары') }}</span>
+                        <div class="preview-section preview-hero align-{{ heroAlignment }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}{% if heroImageId != '' %}; --preview-image: url('{{ firstHeroSlide.image_url|default('') }}'){% endif %}">
+                            <small class="preview-eyebrow" data-preview-eyebrow {{ firstHeroSlide.eyebrow|default('') == '' ? 'hidden' : '' }}>{{ firstHeroSlide.eyebrow|default('') }}</small>
+                            <h2 data-preview-title>{{ firstHeroSlide.title|default(settings.name) }}</h2>
+                            <p data-preview-text>{{ firstHeroSlide.text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
+                            <span class="preview-button" data-preview-button>{{ firstHeroSlide.button_label|default('Смотреть товары') }}</span>
                         </div>
                         <div class="preview-section preview-products" data-preview-section="featured">
                             <h3 data-preview-featured-title>{{ theme.featured_title|default('Популярное') }}</h3>

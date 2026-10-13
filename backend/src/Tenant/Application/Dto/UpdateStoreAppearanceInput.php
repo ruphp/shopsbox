@@ -8,6 +8,7 @@ final readonly class UpdateStoreAppearanceInput
 {
     /**
      * @param list<string> $sections
+     * @param list<array<string, mixed>> $heroSlides
      */
     public function __construct(
         public string $ownerEmail,
@@ -28,6 +29,9 @@ final readonly class UpdateStoreAppearanceInput
         public bool $featuredShowDescription = true,
         public string $seoTitle = '',
         public string $seoDescription = '',
+        public array $heroSlides = [],
+        public bool $heroAutoplay = true,
+        public int $heroInterval = 5,
     ) {
     }
 }

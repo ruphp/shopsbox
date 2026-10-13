@@ -3,15 +3,22 @@
 {% set store = view.store %}
 {% set theme = store.themeSettings %}
 {% set sections = theme.sections|default(['hero', 'featured']) %}
-{% set hero_title = theme.hero_title|default('') ?: store.name %}
-{% set hero_text = theme.hero_text|default('') ?: 'Витрина магазина открыта. Ниже первые опубликованные товары.' %}
 {% set template = theme.template|default('classic') %}
 {% set primary_color = theme.primary_color|default('#0077b6') %}
-{% set hero_image = theme.hero_image_url|default('') %}
-{% set hero_eyebrow = theme.hero_eyebrow|default('') %}
-{% set hero_button_label = theme.hero_button_label|default('Смотреть товары') %}
-{% set hero_alignment = theme.hero_alignment|default('left') %}
-{% set hero_overlay = theme.hero_overlay|default(60) %}
+{% set hero_slides = theme.hero_slides|default([]) %}
+{% if hero_slides is empty %}
+    {% set hero_slides = [{
+        eyebrow: theme.hero_eyebrow|default(''),
+        title: theme.hero_title|default('') ?: store.name,
+        text: theme.hero_text|default('') ?: 'Витрина магазина открыта. Ниже первые опубликованные товары.',
+        button_label: theme.hero_button_label|default('Смотреть товары'), button_url: '',
+        secondary_label: '', secondary_url: '',
+        alignment: theme.hero_alignment|default('left'), overlay: theme.hero_overlay|default(60),
+        image_url: theme.hero_image_url|default('')
+    }] %}
+{% endif %}
+{% set first_hero_slide = hero_slides|first %}
+{% set hero_image = first_hero_slide.image_url|default('') %}
 {% set featured_title = theme.featured_title|default('Популярное') %}
 {% set featured_columns = theme.featured_columns|default(4) %}
 {% set featured_show_description = theme.featured_show_description|default(true) %}
@@ -29,13 +36,33 @@
     <div class="storefront-page storefront-template-{{ template }}" style="--storefront-accent: {{ primary_color }}">
         {% for section in sections %}
             {% if section == 'hero' %}
-                <section class="hero storefront-hero align-{{ hero_alignment }} {{ hero_image ? 'has-image' : '' }}" style="--storefront-hero-overlay: {{ hero_overlay / 100 }}{% if hero_image %}; --storefront-hero-image: url('{{ hero_image }}'){% endif %}">
-                    <div class="wrap">
-                        {% if hero_eyebrow %}<p class="storefront-hero-eyebrow">{{ hero_eyebrow }}</p>{% endif %}
-                        <h1>{{ hero_title }}</h1>
-                        <p>{{ hero_text }}</p>
-                        <a class="button" href="{{ path(storefront_products_route, {storeSlug: store.slug}) }}">{{ hero_button_label }}</a>
+                <section class="storefront-hero-slider" data-hero-slider data-autoplay="{{ theme.hero_autoplay|default(true) ? '1' : '0' }}" data-interval="{{ theme.hero_interval|default(5) * 1000 }}" aria-label="Главные предложения">
+                    <div class="storefront-hero-slides">
+                        {% for slide in hero_slides %}
+                            {% set slide_image = slide.image_url|default('') %}
+                            {% set primary_url = slide.button_url|default('') ?: path(storefront_products_route, {storeSlug: store.slug}) %}
+                            <article class="hero storefront-hero storefront-hero-slide align-{{ slide.alignment|default('left') }} {{ slide_image ? 'has-image' : '' }} {{ loop.first ? 'is-active' : '' }}" data-hero-slide aria-hidden="{{ loop.first ? 'false' : 'true' }}" style="--storefront-hero-overlay: {{ slide.overlay|default(60) / 100 }}{% if slide_image %}; --storefront-hero-image: url('{{ slide_image }}'){% endif %}">
+                                <div class="wrap">
+                                    {% if slide.eyebrow|default('') %}<p class="storefront-hero-eyebrow">{{ slide.eyebrow }}</p>{% endif %}
+                                    {% if loop.first %}<h1>{{ slide.title }}</h1>{% else %}<h2>{{ slide.title }}</h2>{% endif %}
+                                    {% if slide.text|default('') %}<p>{{ slide.text }}</p>{% endif %}
+                                    {% if slide.button_label|default('') or slide.secondary_label|default('') %}
+                                        <div class="storefront-hero-actions">
+                                            {% if slide.button_label|default('') %}<a class="button" href="{{ primary_url }}">{{ slide.button_label }}</a>{% endif %}
+                                            {% if slide.secondary_label|default('') and slide.secondary_url|default('') %}<a class="button button-secondary" href="{{ slide.secondary_url }}">{{ slide.secondary_label }}</a>{% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </article>
+                        {% endfor %}
                     </div>
+                    {% if hero_slides|length > 1 %}
+                        <button class="storefront-slider-arrow is-prev" type="button" data-slider-prev aria-label="Предыдущий слайд">‹</button>
+                        <button class="storefront-slider-arrow is-next" type="button" data-slider-next aria-label="Следующий слайд">›</button>
+                        <div class="storefront-slider-dots" role="tablist" aria-label="Выбор слайда">
+                            {% for slide in hero_slides %}<button type="button" class="{{ loop.first ? 'is-active' : '' }}" data-slider-dot="{{ loop.index0 }}" aria-label="Слайд {{ loop.index }}" aria-selected="{{ loop.first ? 'true' : 'false' }}"></button>{% endfor %}
+                        </div>
+                    {% endif %}
                 </section>
             {% elseif section == 'featured' %}
                 <section class="section storefront-featured">
@@ -85,4 +112,5 @@
             {% endif %}
         {% endfor %}
     </div>
+    {% if hero_slides|length > 1 %}<script src="/assets/storefront-slider.js?v=20261013" defer></script>{% endif %}
 {% endblock %}

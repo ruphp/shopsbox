@@ -555,6 +555,90 @@
     border-bottom-color: var(--storefront-accent);
 }
 
+.storefront-hero-slider {
+    position: relative;
+    overflow: hidden;
+}
+
+.storefront-hero-slide {
+    display: none;
+    width: 100%;
+}
+
+.storefront-hero-slide.is-active {
+    display: flex;
+}
+
+.storefront-hero-slider .storefront-hero-slide:not(.is-active) {
+    display: none;
+}
+
+.storefront-hero-slide:not(.has-image) {
+    min-height: 320px;
+    align-items: center;
+}
+
+.storefront-hero-slide h2 {
+    margin: 0 0 12px;
+    font-size: 2em;
+    line-height: 1.15;
+}
+
+.storefront-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.storefront-hero.align-center .storefront-hero-actions { justify-content: center; }
+.storefront-hero.align-right .storefront-hero-actions { justify-content: flex-end; }
+
+.storefront-slider-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 4;
+    display: grid;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 50%;
+    place-items: center;
+    color: #ffffff;
+    background: rgba(16, 38, 61, 0.64);
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.storefront-slider-arrow.is-prev { left: max(12px, calc((100% - 1180px) / 2)); }
+.storefront-slider-arrow.is-next { right: max(12px, calc((100% - 1180px) / 2)); }
+
+.storefront-slider-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    z-index: 4;
+    display: flex;
+    gap: 8px;
+    transform: translateX(-50%);
+}
+
+.storefront-slider-dots button {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    background: rgba(16, 38, 61, 0.5);
+    cursor: pointer;
+}
+
+.storefront-slider-dots button.is-active {
+    background: #ffffff;
+}
+
 .storefront-page {
     --storefront-accent: #0077b6;
 }
@@ -731,5 +815,15 @@
     .storefront-product-grid.columns-4,
     .storefront-product-grid.columns-5 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .storefront-slider-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 25px;
+    }
+
+    .storefront-hero-slide h2 {
+        font-size: 1.65em;
     }
 }

@@ -95,6 +95,25 @@ final readonly class UpdateStoreAppearanceUseCase
         $logo = $this->selectedImage($input->logoImageId, $images, 'logo_image_id');
         $heroImage = $this->selectedImage($input->heroImageId, $images, 'hero_image_id');
 
+        $heroSlides = [];
+        if ($input->heroSlides !== []) {
+            if (count($input->heroSlides) > 5) {
+                throw InvalidTenantInput::forField('hero_slides', 'A banner can contain up to five slides.');
+            }
+            foreach ($input->heroSlides as $index => $slide) {
+                $heroSlides[] = $this->normalizeSlide($slide, $images, $index);
+            }
+            $firstSlide = $heroSlides[0];
+            $heroTitle = $firstSlide['title'];
+            $heroText = $firstSlide['text'];
+            $heroEyebrow = $firstSlide['eyebrow'];
+            $heroButtonLabel = $firstSlide['button_label'];
+            $heroAlignment = $firstSlide['alignment'];
+            $heroOverlay = $firstSlide['overlay'];
+            $heroImage = $firstSlide['image_id'] === null ? null : $images[$firstSlide['image_id']];
+        }
+        $heroInterval = in_array($input->heroInterval, [3, 5, 7, 10], true) ? $input->heroInterval : 5;
+
         $themeSettings = [
             'configured' => true,
             'template' => $template,
@@ -111,6 +130,9 @@ final readonly class UpdateStoreAppearanceUseCase
             'featured_show_description' => $input->featuredShowDescription,
             'seo_title' => $seoTitle,
             'seo_description' => $seoDescription,
+            'hero_slides' => $heroSlides,
+            'hero_autoplay' => $input->heroAutoplay,
+            'hero_interval' => $heroInterval,
             'sections' => $sections,
             'logo_image_id' => $logo?->id,
             'logo_image_url' => $logo?->publicUrl,
@@ -168,5 +190,68 @@ final readonly class UpdateStoreAppearanceUseCase
         }
 
         return $images[$imageId];
+    }
+
+    /**
+     * @param array<string, mixed> $slide
+     * @param array<string, StoreMediaFileView> $images
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeSlide(array $slide, array $images, int $index): array
+    {
+        $number = $index + 1;
+        $title = trim((string) ($slide['title'] ?? ''));
+        $eyebrow = trim((string) ($slide['eyebrow'] ?? ''));
+        $text = trim((string) ($slide['text'] ?? ''));
+        $buttonLabel = trim((string) ($slide['button_label'] ?? ''));
+        $buttonUrl = $this->normalizeSlideUrl((string) ($slide['button_url'] ?? ''), 'hero_slides');
+        $secondaryLabel = trim((string) ($slide['secondary_label'] ?? ''));
+        $secondaryUrl = $this->normalizeSlideUrl((string) ($slide['secondary_url'] ?? ''), 'hero_slides');
+        if ($title === '' || mb_strlen($title) > 120) {
+            throw InvalidTenantInput::forField('hero_slides', sprintf('Slide %d title must contain up to 120 characters.', $number));
+        }
+        if (mb_strlen($eyebrow) > 60 || mb_strlen($text) > 500) {
+            throw InvalidTenantInput::forField('hero_slides', sprintf('Slide %d text is too long.', $number));
+        }
+        if (mb_strlen($buttonLabel) > 40 || mb_strlen($secondaryLabel) > 40) {
+            throw InvalidTenantInput::forField('hero_slides', sprintf('Slide %d button label is too long.', $number));
+        }
+        if ($secondaryLabel !== '' && $secondaryUrl === '') {
+            throw InvalidTenantInput::forField('hero_slides', sprintf('Choose a link for the second button on slide %d.', $number));
+        }
+
+        $imageId = trim((string) ($slide['image_id'] ?? '')) ?: null;
+        $image = $this->selectedImage($imageId, $images, 'hero_slides');
+        $alignment = in_array(($slide['alignment'] ?? null), ['left', 'center', 'right'], true)
+            ? (string) $slide['alignment']
+            : 'left';
+
+        return [
+            'eyebrow' => $eyebrow,
+            'title' => $title,
+            'text' => $text,
+            'button_label' => $buttonLabel,
+            'button_url' => $buttonUrl,
+            'secondary_label' => $secondaryLabel,
+            'secondary_url' => $secondaryUrl,
+            'alignment' => $alignment,
+            'overlay' => max(0, min(90, (int) ($slide['overlay'] ?? 60))),
+            'image_id' => $image?->id,
+            'image_url' => $image?->publicUrl,
+        ];
+    }
+
+    private function normalizeSlideUrl(string $url, string $field): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+        if (!preg_match('~^(?:https?://|/[^/]|\#)~i', $url)) {
+            throw InvalidTenantInput::forField($field, 'Banner links must use https://, http://, /path or #anchor.');
+        }
+
+        return mb_substr($url, 0, 500);
     }
 }

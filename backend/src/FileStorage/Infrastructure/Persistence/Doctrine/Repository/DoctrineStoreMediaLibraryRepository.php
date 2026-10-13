@@ -95,6 +95,11 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
         $theme = $file->store()->themeSettings();
         if (($theme['logo_image_id'] ?? null) === $file->id()) { $usage[] = 'Логотип'; }
         if (($theme['hero_image_id'] ?? null) === $file->id()) { $usage[] = 'Баннер'; }
+        foreach ((array) ($theme['hero_slides'] ?? []) as $index => $slide) {
+            if (is_array($slide) && ($slide['image_id'] ?? null) === $file->id()) {
+                $usage[] = 'Баннер: слайд '.($index + 1);
+            }
+        }
         return $usage;
     }
 }

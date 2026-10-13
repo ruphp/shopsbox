@@ -36,6 +36,12 @@ final readonly class UpdateStoreAppearanceForm
             $request->request->getBoolean('featured_show_description'),
             (string) $request->request->get('seo_title', ''),
             (string) $request->request->get('seo_description', ''),
+            array_values(array_filter(
+                $request->request->all('hero_slides'),
+                static fn (mixed $slide): bool => is_array($slide),
+            )),
+            $request->request->getBoolean('hero_autoplay'),
+            $request->request->getInt('hero_interval', 5),
         );
     }
 
