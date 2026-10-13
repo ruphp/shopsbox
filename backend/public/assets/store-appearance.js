@@ -21,6 +21,9 @@
     const previewProductGrid = preview.querySelector('[data-preview-product-grid]');
     const featuredSourceInput = editor.querySelector('[data-featured-source]');
     const sectionOptions = editor.querySelector('.section-options');
+    const blockLibrary = editor.querySelector('[data-preview-block-library]');
+    const sectionControl = (name) => sectionOptions.querySelector(`[data-section-control="${name}"]`);
+    const sectionEnabled = (control) => control.querySelector('input[type="checkbox"]').checked;
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
     const field = (slide, name) => slide.querySelector(`[data-slide-field="${name}"]`);
 
@@ -104,33 +107,127 @@
         if (logoUrl !== '') previewLogo.src = logoUrl;
     };
 
+    const updateRichPreviews = () => {
+        const value = (name) => editor.querySelector(`[name="${name}"]`)?.value.trim() || '';
+        const benefits = [...editor.querySelectorAll('[name^="benefits"][name$="[title]"]')]
+            .map((titleInput) => ({
+                title: titleInput.value.trim(),
+                text: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[text]')}"]`)?.value.trim() || '',
+            }))
+            .filter((benefit) => benefit.title || benefit.text)
+            .slice(0, 3);
+        const benefitsList = preview.querySelector('[data-preview-benefits-list]');
+        preview.querySelector('[data-preview-benefits-title]').textContent = value('benefits_title') || 'Почему выбирают нас';
+        benefitsList.replaceChildren(...benefits.map((benefit) => {
+            const item = document.createElement('span');
+            const title = document.createElement('strong');
+            const text = document.createElement('small');
+            title.textContent = benefit.title || 'Преимущество';
+            text.textContent = benefit.text;
+            item.append(title, text);
+            return item;
+        }));
+
+        preview.querySelector('[data-preview-content-title]').textContent = value('content_title') || 'О магазине';
+        preview.querySelector('[data-preview-content-text]').textContent = value('content_text') || 'Кратко расскажите о магазине.';
+        const contentLayout = preview.querySelector('[data-preview-content-layout]');
+        const contentImage = preview.querySelector('[data-preview-content-image]');
+        const contentImageSelect = editor.querySelector('[name="content_image_id"]');
+        const contentImageUrl = contentImageSelect?.selectedOptions[0]?.dataset.imageUrl || '';
+        contentLayout.classList.toggle('image-left', value('content_image_position') !== 'right');
+        contentLayout.classList.toggle('image-right', value('content_image_position') === 'right');
+        contentImage.hidden = contentImageUrl === '';
+        contentImage.style.backgroundImage = contentImageUrl === '' ? '' : `url("${contentImageUrl.replaceAll('"', '%22')}")`;
+
+        preview.querySelector('[data-preview-reviews-title]').textContent = value('reviews_title') || 'Отзывы покупателей';
+        preview.querySelector('[data-preview-review-author]').textContent = value('reviews[0][author]') || 'Имя покупателя';
+        preview.querySelector('[data-preview-review-text]').textContent = value('reviews[0][text]') || 'Здесь появится отзыв покупателя.';
+
+        preview.querySelector('[data-preview-faq-title]').textContent = value('faq_title') || 'Частые вопросы';
+        const questions = [...editor.querySelectorAll('[name^="faqs"][name$="[question]"]')]
+            .map((input) => input.value.trim()).filter(Boolean).slice(0, 3);
+        preview.querySelector('[data-preview-faq-list]').replaceChildren(...questions.map((question) => {
+            const item = document.createElement('span');
+            item.textContent = question;
+            return item;
+        }));
+    };
+
     const updateSections = () => {
-        [...sectionOptions.querySelectorAll('[data-section-control]')]
-            .forEach((control, index, controls) => {
+        const controls = [...sectionOptions.querySelectorAll('[data-section-control]')];
+        controls.forEach((control, index) => {
                 const isHero = control.dataset.sectionControl === 'hero';
                 control.querySelector('.section-position').value = String(index + 1);
                 control.querySelector('.section-drag-handle').draggable = !isHero;
                 control.querySelector('[data-section-up]').disabled = isHero || index <= 1;
                 control.querySelector('[data-section-down]').disabled = isHero || index === controls.length - 1;
                 const section = preview.querySelector(`[data-preview-section="${control.dataset.sectionControl}"]`);
-                section.hidden = !control.querySelector('input[type="checkbox"]').checked;
+                section.hidden = !sectionEnabled(control);
                 preview.appendChild(section);
             });
+        const enabledControls = controls.filter(sectionEnabled);
+        enabledControls.forEach((control, index) => {
+            const section = preview.querySelector(`[data-preview-section="${control.dataset.sectionControl}"]`);
+            const up = section.querySelector('[data-preview-up]');
+            const down = section.querySelector('[data-preview-down]');
+            if (up) up.disabled = index === 1;
+            if (down) down.disabled = index === enabledControls.length - 1;
+        });
+        blockLibrary.querySelectorAll('[data-preview-add]').forEach((button) => {
+            button.hidden = sectionEnabled(sectionControl(button.dataset.previewAdd));
+        });
+        blockLibrary.querySelector('[data-preview-library-empty]').hidden = [...blockLibrary.querySelectorAll('[data-preview-add]')]
+            .some((button) => !button.hidden);
+    };
+
+    const moveEnabledSection = (control, direction) => {
+        const enabled = [...sectionOptions.querySelectorAll('[data-section-control]')].filter(sectionEnabled);
+        const index = enabled.indexOf(control);
+        const target = enabled[index + direction];
+        if (!target || target.dataset.sectionControl === 'hero') return;
+        if (direction < 0) sectionOptions.insertBefore(control, target);
+        else sectionOptions.insertBefore(target, control);
+        updateSections();
     };
 
     editor.addEventListener('input', (event) => {
         if (event.target.closest('[data-hero-slide]')) updateHeroPreview();
         if (event.target === featuredTitleInput) updateProductsPreview();
+        if (event.target.closest('[data-config-section="benefits"], [data-config-section="content"], [data-config-section="reviews"], [data-config-section="faq"]')) updateRichPreviews();
     });
 
     editor.addEventListener('change', (event) => {
         const slide = event.target.closest('[data-hero-slide]');
-        if (!slide) return;
-        if (event.target.matches('[data-slide-field="image_id"]')) updateSlideImage(slide);
-        updateHeroPreview();
+        if (slide) {
+            if (event.target.matches('[data-slide-field="image_id"]')) updateSlideImage(slide);
+            updateHeroPreview();
+        }
+        if (event.target.closest('[data-config-section="content"]')) updateRichPreviews();
     });
 
     editor.addEventListener('click', (event) => {
+        const previewAction = event.target.closest('[data-preview-up], [data-preview-down], [data-preview-edit], [data-preview-hide], [data-preview-add]');
+        if (previewAction) {
+            const name = previewAction.dataset.previewAdd || previewAction.closest('[data-preview-section]')?.dataset.previewSection;
+            const control = sectionControl(name);
+            if (previewAction.matches('[data-preview-add]')) {
+                control.querySelector('input[type="checkbox"]').checked = true;
+                updateSections();
+                preview.querySelector(`[data-preview-section="${name}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (previewAction.matches('[data-preview-hide]')) {
+                control.querySelector('input[type="checkbox"]').checked = false;
+                updateSections();
+            } else if (previewAction.matches('[data-preview-up]')) {
+                moveEnabledSection(control, -1);
+            } else if (previewAction.matches('[data-preview-down]')) {
+                moveEnabledSection(control, 1);
+            } else if (previewAction.matches('[data-preview-edit]')) {
+                const config = editor.querySelector(`[data-config-section="${name}"]`);
+                if (config) config.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                else if (name === 'contacts') window.location.assign(editor.dataset.storeSettingsUrl);
+            }
+            return;
+        }
         const sectionAction = event.target.closest('[data-section-up], [data-section-down]');
         if (sectionAction) {
             const control = sectionAction.closest('[data-section-control]');
@@ -218,6 +315,29 @@
         sectionOptions.insertBefore(dragging, event.clientY < bounds.top + bounds.height / 2 ? target : target.nextElementSibling);
     });
 
+    preview.addEventListener('dragstart', (event) => {
+        const handle = event.target.closest('[data-preview-section] .preview-block-drag');
+        if (!handle) return;
+        handle.closest('[data-preview-section]').classList.add('is-preview-dragging');
+    });
+    preview.addEventListener('dragover', (event) => {
+        const dragging = preview.querySelector('.is-preview-dragging');
+        if (!dragging) return;
+        event.preventDefault();
+        const target = event.target.closest('[data-preview-section]');
+        if (!target || target === dragging || target.dataset.previewSection === 'hero') return;
+        const bounds = target.getBoundingClientRect();
+        preview.insertBefore(dragging, event.clientY < bounds.top + bounds.height / 2 ? target : target.nextElementSibling);
+    });
+    preview.addEventListener('dragend', () => {
+        preview.querySelector('.is-preview-dragging')?.classList.remove('is-preview-dragging');
+        [...preview.querySelectorAll('[data-preview-section]')].forEach((section) => {
+            sectionOptions.appendChild(sectionControl(section.dataset.previewSection));
+        });
+        sectionOptions.prepend(heroControl);
+        updateSections();
+    });
+
     slideElements().forEach(updateSlideImage);
     renumberSlides();
     updateProductsPreview();
@@ -225,5 +345,6 @@
     updateTemplate();
     updateColor();
     updateLogo();
+    updateRichPreviews();
     updateSections();
 })();

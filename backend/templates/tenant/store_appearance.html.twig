@@ -1,5 +1,15 @@
 {% extends 'tenant/_owner_layout.html.twig' %}
 
+{% macro preview_tools(section, label, locked = false) %}
+    <div class="preview-block-tools" aria-label="Управление блоком {{ label }}">
+        {% if not locked %}<span class="preview-block-drag" draggable="true" title="Перетащить блок" aria-label="Перетащить блок">↕</span>{% endif %}
+        {% if not locked %}<button type="button" data-preview-up title="Переместить выше" aria-label="Переместить {{ label }} выше">↑</button>{% endif %}
+        {% if not locked %}<button type="button" data-preview-down title="Переместить ниже" aria-label="Переместить {{ label }} ниже">↓</button>{% endif %}
+        <button type="button" data-preview-edit title="Редактировать" aria-label="Редактировать {{ label }}">✎</button>
+        {% if not locked %}<button type="button" data-preview-hide title="Скрыть блок" aria-label="Скрыть {{ label }}">×</button>{% endif %}
+    </div>
+{% endmacro %}
+
 {% block title %}Оформление витрины | ShopsBox{% endblock %}
 {% block meta_description %}Настройка внешнего вида витрины магазина ShopsBox.{% endblock %}
 
@@ -37,6 +47,7 @@
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
     {% set reviews = theme.reviews|default([]) %}
+    {% set firstReview = reviews|first|default({}) %}
     {% set faqs = theme.faqs|default([]) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'reviews': 'Отзывы', 'faq': 'Частые вопросы', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
@@ -44,7 +55,7 @@
         {% set sectionPositions = sectionPositions|merge({(enabledSection): loop.index}) %}
     {% endfor %}
 
-    <section class="section appearance-page" data-appearance-editor>
+    <section class="section appearance-page" data-appearance-editor data-store-settings-url="{{ path('owner_store_settings') }}">
         <div class="wrap">
             <header class="appearance-heading">
                 <div>
@@ -86,7 +97,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-config-section="categories">
                         <legend>Категории на главной</legend>
                         <p class="field-hint">Назначьте обложки категориям. Файл останется защищённым от удаления, пока используется на витрине.</p>
                         {% if categories is empty %}
@@ -157,7 +168,7 @@
                         {% endif %}
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-config-section="hero">
                         <legend>Баннеры</legend>
                         <p class="field-hint">Первый слайд содержит единственный H1 страницы. Остальные заголовки выводятся как H2, чтобы сохранить правильную SEO-структуру.</p>
                         <div class="appearance-slider-settings">
@@ -183,7 +194,7 @@
                         </template>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-config-section="featured">
                         <legend>Товары на главной</legend>
                         <label class="appearance-field" for="featured-source">
                             <span>Какие товары показывать</span>
@@ -247,7 +258,7 @@
                         </label>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-config-section="benefits">
                         <legend>Преимущества</legend>
                         <p class="field-hint">Коротко объясните покупателю, почему стоит заказать именно у вас. Пустые пункты не выводятся.</p>
                         <label class="appearance-field">
@@ -266,7 +277,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-config-section="content">
                         <legend>Текст и изображение</legend>
                         <p class="field-hint">Подходит для рассказа о магазине, производстве, доставке или отдельном предложении.</p>
                         <label class="appearance-field">
@@ -310,7 +321,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-config-section="reviews">
                         <legend>Отзывы</legend>
                         <p class="field-hint">Добавляйте только реальные отзывы, которые можно подтвердить при необходимости.</p>
                         <label class="appearance-field"><span>Заголовок блока</span><input name="reviews_title" type="text" maxlength="80" value="{{ theme.reviews_title|default('Отзывы покупателей') }}"></label>
@@ -327,7 +338,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-config-section="faq">
                         <legend>Частые вопросы</legend>
                         <p class="field-hint">Ответы выводятся раскрывающимся списком и получают SEO-разметку FAQPage.</p>
                         <label class="appearance-field"><span>Заголовок блока</span><input name="faq_title" type="text" maxlength="80" value="{{ theme.faq_title|default('Частые вопросы') }}"></label>
@@ -394,8 +405,17 @@
 
                 <aside class="appearance-preview-wrap" aria-label="Предварительный просмотр">
                     <div class="appearance-preview-toolbar">
-                        <strong>Предпросмотр</strong>
-                        <span>Главная страница</span>
+                        <div><strong>Макет главной</strong><span>Перетаскивайте блоки мышкой</span></div>
+                        <span>Черновик</span>
+                    </div>
+                    <div class="preview-block-library">
+                        <strong>Добавить блок</strong>
+                        <div data-preview-block-library>
+                            {% for section in ['categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
+                                <button type="button" data-preview-add="{{ section }}">+ {{ sectionLabels[section] }}</button>
+                            {% endfor %}
+                            <span data-preview-library-empty hidden>Все блоки добавлены</span>
+                        </div>
                     </div>
                     <div class="appearance-preview template-{{ template }}" style="--preview-accent: {{ primaryColor }}" data-appearance-preview>
                         <header>
@@ -406,20 +426,44 @@
                             <span>Товары&nbsp;&nbsp; Корзина</span>
                         </header>
                         <div class="preview-section preview-hero align-{{ heroAlignment }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}{% if heroImageId != '' %}; --preview-image: url('{{ firstHeroSlide.image_url|default('') }}'){% endif %}">
+                            {{ _self.preview_tools('hero', sectionLabels.hero, true) }}
                             <small class="preview-eyebrow" data-preview-eyebrow {{ firstHeroSlide.eyebrow|default('') == '' ? 'hidden' : '' }}>{{ firstHeroSlide.eyebrow|default('') }}</small>
                             <h2 data-preview-title>{{ firstHeroSlide.title|default(settings.name) }}</h2>
                             <p data-preview-text>{{ firstHeroSlide.text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
                             <span class="preview-button" data-preview-button>{{ firstHeroSlide.button_label|default('Смотреть товары') }}</span>
                         </div>
                         <div class="preview-section preview-products" data-preview-section="featured">
+                            {{ _self.preview_tools('featured', sectionLabels.featured) }}
                             <h3 data-preview-featured-title>{{ theme.featured_title|default('Популярное') }}</h3>
                             <div class="{{ theme.featured_layout|default('grid') == 'carousel' ? 'is-carousel' : '' }}" data-preview-product-grid style="--preview-columns: {{ featuredColumns }}">{% for item in 1..featuredColumns %}<i></i>{% endfor %}</div>
                         </div>
                         <div class="preview-section preview-categories" data-preview-section="categories">
+                            {{ _self.preview_tools('categories', sectionLabels.categories) }}
                             <h3>Категории</h3>
                             <div>{% for category in categories|slice(0, 4) %}<span>{{ category.name }}</span>{% endfor %}</div>
                         </div>
+                        <div class="preview-section preview-benefits" data-preview-section="benefits">
+                            {{ _self.preview_tools('benefits', sectionLabels.benefits) }}
+                            <h3 data-preview-benefits-title>{{ theme.benefits_title|default('Почему выбирают нас') }}</h3>
+                            <div data-preview-benefits-list>
+                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default(''))|slice(0, 3) %}<span><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="preview-section preview-content" data-preview-section="content">
+                            {{ _self.preview_tools('content', sectionLabels.content) }}
+                            <div class="preview-content-layout image-{{ theme.content_image_position|default('left') }}" data-preview-content-layout>
+                                <span class="preview-content-image" data-preview-content-image{% if theme.content_image_url|default('') %} style="background-image:url('{{ theme.content_image_url }}')"{% endif %}></span>
+                                <div><h3 data-preview-content-title>{{ theme.content_title|default('О магазине') }}</h3><p data-preview-content-text>{{ theme.content_text|default('') ?: 'Кратко расскажите о магазине.' }}</p></div>
+                            </div>
+                        </div>
+                        <div class="preview-section preview-reviews" data-preview-section="reviews">
+                            {{ _self.preview_tools('reviews', sectionLabels.reviews) }}
+                            <h3 data-preview-reviews-title>{{ theme.reviews_title|default('Отзывы покупателей') }}</h3>
+                            <blockquote data-preview-review-text>{{ firstReview.text|default('Здесь появится отзыв покупателя.') }}</blockquote>
+                            <strong data-preview-review-author>{{ firstReview.author|default('Имя покупателя') }}</strong>
+                        </div>
                         <div class="preview-section preview-contacts" data-preview-section="contacts">
+                            {{ _self.preview_tools('contacts', sectionLabels.contacts) }}
                             <h3>Контакты магазина</h3>
                             <div class="store-contact-list">
                                 {% if settings.contactPhone %}<span>{{ settings.contactPhone }}</span>{% endif %}
@@ -432,11 +476,16 @@
                                 {% endif %}
                             </div>
                         </div>
+                        <div class="preview-section preview-faq" data-preview-section="faq">
+                            {{ _self.preview_tools('faq', sectionLabels.faq) }}
+                            <h3 data-preview-faq-title>{{ theme.faq_title|default('Частые вопросы') }}</h3>
+                            <div data-preview-faq-list>{% for faq in faqs|filter(item => item.question|default(''))|slice(0, 3) %}<span>{{ faq.question }}</span>{% endfor %}</div>
+                        </div>
                     </div>
                 </aside>
             </form>
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261013-builder-foundation" defer></script>
+    <script src="/assets/store-appearance.js?v=20261013-visual-blocks" defer></script>
 {% endblock %}
