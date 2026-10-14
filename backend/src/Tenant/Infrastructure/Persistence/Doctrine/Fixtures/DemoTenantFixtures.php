@@ -56,6 +56,8 @@ final class DemoTenantFixtures extends Fixture
             $manager->persist($store);
         }
 
+        $store->approvePublication('system:demo-fixture');
+
         $this->addReference(self::DEMO_TENANT_REFERENCE, $tenant);
         $this->addReference(self::DEMO_STORE_REFERENCE, $store);
 

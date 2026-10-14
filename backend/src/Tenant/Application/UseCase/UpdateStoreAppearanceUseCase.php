@@ -18,6 +18,7 @@ final readonly class UpdateStoreAppearanceUseCase
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
     private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'];
     private const BENEFIT_ICONS = ['delivery', 'quality', 'support', 'payment', 'return', 'secure', 'gift', 'stock', 'pickup', 'custom'];
+    private const REVIEW_AVATARS = ['person-1', 'person-2', 'person-3'];
 
     public function __construct(
         private StoreRepository $storeRepository,
@@ -144,7 +145,7 @@ final readonly class UpdateStoreAppearanceUseCase
             : 'left';
         $reviewsTitle = $this->requiredHeading($input->reviewsTitle, 'reviews_title');
         $reviews = [];
-        foreach (array_slice($input->reviews, 0, 8) as $review) {
+        foreach (array_slice($input->reviews, 0, 8) as $reviewIndex => $review) {
             $author = trim((string) ($review['author'] ?? ''));
             $text = trim((string) ($review['text'] ?? ''));
             if ($author === '' && $text === '') {
@@ -153,7 +154,16 @@ final readonly class UpdateStoreAppearanceUseCase
             if ($author === '' || mb_strlen($author) > 80 || $text === '' || mb_strlen($text) > 600) {
                 throw InvalidTenantInput::forField('reviews', 'Each review needs an author up to 80 characters and text up to 600 characters.');
             }
-            $reviews[] = ['author' => $author, 'text' => $text, 'rating' => max(1, min(5, (int) ($review['rating'] ?? 5)))];
+            $avatar = trim((string) ($review['avatar'] ?? ''));
+            if (!in_array($avatar, self::REVIEW_AVATARS, true)) {
+                $avatar = self::REVIEW_AVATARS[$reviewIndex % count(self::REVIEW_AVATARS)];
+            }
+            $reviews[] = [
+                'author' => $author,
+                'text' => $text,
+                'rating' => max(1, min(5, (int) ($review['rating'] ?? 5))),
+                'avatar' => $avatar,
+            ];
         }
         $faqTitle = $this->requiredHeading($input->faqTitle, 'faq_title');
         $faqs = [];

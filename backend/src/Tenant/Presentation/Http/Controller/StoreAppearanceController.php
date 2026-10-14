@@ -7,6 +7,7 @@ namespace App\Tenant\Presentation\Http\Controller;
 use App\Catalog\Application\Contracts\CategoryRepository;
 use App\Catalog\Application\UseCase\ListProductsUseCase;
 use App\FileStorage\Application\UseCase\ListStoreMediaLibraryUseCase;
+use App\FileStorage\Application\SystemMediaCatalog;
 use App\Storefront\Application\Dto\StorefrontStoreView;
 use App\Storefront\Application\UseCase\ShowStorefrontHomeUseCase;
 use App\Tenant\Application\Exception\InvalidTenantInput;
@@ -36,6 +37,7 @@ final readonly class StoreAppearanceController
         private CategoryRepository $categoryRepository,
         private ListProductsUseCase $listProducts,
         private ShowStorefrontHomeUseCase $showStorefrontHome,
+        private SystemMediaCatalog $systemMediaCatalog,
     ) {
     }
 
@@ -63,6 +65,7 @@ final readonly class StoreAppearanceController
             'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
             'categories' => $this->categoryRepository->listByStore($settings->storeId),
             'products' => $this->listProducts->execute($settings->storeId),
+            'systemReviewAvatars' => $this->systemMediaCatalog->reviewAvatars(),
         ]));
     }
 
@@ -135,6 +138,7 @@ final readonly class StoreAppearanceController
                 'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
                 'categories' => $this->categoryRepository->listByStore($settings->storeId),
                 'products' => $this->listProducts->execute($settings->storeId),
+                'systemReviewAvatars' => $this->systemMediaCatalog->reviewAvatars(),
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (StoreSettingsAccessDenied $exception) {
             return new Response($exception->getMessage(), Response::HTTP_FORBIDDEN);

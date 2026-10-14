@@ -105,7 +105,7 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'content_button_label' => 'Подробнее',
                     'content_button_url' => '/about',
                     'reviews_title' => 'Нас рекомендуют',
-                    'reviews' => [['author' => 'Анна', 'text' => 'Всё понравилось.', 'rating' => 5]],
+                    'reviews' => [['author' => 'Анна', 'text' => 'Всё понравилось.', 'rating' => 5, 'avatar' => 'person-1']],
                     'faq_title' => 'Вопросы о заказе',
                     'faqs' => [['question' => 'Есть доставка?', 'answer' => 'Да, по России.']],
                     'sections' => ['hero', 'contacts', 'featured'],

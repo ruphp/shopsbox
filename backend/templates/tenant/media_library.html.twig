@@ -91,6 +91,29 @@
                 </div>
             {% endif %}
 
+            <section class="system-media-library" aria-labelledby="system-media-title">
+                <header>
+                    <div>
+                        <p class="eyebrow">Системная библиотека</p>
+                        <h2 id="system-media-title">Шаблонные изображения и SVG</h2>
+                    </div>
+                    <p>Не занимают место в тарифе и не удаляются из магазина.</p>
+                </header>
+                {% for group in systemMediaGroups %}
+                    <section class="system-media-group">
+                        <div><h3>{{ group.title }}</h3><p>{{ group.description }}</p></div>
+                        <div class="system-media-grid">
+                            {% for item in group.items %}
+                                <article class="system-media-card is-{{ group.kind }}">
+                                    <a href="{{ item.url }}" target="_blank" rel="noopener"><img src="{{ item.url }}" alt=""></a>
+                                    <strong>{{ item.label }}</strong>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endfor %}
+            </section>
+
             <aside class="media-library-note">
                 <strong>Правила удаления</strong>
                 <p>Файл, который используется товаром, логотипом или баннером, удалить нельзя. Неиспользуемые файлы можно удалить из медиатеки.</p>

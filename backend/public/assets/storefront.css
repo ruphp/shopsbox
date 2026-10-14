@@ -880,20 +880,15 @@
 }
 
 .storefront-benefit-icon {
-    display: inline-flex;
-    width: 42px;
-    height: 42px;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    width: 58px;
+    height: 58px;
     margin-bottom: 14px;
-    border-radius: 50%;
-    color: #ffffff;
-    background: var(--storefront-accent);
 }
 
 .storefront-benefit-icon img {
-    width: 24px;
-    height: 24px;
+    width: 100%;
+    height: 100%;
 }
 
 .storefront-benefit-grid h3,
@@ -974,17 +969,12 @@
     gap: 10px;
 }
 
-.storefront-review-author > span {
-    display: inline-flex;
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
-    align-items: center;
-    justify-content: center;
+.storefront-review-author > img {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
     border-radius: 50%;
-    color: #ffffff;
-    background: var(--storefront-accent);
-    font-weight: 800;
+    object-fit: cover;
 }
 
 .storefront-faq-list {

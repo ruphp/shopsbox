@@ -24,6 +24,7 @@
 {% set featured_show_description = theme.featured_show_description|default(true) %}
 {% set featured_layout = theme.featured_layout|default('grid') %}
 {% set benefit_icon_keys = ['delivery', 'quality', 'support', 'payment', 'return', 'secure', 'gift', 'stock', 'pickup', 'custom'] %}
+{% set review_avatar_keys = ['person-1', 'person-2', 'person-3'] %}
 {% set seo_title = theme.seo_title|default('') ?: store.name %}
 {% set seo_description = theme.seo_description|default('') ?: (store.publicDescription|default('') ?: 'Открытая витрина магазина ' ~ store.name ~ ' с опубликованными товарами.') %}
 
@@ -151,7 +152,7 @@
                             {% for benefit in theme.benefits %}
                                 {% set benefit_icon = benefit.icon|default('') in benefit_icon_keys ? benefit.icon : benefit_icon_keys[loop.index0] %}
                                 <article>
-                                    <span class="storefront-benefit-icon" aria-hidden="true"><img src="/assets/benefit-icons/{{ benefit_icon }}.svg" alt=""></span>
+                                    <span class="storefront-benefit-icon" aria-hidden="true"><img src="/assets/system-media/benefits/{{ benefit_icon }}.svg" alt=""></span>
                                     <h3>{{ benefit.title }}</h3>
                                     {% if benefit.text %}<p>{{ benefit.text }}</p>{% endif %}
                                 </article>
@@ -180,10 +181,11 @@
                         <h2>{{ theme.reviews_title|default('Отзывы покупателей') }}</h2>
                         <div class="storefront-review-grid">
                             {% for review in theme.reviews %}
+                                {% set review_avatar = review.avatar|default('') in review_avatar_keys ? review.avatar : review_avatar_keys[loop.index0 % (review_avatar_keys|length)] %}
                                 <article>
                                     <div class="storefront-review-rating" aria-label="Оценка {{ review.rating }} из 5">{% for star in 1..5 %}<span class="{{ star <= review.rating ? 'is-filled' : '' }}" aria-hidden="true">★</span>{% endfor %}</div>
                                     <blockquote>{{ review.text }}</blockquote>
-                                    <div class="storefront-review-author"><span aria-hidden="true">{{ review.author|slice(0, 1)|upper }}</span><strong>{{ review.author }}</strong></div>
+                                    <div class="storefront-review-author"><img src="/assets/system-media/people/{{ review_avatar }}.jpg" alt=""><strong>{{ review.author }}</strong></div>
                                 </article>
                             {% endfor %}
                         </div>

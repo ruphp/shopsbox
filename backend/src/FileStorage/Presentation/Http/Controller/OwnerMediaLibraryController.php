@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FileStorage\Presentation\Http\Controller;
 
+use App\FileStorage\Application\SystemMediaCatalog;
 use App\FileStorage\Application\UseCase\ListStoreMediaLibraryUseCase;
 use App\FileStorage\Application\UseCase\UploadStoreMediaFileUseCase;
 use App\FileStorage\Application\UseCase\DeleteStoreMediaFileUseCase;
@@ -29,6 +30,7 @@ final readonly class OwnerMediaLibraryController
         private UploadStoreMediaFileUseCase $uploadMediaFile,
         private DeleteStoreMediaFileUseCase $deleteMediaFile,
         private CsrfTokenManagerInterface $csrfTokenManager,
+        private SystemMediaCatalog $systemMediaCatalog,
     ) {
     }
 
@@ -79,6 +81,7 @@ final readonly class OwnerMediaLibraryController
             'settings' => $settings,
             'library' => $library,
             'currentType' => $request->query->getString('type'),
+            'systemMediaGroups' => $this->systemMediaCatalog->groups(),
         ]));
     }
 

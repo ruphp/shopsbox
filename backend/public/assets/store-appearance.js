@@ -22,6 +22,7 @@
     const featuredSourceInput = editor.querySelector('[data-featured-source]');
     const sectionOptions = editor.querySelector('.section-options');
     const blockLibrary = editor.querySelector('[data-preview-block-library]');
+    const previewStage = editor.querySelector('[data-preview-stage]');
     const sectionControl = (name) => sectionOptions.querySelector(`[data-section-control="${name}"]`);
     const sectionEnabled = (control) => control.querySelector('input[type="checkbox"]').checked;
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
@@ -124,7 +125,7 @@
             const icon = document.createElement('img');
             const title = document.createElement('strong');
             const text = document.createElement('small');
-            icon.src = `/assets/benefit-icons/${benefit.icon}.svg`;
+            icon.src = `/assets/system-media/benefits/${benefit.icon}.svg`;
             icon.alt = '';
             title.textContent = benefit.title || 'Преимущество';
             text.textContent = benefit.text;
@@ -148,19 +149,21 @@
             .map((authorInput) => ({
                 author: authorInput.value.trim(),
                 text: editor.querySelector(`[name="${authorInput.name.replace('[author]', '[text]')}"]`)?.value.trim() || '',
+                avatar: editor.querySelector(`[name="${authorInput.name.replace('[author]', '[avatar]')}"]`)?.value || 'person-1',
             }))
             .filter((review) => review.author || review.text)
             .slice(0, 8);
-        const reviewItems = reviews.length > 0 ? reviews : [{ author: 'Имя покупателя', text: 'Здесь появится отзыв покупателя.' }];
+        const reviewItems = reviews.length > 0 ? reviews : [{ author: 'Имя покупателя', text: 'Здесь появится отзыв покупателя.', avatar: 'person-1' }];
         preview.querySelector('[data-preview-reviews-list]').replaceChildren(...reviewItems.map((review) => {
             const item = document.createElement('article');
             const text = document.createElement('blockquote');
             const authorRow = document.createElement('div');
-            const avatar = document.createElement('span');
+            const avatar = document.createElement('img');
             const author = document.createElement('strong');
             text.textContent = review.text || 'Отзыв покупателя';
             author.textContent = review.author || 'Покупатель';
-            avatar.textContent = author.textContent.slice(0, 1).toLocaleUpperCase('ru-RU');
+            avatar.src = `/assets/system-media/people/${review.avatar}.jpg`;
+            avatar.alt = '';
             authorRow.className = 'preview-review-author';
             authorRow.append(avatar, author);
             item.append(text, authorRow);
@@ -229,11 +232,47 @@
         if (event.target.closest('[data-config-section="benefits"]')) {
             const setting = event.target.closest('.benefit-setting');
             if (event.target.matches('[data-benefit-icon-select]')) {
-                setting.querySelector('[data-benefit-icon-preview]').src = `/assets/benefit-icons/${event.target.value}.svg`;
+                setting.querySelector('[data-benefit-icon-preview]').src = `/assets/system-media/benefits/${event.target.value}.svg`;
             }
             updateRichPreviews();
         }
+        if (event.target.matches('[data-review-avatar-select]')) {
+            event.target.closest('.review-editor-meta').querySelector('[data-review-avatar-preview]').src = `/assets/system-media/people/${event.target.value}.jpg`;
+        }
         if (event.target.closest('[data-config-section="content"], [data-config-section="reviews"], [data-config-section="faq"]')) updateRichPreviews();
+    });
+
+    const setPanelExpanded = (panel, expanded) => {
+        const legend = panel.querySelector(':scope > legend');
+        panel.classList.toggle('is-collapsed', !expanded);
+        legend.setAttribute('aria-expanded', String(expanded));
+    };
+
+    editor.querySelectorAll('.appearance-group').forEach((panel, index) => {
+        const legend = panel.querySelector(':scope > legend');
+        if (!legend) return;
+        panel.classList.add('is-collapsible');
+        legend.setAttribute('role', 'button');
+        legend.setAttribute('tabindex', '0');
+        setPanelExpanded(panel, index === 0);
+        const toggle = () => setPanelExpanded(panel, panel.classList.contains('is-collapsed'));
+        legend.addEventListener('click', toggle);
+        legend.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            toggle();
+        });
+    });
+
+    editor.querySelectorAll('button[data-preview-device]').forEach((button) => {
+        button.addEventListener('click', () => {
+            previewStage.dataset.previewDevice = button.dataset.previewDevice;
+            editor.querySelectorAll('button[data-preview-device]').forEach((item) => {
+                const active = item === button;
+                item.classList.toggle('is-active', active);
+                item.setAttribute('aria-pressed', String(active));
+            });
+        });
     });
 
     editor.addEventListener('click', (event) => {
@@ -254,7 +293,10 @@
                 moveEnabledSection(control, 1);
             } else if (previewAction.matches('[data-preview-edit]')) {
                 const config = editor.querySelector(`[data-config-section="${name}"]`);
-                if (config) config.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (config) {
+                    setPanelExpanded(config, true);
+                    config.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
                 else if (name === 'contacts') window.location.assign(editor.dataset.storeSettingsUrl);
             }
             return;

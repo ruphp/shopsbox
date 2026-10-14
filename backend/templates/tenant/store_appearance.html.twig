@@ -49,6 +49,7 @@
     {% set benefitIcons = {'delivery': 'Доставка', 'quality': 'Качество', 'support': 'Поддержка', 'payment': 'Удобная оплата', 'return': 'Возврат', 'secure': 'Безопасность', 'gift': 'Подарок', 'stock': 'В наличии', 'pickup': 'Самовывоз', 'custom': 'Индивидуальный подход'} %}
     {% set benefitIconKeys = benefitIcons|keys %}
     {% set reviews = theme.reviews|default([]) %}
+    {% set reviewAvatarKeys = systemReviewAvatars|map(item => item.key) %}
     {% set faqs = theme.faqs|default([]) %}
     {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'reviews': 'Отзывы', 'faq': 'Частые вопросы', 'contacts': 'Контакты'} %}
     {% set sectionPositions = {} %}
@@ -281,7 +282,7 @@
                                 <div class="benefit-setting">
                                     <div class="benefit-setting-heading">
                                         <strong>Пункт {{ index + 1 }}</strong>
-                                        <span class="benefit-icon-swatch"><img src="/assets/benefit-icons/{{ benefitIcon }}.svg" alt="" data-benefit-icon-preview></span>
+                                        <span class="benefit-icon-swatch"><img src="/assets/system-media/benefits/{{ benefitIcon }}.svg" alt="" data-benefit-icon-preview></span>
                                     </div>
                                     <label>
                                         <span>Иконка</span>
@@ -347,11 +348,16 @@
                         <div class="editor-item-list">
                             {% for index in 0..5 %}
                                 {% set review = reviews[index]|default({}) %}
+                                {% set reviewAvatar = review.avatar|default('') in reviewAvatarKeys ? review.avatar : systemReviewAvatars[index % (systemReviewAvatars|length)].key %}
                                 <div class="editor-item">
                                     <strong>Отзыв {{ index + 1 }}</strong>
                                     <input name="reviews[{{ index }}][author]" type="text" maxlength="80" value="{{ review.author|default('') }}" placeholder="Имя покупателя">
                                     <textarea name="reviews[{{ index }}][text]" maxlength="600" rows="3" placeholder="Текст отзыва">{{ review.text|default('') }}</textarea>
-                                    <label><span>Оценка</span><select name="reviews[{{ index }}][rating]">{% for rating in 5..1 %}<option value="{{ rating }}" {{ review.rating|default(5) == rating ? 'selected' : '' }}>{{ rating }} из 5</option>{% endfor %}</select></label>
+                                    <div class="review-editor-meta">
+                                        <img src="/assets/system-media/people/{{ reviewAvatar }}.jpg" alt="" data-review-avatar-preview>
+                                        <label><span>Фото</span><select name="reviews[{{ index }}][avatar]" data-review-avatar-select>{% for avatar in systemReviewAvatars %}<option value="{{ avatar.key }}" {{ reviewAvatar == avatar.key ? 'selected' : '' }}>{{ avatar.label }}</option>{% endfor %}</select></label>
+                                        <label><span>Оценка</span><select name="reviews[{{ index }}][rating]">{% for rating in 5..1 %}<option value="{{ rating }}" {{ review.rating|default(5) == rating ? 'selected' : '' }}>{{ rating }} из 5</option>{% endfor %}</select></label>
+                                    </div>
                                 </div>
                             {% endfor %}
                         </div>
@@ -425,8 +431,13 @@
                 <aside class="appearance-preview-wrap" aria-label="Предварительный просмотр">
                     <div class="appearance-preview-toolbar">
                         <div><strong>Макет главной</strong><span>Перетаскивайте блоки мышкой</span></div>
-                        <span>Черновик</span>
+                        <div class="preview-device-switch" aria-label="Ширина предпросмотра">
+                            <button type="button" class="is-active" data-preview-device="desktop" aria-pressed="true" title="Компьютер">100%</button>
+                            <button type="button" data-preview-device="tablet" aria-pressed="false" title="Планшет">768</button>
+                            <button type="button" data-preview-device="mobile" aria-pressed="false" title="Телефон">390</button>
+                        </div>
                     </div>
+                    <div class="appearance-preview-stage" data-preview-stage data-preview-device="desktop">
                     <div class="preview-block-library">
                         <strong>Добавить блок</strong>
                         <div data-preview-block-library>
@@ -465,7 +476,7 @@
                             {{ _self.preview_tools('benefits', sectionLabels.benefits) }}
                             <h3 data-preview-benefits-title>{{ theme.benefits_title|default('Почему выбирают нас') }}</h3>
                             <div data-preview-benefits-list>
-                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default('')) %}{% set previewBenefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : benefitIconKeys[loop.index0] %}<span><img src="/assets/benefit-icons/{{ previewBenefitIcon }}.svg" alt=""><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
+                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default('')) %}{% set previewBenefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : benefitIconKeys[loop.index0] %}<span><img src="/assets/system-media/benefits/{{ previewBenefitIcon }}.svg" alt=""><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
                             </div>
                         </div>
                         <div class="preview-section preview-content" data-preview-section="content">
@@ -480,9 +491,10 @@
                             <h3 data-preview-reviews-title>{{ theme.reviews_title|default('Отзывы покупателей') }}</h3>
                             <div class="preview-review-list" data-preview-reviews-list>
                                 {% for review in reviews|filter(item => item.author|default('') or item.text|default('')) %}
-                                    <article><blockquote>{{ review.text }}</blockquote><div class="preview-review-author"><span>{{ review.author|slice(0, 1)|upper }}</span><strong>{{ review.author }}</strong></div></article>
+                                    {% set previewAvatar = review.avatar|default('') in reviewAvatarKeys ? review.avatar : systemReviewAvatars[loop.index0 % (systemReviewAvatars|length)].key %}
+                                    <article><blockquote>{{ review.text }}</blockquote><div class="preview-review-author"><img src="/assets/system-media/people/{{ previewAvatar }}.jpg" alt=""><strong>{{ review.author }}</strong></div></article>
                                 {% else %}
-                                    <article><blockquote>Здесь появится отзыв покупателя.</blockquote><div class="preview-review-author"><span>И</span><strong>Имя покупателя</strong></div></article>
+                                    <article><blockquote>Здесь появится отзыв покупателя.</blockquote><div class="preview-review-author"><img src="/assets/system-media/people/person-1.jpg" alt=""><strong>Имя покупателя</strong></div></article>
                                 {% endfor %}
                             </div>
                         </div>
@@ -506,10 +518,11 @@
                             <div data-preview-faq-list>{% for faq in faqs|filter(item => item.question|default('')) %}<span>{{ faq.question }}</span>{% endfor %}</div>
                         </div>
                     </div>
+                    </div>
                 </aside>
             </form>
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261013-benefit-icons" defer></script>
+    <script src="/assets/store-appearance.js?v=20261014-builder" defer></script>
 {% endblock %}
