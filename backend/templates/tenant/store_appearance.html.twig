@@ -99,7 +99,7 @@
                                 <span>{{ hasAppearanceDraft|default(false) ? 'Покупатели не увидят его до публикации.' : 'Сохраните черновик или сразу опубликуйте оформление.' }}</span>
                             </div>
                             <button class="button button-secondary" type="submit" name="appearance_action" value="draft">Сохранить</button>
-                            <button class="button" type="submit" name="appearance_action" value="publish">Опубликовать</button>
+                            <button class="button" type="submit" name="appearance_action" value="publish">Опубликовать изменения</button>
                         </div>
                     </div>
                     <button class="appearance-library-open" type="button" data-block-library-open data-editor-panel="layout">Добавить блок</button>
@@ -463,7 +463,7 @@
 
                     <div class="appearance-actions">
                         <button class="button button-secondary" type="submit" name="appearance_action" value="draft">Сохранить черновик</button>
-                        <button class="button" type="submit" name="appearance_action" value="publish">Опубликовать оформление</button>
+                        <button class="button" type="submit" name="appearance_action" value="publish">Опубликовать изменения</button>
                         <a href="{{ path('owner_dashboard') }}">Вернуться к плану запуска</a>
                     </div>
                 </div>
