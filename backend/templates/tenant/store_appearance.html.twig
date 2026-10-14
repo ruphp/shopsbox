@@ -81,15 +81,24 @@
                 <input type="hidden" name="_token" value="{{ csrf_token('store_appearance') }}">
 
                 <div class="appearance-controls">
-                    <div class="appearance-actions appearance-actions-top">
-                        <div>
-                            <strong>{{ hasAppearanceDraft|default(false) ? 'Открыт черновик' : 'Изменения ещё не сохранены' }}</strong>
-                            <span>{{ hasAppearanceDraft|default(false) ? 'Покупатели не увидят его до публикации.' : 'Сохраните черновик или сразу опубликуйте оформление.' }}</span>
+                    <div class="appearance-sidebar-head">
+                        <nav class="appearance-editor-tabs" aria-label="Разделы редактора">
+                            <button type="button" class="is-active" data-editor-tab="layout" aria-pressed="true">Макет</button>
+                            <button type="button" data-editor-tab="style" aria-pressed="false">Стиль</button>
+                            <button type="button" data-editor-tab="seo" aria-pressed="false">SEO</button>
+                        </nav>
+                        <div class="appearance-actions appearance-actions-top">
+                            <div>
+                                <strong>{{ hasAppearanceDraft|default(false) ? 'Открыт черновик' : 'Изменения ещё не сохранены' }}</strong>
+                                <span>{{ hasAppearanceDraft|default(false) ? 'Покупатели не увидят его до публикации.' : 'Сохраните черновик или сразу опубликуйте оформление.' }}</span>
+                            </div>
+                            <button class="button button-secondary" type="submit" name="appearance_action" value="draft">Сохранить</button>
+                            <button class="button" type="submit" name="appearance_action" value="publish">Опубликовать</button>
                         </div>
-                        <button class="button button-secondary" type="submit" name="appearance_action" value="draft">Сохранить черновик</button>
-                        <button class="button" type="submit" name="appearance_action" value="publish">Опубликовать</button>
                     </div>
-                    <fieldset class="appearance-group">
+                    <button class="appearance-library-open" type="button" data-block-library-open data-editor-panel="layout">Добавить блок</button>
+
+                    <fieldset class="appearance-group" data-editor-panel="style">
                         <legend>Шаблон</legend>
                         <div class="template-options">
                             <label class="template-option">
@@ -107,7 +116,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="categories">
+                    <fieldset class="appearance-group" data-config-section="categories" data-editor-panel="layout">
                         <legend>Категории на главной</legend>
                         <p class="field-hint">Назначьте обложки категориям. Файл останется защищённым от удаления, пока используется на витрине.</p>
                         {% if categories is empty %}
@@ -135,7 +144,7 @@
                         {% endif %}
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-editor-panel="style">
                         <legend>Основной цвет</legend>
                         <div class="color-options">
                             {% for color, label in {'#0077b6': 'Синий', '#16876b': 'Зелёный', '#d1492e': 'Красный', '#6d4bb8': 'Фиолетовый'} %}
@@ -148,7 +157,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-editor-panel="style">
                         <legend>Логотип</legend>
                         {% if mediaImages is empty %}
                             <p class="muted">В медиатеке пока нет изображений.</p>
@@ -178,7 +187,7 @@
                         {% endif %}
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="hero">
+                    <fieldset class="appearance-group" data-config-section="hero" data-editor-panel="layout">
                         <legend>Баннеры</legend>
                         <p class="field-hint">Первый слайд содержит единственный H1 страницы. Остальные заголовки выводятся как H2, чтобы сохранить правильную SEO-структуру.</p>
                         <div class="appearance-slider-settings">
@@ -204,7 +213,7 @@
                         </template>
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="featured">
+                    <fieldset class="appearance-group" data-config-section="featured" data-editor-panel="layout">
                         <legend>Товары на главной</legend>
                         <label class="appearance-field" for="featured-source">
                             <span>Какие товары показывать</span>
@@ -268,7 +277,7 @@
                         </label>
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="benefits">
+                    <fieldset class="appearance-group" data-config-section="benefits" data-editor-panel="layout">
                         <legend>Преимущества</legend>
                         <p class="field-hint">Коротко объясните покупателю, почему стоит заказать именно у вас. Пустые пункты не выводятся.</p>
                         <label class="appearance-field">
@@ -297,7 +306,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="content">
+                    <fieldset class="appearance-group" data-config-section="content" data-editor-panel="layout">
                         <legend>Текст и изображение</legend>
                         <p class="field-hint">Подходит для рассказа о магазине, производстве, доставке или отдельном предложении.</p>
                         <label class="appearance-field">
@@ -341,7 +350,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="reviews">
+                    <fieldset class="appearance-group" data-config-section="reviews" data-editor-panel="layout">
                         <legend>Отзывы</legend>
                         <p class="field-hint">Добавляйте только реальные отзывы, которые можно подтвердить при необходимости.</p>
                         <label class="appearance-field"><span>Заголовок блока</span><input name="reviews_title" type="text" maxlength="80" value="{{ theme.reviews_title|default('Отзывы покупателей') }}"></label>
@@ -363,7 +372,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="faq">
+                    <fieldset class="appearance-group" data-config-section="faq" data-editor-panel="layout">
                         <legend>Частые вопросы</legend>
                         <p class="field-hint">Ответы выводятся раскрывающимся списком и получают SEO-разметку FAQPage.</p>
                         <label class="appearance-field"><span>Заголовок блока</span><input name="faq_title" type="text" maxlength="80" value="{{ theme.faq_title|default('Частые вопросы') }}"></label>
@@ -379,7 +388,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-editor-panel="layout">
                         <legend>Блоки на главной</legend>
                         <p class="field-hint">Включите нужные блоки и задайте их порядок.</p>
                         <div class="section-options">
@@ -406,7 +415,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="appearance-group">
+                    <fieldset class="appearance-group" data-editor-panel="seo">
                         <legend>SEO главной страницы</legend>
                         <p class="field-hint">Если оставить поля пустыми, ShopsBox подставит название и описание магазина. Адрес страницы и canonical формируются автоматически.</p>
                         <label class="appearance-field" for="seo-title">
@@ -439,13 +448,8 @@
                     </div>
                     <div class="appearance-preview-stage" data-preview-stage data-preview-device="desktop">
                     <div class="preview-block-library">
-                        <strong>Добавить блок</strong>
-                        <div data-preview-block-library>
-                            {% for section in ['categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
-                                <button type="button" data-preview-add="{{ section }}">+ {{ sectionLabels[section] }}</button>
-                            {% endfor %}
-                            <span data-preview-library-empty hidden>Все блоки добавлены</span>
-                        </div>
+                        <button type="button" data-block-library-open>Добавить блок</button>
+                        <span data-preview-library-summary>Соберите главную страницу из готовых блоков</span>
                     </div>
                     <div class="appearance-preview template-{{ template }}" style="--preview-accent: {{ primaryColor }}" data-appearance-preview>
                         <header>
@@ -520,9 +524,44 @@
                     </div>
                     </div>
                 </aside>
+
+                <dialog class="appearance-block-dialog" data-block-library-dialog aria-labelledby="block-library-title">
+                    <div class="appearance-block-dialog-head">
+                        <div><p class="eyebrow">Библиотека</p><h2 id="block-library-title">Добавить блок</h2></div>
+                        <button type="button" class="icon-button" data-block-library-close aria-label="Закрыть">×</button>
+                    </div>
+                    <nav class="appearance-library-tabs" aria-label="Разделы библиотеки">
+                        <button type="button" class="is-active" data-library-tab="blocks" aria-pressed="true">Блоки</button>
+                        <button type="button" data-library-tab="presets" aria-pressed="false">Готовые наборы</button>
+                    </nav>
+                    <div data-library-panel="blocks">
+                        <div class="appearance-block-grid" data-preview-block-library>
+                            {% set blockDescriptions = {
+                                'categories': 'Навигация по разделам каталога',
+                                'featured': 'Сетка или карусель товаров',
+                                'benefits': 'Преимущества магазина',
+                                'content': 'Текст с изображением и кнопкой',
+                                'reviews': 'Отзывы покупателей',
+                                'faq': 'Ответы на частые вопросы',
+                                'contacts': 'Контактные данные магазина'
+                            } %}
+                            {% for section in ['categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
+                                <button type="button" data-preview-add="{{ section }}"><strong>{{ sectionLabels[section] }}</strong><span>{{ blockDescriptions[section] }}</span></button>
+                            {% endfor %}
+                            <p data-preview-library-empty hidden>Все доступные блоки уже добавлены.</p>
+                        </div>
+                    </div>
+                    <div data-library-panel="presets" hidden>
+                        <div class="appearance-preset-grid">
+                            <button type="button" data-layout-preset="hero,categories,featured,benefits,contacts"><strong>Каталог</strong><span>Категории, товары, преимущества и контакты</span></button>
+                            <button type="button" data-layout-preset="hero,featured,content,reviews,contacts"><strong>Брендовый магазин</strong><span>Товары, история магазина, отзывы и контакты</span></button>
+                            <button type="button" data-layout-preset="hero,categories,featured,benefits,content,reviews,faq,contacts"><strong>Полная витрина</strong><span>Все доступные блоки главной страницы</span></button>
+                        </div>
+                    </div>
+                </dialog>
             </form>
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261014-builder" defer></script>
+    <script src="/assets/store-appearance.js?v=20261014-builder-tabs" defer></script>
 {% endblock %}

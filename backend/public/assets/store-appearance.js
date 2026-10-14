@@ -23,6 +23,8 @@
     const sectionOptions = editor.querySelector('.section-options');
     const blockLibrary = editor.querySelector('[data-preview-block-library]');
     const previewStage = editor.querySelector('[data-preview-stage]');
+    const blockDialog = editor.querySelector('[data-block-library-dialog]');
+    const editorTabs = [...editor.querySelectorAll('[data-editor-tab]')];
     const sectionControl = (name) => sectionOptions.querySelector(`[data-section-control="${name}"]`);
     const sectionEnabled = (control) => control.querySelector('input[type="checkbox"]').checked;
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
@@ -200,11 +202,12 @@
             if (up) up.disabled = index === 1;
             if (down) down.disabled = index === enabledControls.length - 1;
         });
-        blockLibrary.querySelectorAll('[data-preview-add]').forEach((button) => {
+        const addButtons = [...blockLibrary.querySelectorAll('[data-preview-add]')];
+        addButtons.forEach((button) => {
             button.hidden = sectionEnabled(sectionControl(button.dataset.previewAdd));
         });
-        blockLibrary.querySelector('[data-preview-library-empty]').hidden = [...blockLibrary.querySelectorAll('[data-preview-add]')]
-            .some((button) => !button.hidden);
+        const hasAvailableBlocks = addButtons.some((button) => !button.hidden);
+        blockLibrary.querySelector('[data-preview-library-empty]').hidden = hasAvailableBlocks;
     };
 
     const moveEnabledSection = (control, direction) => {
@@ -248,19 +251,80 @@
         legend.setAttribute('aria-expanded', String(expanded));
     };
 
-    editor.querySelectorAll('.appearance-group').forEach((panel, index) => {
+    const switchEditorPanel = (name) => {
+        editorTabs.forEach((button) => {
+            const active = button.dataset.editorTab === name;
+            button.classList.toggle('is-active', active);
+            button.setAttribute('aria-pressed', String(active));
+        });
+        editor.querySelectorAll('[data-editor-panel]').forEach((panel) => {
+            panel.hidden = panel.dataset.editorPanel !== name;
+        });
+    };
+
+    const initializedPanels = new Set();
+    editor.querySelectorAll('.appearance-group').forEach((panel) => {
         const legend = panel.querySelector(':scope > legend');
         if (!legend) return;
         panel.classList.add('is-collapsible');
         legend.setAttribute('role', 'button');
         legend.setAttribute('tabindex', '0');
-        setPanelExpanded(panel, index === 0);
+        const panelName = panel.dataset.editorPanel || 'layout';
+        setPanelExpanded(panel, !initializedPanels.has(panelName));
+        initializedPanels.add(panelName);
         const toggle = () => setPanelExpanded(panel, panel.classList.contains('is-collapsed'));
         legend.addEventListener('click', toggle);
         legend.addEventListener('keydown', (event) => {
             if (event.key !== 'Enter' && event.key !== ' ') return;
             event.preventDefault();
             toggle();
+        });
+    });
+
+    editorTabs.forEach((button) => {
+        button.addEventListener('click', () => switchEditorPanel(button.dataset.editorTab));
+    });
+
+    editor.querySelectorAll('[data-block-library-open]').forEach((button) => {
+        button.addEventListener('click', () => {
+            blockDialog.showModal();
+        });
+    });
+    editor.querySelector('[data-block-library-close]').addEventListener('click', () => blockDialog.close());
+    blockDialog.addEventListener('click', (event) => {
+        if (event.target === blockDialog) blockDialog.close();
+    });
+    editor.querySelectorAll('[data-library-tab]').forEach((button) => {
+        button.addEventListener('click', () => {
+            editor.querySelectorAll('[data-library-tab]').forEach((item) => {
+                const active = item === button;
+                item.classList.toggle('is-active', active);
+                item.setAttribute('aria-pressed', String(active));
+            });
+            editor.querySelectorAll('[data-library-panel]').forEach((panel) => {
+                panel.hidden = panel.dataset.libraryPanel !== button.dataset.libraryTab;
+            });
+        });
+    });
+
+    editor.querySelectorAll('[data-layout-preset]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const orderedNames = button.dataset.layoutPreset.split(',');
+            const controls = [...sectionOptions.querySelectorAll('[data-section-control]')];
+            controls.forEach((control) => {
+                control.querySelector('input[type="checkbox"]').checked = orderedNames.includes(control.dataset.sectionControl);
+            });
+            orderedNames.forEach((name) => {
+                const control = sectionControl(name);
+                if (control) sectionOptions.appendChild(control);
+            });
+            controls.filter((control) => !orderedNames.includes(control.dataset.sectionControl))
+                .forEach((control) => sectionOptions.appendChild(control));
+            const hero = sectionControl('hero');
+            if (hero) sectionOptions.prepend(hero);
+            updateSections();
+            blockDialog.close();
+            previewStage.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
 
@@ -283,6 +347,7 @@
             if (previewAction.matches('[data-preview-add]')) {
                 control.querySelector('input[type="checkbox"]').checked = true;
                 updateSections();
+                blockDialog.close();
                 preview.querySelector(`[data-preview-section="${name}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else if (previewAction.matches('[data-preview-hide]')) {
                 control.querySelector('input[type="checkbox"]').checked = false;
@@ -294,6 +359,7 @@
             } else if (previewAction.matches('[data-preview-edit]')) {
                 const config = editor.querySelector(`[data-config-section="${name}"]`);
                 if (config) {
+                    switchEditorPanel(config.dataset.editorPanel || 'layout');
                     setPanelExpanded(config, true);
                     config.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
@@ -420,4 +486,5 @@
     updateLogo();
     updateRichPreviews();
     updateSections();
+    switchEditorPanel('layout');
 })();
