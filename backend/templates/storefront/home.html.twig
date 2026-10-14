@@ -88,7 +88,7 @@
                         {% if view.featuredProducts is empty %}
                             <p class="muted">Пока нет опубликованных товаров.</p>
                         {% else %}
-                            <div class="storefront-product-block {{ featured_layout == 'carousel' ? 'is-carousel' : '' }}"{% if featured_layout == 'carousel' %} data-product-carousel{% endif %}>
+                            <div class="storefront-product-block {{ featured_layout == 'carousel' ? 'is-carousel' : '' }}"{% if featured_layout == 'carousel' %} data-product-carousel data-autoplay="{{ theme.featured_autoplay|default(true) ? '1' : '0' }}" data-interval="{{ theme.featured_interval|default(5) * 1000 }}"{% endif %}>
                                 {% if featured_layout == 'carousel' %}<button type="button" class="product-carousel-arrow is-prev" data-carousel-prev aria-label="Показать предыдущие товары">‹</button>{% endif %}
                                 <div class="product-grid storefront-product-grid columns-{{ featured_columns }}"{% if featured_layout == 'carousel' %} data-carousel-track tabindex="0"{% endif %}>
                                 {% for product in view.featuredProducts %}
@@ -211,5 +211,5 @@
         {% endfor %}
     </div>
     {% if hero_slides|length > 1 %}<script src="/assets/storefront-slider.js?v=20261013" defer></script>{% endif %}
-    {% if featured_layout == 'carousel' %}<script src="/assets/storefront-carousel.js?v=20261013" defer></script>{% endif %}
+    {% if featured_layout == 'carousel' %}<script src="/assets/storefront-carousel.js?v=20261014-auto" defer></script>{% endif %}
 {% endblock %}

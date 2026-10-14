@@ -773,8 +773,8 @@
 
 .appearance-field-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
 }
 
 .category-image-settings {
@@ -946,10 +946,15 @@
 
 .appearance-slider-settings {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 140px;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
     align-items: end;
     margin-bottom: 16px;
+}
+
+.appearance-page [hidden],
+.appearance-preview [hidden] {
+    display: none !important;
 }
 
 .appearance-slides {

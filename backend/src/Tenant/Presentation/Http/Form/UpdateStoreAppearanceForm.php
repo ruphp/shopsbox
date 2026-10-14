@@ -68,6 +68,8 @@ final readonly class UpdateStoreAppearanceForm
             (string) $request->request->get('faq_title', 'Частые вопросы'),
             array_values(array_filter($request->request->all('faqs'), static fn (mixed $faq): bool => is_array($faq))),
             (string) $request->request->get('appearance_action', 'draft'),
+            $request->request->getBoolean('featured_autoplay'),
+            $request->request->getInt('featured_interval', 5),
         );
     }
 

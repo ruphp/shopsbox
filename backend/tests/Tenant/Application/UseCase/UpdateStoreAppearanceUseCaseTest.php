@@ -98,6 +98,8 @@ final class UpdateStoreAppearanceUseCaseTest extends TestCase
                     'featured_source' => 'category',
                     'featured_category_slug' => 'new-items',
                     'featured_product_ids' => [],
+                    'featured_autoplay' => true,
+                    'featured_interval' => 5,
                     'category_images' => [
                         'new-items' => ['image_id' => 'category-id', 'image_url' => '/media/category.jpg'],
                     ],

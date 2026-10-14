@@ -49,6 +49,7 @@
     {% set featuredShowDescription = theme.featured_show_description|default(true) %}
     {% set featuredSource = theme.featured_source|default('latest') %}
     {% set featuredProductIds = theme.featured_product_ids|default([]) %}
+    {% set featuredLayout = theme.featured_layout|default('grid') %}
     {% set categoryImages = theme.category_images|default({}) %}
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
@@ -226,8 +227,9 @@
                                 <option value="latest" {{ featuredSource == 'latest' ? 'selected' : '' }}>Новинки</option>
                                 <option value="popular" {{ featuredSource == 'popular' ? 'selected' : '' }}>Популярные по просмотрам</option>
                                 <option value="category" {{ featuredSource == 'category' ? 'selected' : '' }}>Из категории</option>
-                                <option value="manual" {{ featuredSource == 'manual' ? 'selected' : '' }}>Выбрать вручную</option>
+                                <option value="manual" {{ featuredSource == 'manual' ? 'selected' : '' }}>Рекомендуемые (выбрать вручную)</option>
                             </select>
+                            <small class="field-hint">Новинки сортируются по дате, популярные по просмотрам, рекомендуемые вы выбираете сами.</small>
                         </label>
                         <div data-featured-source-panel="category" {{ featuredSource != 'category' ? 'hidden' : '' }}>
                             <label class="appearance-field" for="featured-category">
@@ -265,14 +267,26 @@
                             <label class="appearance-field" for="featured-layout">
                                 <span>Отображение</span>
                                 <select id="featured-layout" name="featured_layout">
-                                    <option value="grid" {{ theme.featured_layout|default('grid') == 'grid' ? 'selected' : '' }}>Сетка</option>
-                                    <option value="carousel" {{ theme.featured_layout|default('grid') == 'carousel' ? 'selected' : '' }}>Карусель</option>
+                                    <option value="grid" {{ featuredLayout == 'grid' ? 'selected' : '' }}>Сетка</option>
+                                    <option value="carousel" {{ featuredLayout == 'carousel' ? 'selected' : '' }}>Карусель со стрелками</option>
                                 </select>
                             </label>
                             <label class="appearance-field" for="featured-limit">
                                 <span>Количество товаров</span>
                                 <select id="featured-limit" name="featured_limit">
                                     {% for limit in [4, 6, 8, 10, 12] %}<option value="{{ limit }}" {{ theme.featured_limit|default(6) == limit ? 'selected' : '' }}>{{ limit }}</option>{% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="appearance-slider-settings" data-featured-carousel-settings {{ featuredLayout != 'carousel' ? 'hidden' : '' }}>
+                            <label class="active-check">
+                                <input type="checkbox" name="featured_autoplay" value="1" {{ theme.featured_autoplay|default(true) ? 'checked' : '' }}>
+                                Прокручивать товары автоматически
+                            </label>
+                            <label class="appearance-field">
+                                <span>Интервал</span>
+                                <select name="featured_interval">
+                                    {% for seconds in [3, 5, 7, 10] %}<option value="{{ seconds }}" {{ theme.featured_interval|default(5) == seconds ? 'selected' : '' }}>{{ seconds }} сек.</option>{% endfor %}
                                 </select>
                             </label>
                         </div>
@@ -489,7 +503,7 @@
                         <div class="preview-section preview-products" data-preview-section="featured">
                             {{ _self.preview_tools('featured', sectionLabels.featured) }}
                             <h3 data-preview-featured-title>{{ theme.featured_title|default('Популярное') }}</h3>
-                            <div class="{{ theme.featured_layout|default('grid') == 'carousel' ? 'is-carousel' : '' }}" data-preview-product-grid style="--preview-columns: {{ featuredColumns }}">{% for item in 1..featuredColumns %}<i></i>{% endfor %}</div>
+                            <div class="{{ featuredLayout == 'carousel' ? 'is-carousel' : '' }}" data-preview-product-grid style="--preview-columns: {{ featuredColumns }}">{% for item in 1..featuredColumns %}<i></i>{% endfor %}</div>
                         </div>
                         <div class="preview-section preview-categories" data-preview-section="categories">
                             {{ _self.preview_tools('categories', sectionLabels.categories) }}
@@ -587,7 +601,7 @@
                     </div>
                     <div class="appearance-media-picker-body">
                         <section data-media-picker-group="benefit">
-                            <h3>Иконки Lucide</h3>
+                                <h3>Иконки Bootstrap</h3>
                             <p class="field-hint">Единый аккуратный набор. Цвет задаётся отдельно.</p>
                             <div class="appearance-media-picker-grid">
                                 {% for icon in systemBenefitIcons %}<button type="button" data-media-option data-media-kind="benefit" data-media-value="system-benefit:{{ icon.key }}" data-media-url="{{ icon.url }}" data-media-system="1"><span class="is-system" style="--media-url:url('{{ icon.url }}')"></span><strong>{{ icon.label }}</strong></button>{% endfor %}
@@ -617,5 +631,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261014-media-builder" defer></script>
+    <script src="/assets/store-appearance.js?v=20261014-product-carousel" defer></script>
 {% endblock %}

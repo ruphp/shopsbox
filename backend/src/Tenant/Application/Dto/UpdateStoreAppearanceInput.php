@@ -55,6 +55,8 @@ final readonly class UpdateStoreAppearanceInput
         public string $faqTitle = 'Частые вопросы',
         public array $faqs = [],
         public string $action = 'publish',
+        public bool $featuredAutoplay = true,
+        public int $featuredInterval = 5,
     ) {
     }
 }

@@ -20,6 +20,7 @@
     const featuredTitleInput = editor.querySelector('[name="featured_title"]');
     const featuredColumnsInput = editor.querySelector('[name="featured_columns"]');
     const featuredLayoutInput = editor.querySelector('[name="featured_layout"]');
+    const featuredCarouselSettings = editor.querySelector('[data-featured-carousel-settings]');
     const previewFeaturedTitle = preview.querySelector('[data-preview-featured-title]');
     const previewProductGrid = preview.querySelector('[data-preview-product-grid]');
     const featuredSourceInput = editor.querySelector('[data-featured-source]');
@@ -33,6 +34,7 @@
     const sectionEnabled = (control) => control.querySelector('input[type="checkbox"]').checked;
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
     const field = (slide, name) => slide.querySelector(`[data-slide-field="${name}"]`);
+    const previewSlideElements = () => slideElements().filter((slide) => field(slide, 'title').value.trim() !== '');
     let activeSlide = slideElements()[0] || null;
     let mediaPickerTarget = null;
 
@@ -95,7 +97,7 @@
         previewHero.classList.toggle('has-image', imageUrl !== '');
         if (imageUrl === '') previewHero.style.removeProperty('--preview-image');
         else previewHero.style.setProperty('--preview-image', `url("${imageUrl.replaceAll('"', '%22')}")`);
-        slideElements().forEach((item, index) => {
+        previewSlideElements().forEach((item, index) => {
             const dot = previewSlideNav.children[index];
             if (!dot) return;
             const active = item === slide;
@@ -112,7 +114,7 @@
     };
 
     const updateSlideNavigator = () => {
-        const items = slideElements();
+        const items = previewSlideElements();
         previewSlideSwitcher.hidden = items.length <= 1;
         previewSlideNav.replaceChildren(...items.map((slide, index) => {
             const button = document.createElement('button');
@@ -150,6 +152,7 @@
         previewProductGrid.style.setProperty('--preview-columns', columns);
         previewProductGrid.replaceChildren(...Array.from({ length: columns }, () => document.createElement('i')));
         previewProductGrid.classList.toggle('is-carousel', featuredLayoutInput.value === 'carousel');
+        featuredCarouselSettings.hidden = featuredLayoutInput.value !== 'carousel';
     };
 
     const updateFeaturedSource = () => {
@@ -305,6 +308,11 @@
             updateHeroPreview();
         }
         if (event.target === featuredTitleInput) updateProductsPreview();
+        if (event.target.matches('[name^="faqs"][name$="[question]"], [name^="faqs"][name$="[answer]"]') && event.target.value.trim() !== '') {
+            const faqControl = sectionControl('faq');
+            faqControl.querySelector('input[type="checkbox"]').checked = true;
+            updateSections();
+        }
         if (event.target.closest('[data-config-section="benefits"], [data-config-section="content"], [data-config-section="reviews"], [data-config-section="faq"]')) updateRichPreviews();
     });
 
@@ -460,7 +468,8 @@
     editor.addEventListener('click', (event) => {
         const previewSlideButton = event.target.closest('[data-preview-slide], [data-preview-slide-prev], [data-preview-slide-next]');
         if (previewSlideButton) {
-            const items = slideElements();
+            const items = previewSlideElements();
+            if (items.length <= 1) return;
             let index = items.indexOf(activeSlide);
             if (previewSlideButton.matches('[data-preview-slide]')) index = Number(previewSlideButton.dataset.previewSlide);
             if (previewSlideButton.matches('[data-preview-slide-prev]')) index = (index - 1 + items.length) % items.length;

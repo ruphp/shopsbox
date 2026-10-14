@@ -94,6 +94,9 @@ final readonly class UpdateStoreAppearanceUseCase
             ? $input->featuredLayout
             : 'grid';
         $featuredLimit = max(4, min(12, $input->featuredLimit));
+        $featuredInterval = in_array($input->featuredInterval, [3, 5, 7, 10], true)
+            ? $input->featuredInterval
+            : 5;
         $featuredSource = in_array($input->featuredSource, ['latest', 'popular', 'category', 'manual'], true)
             ? $input->featuredSource
             : 'latest';
@@ -284,6 +287,8 @@ final readonly class UpdateStoreAppearanceUseCase
             'featured_source' => $featuredSource,
             'featured_category_slug' => $featuredCategorySlug,
             'featured_product_ids' => $featuredProductIds,
+            'featured_autoplay' => $input->featuredAutoplay,
+            'featured_interval' => $featuredInterval,
             'category_images' => $categoryImages,
             'benefits_title' => $benefitsTitle,
             'benefits' => $benefits,
