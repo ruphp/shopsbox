@@ -30,6 +30,9 @@
             button_label: theme.hero_button_label|default('Смотреть товары'),
             button_url: '', secondary_label: '', secondary_url: '',
             alignment: theme.hero_alignment|default('left'),
+            vertical_alignment: 'center',
+            content_width: 'medium',
+            image_position: 'center',
             overlay: theme.hero_overlay|default(60),
             image_id: heroImageId,
             image_url: theme.hero_image_url|default('')
@@ -38,6 +41,9 @@
     {% set firstHeroSlide = heroSlides|first %}
     {% set heroImageId = firstHeroSlide.image_id|default('') %}
     {% set heroAlignment = firstHeroSlide.alignment|default('left') %}
+    {% set heroVerticalAlignment = firstHeroSlide.vertical_alignment|default('center') %}
+    {% set heroContentWidth = firstHeroSlide.content_width|default('medium') %}
+    {% set heroImagePosition = firstHeroSlide.image_position|default('center') %}
     {% set heroOverlay = firstHeroSlide.overlay|default(60) %}
     {% set featuredColumns = theme.featured_columns|default(4) %}
     {% set featuredShowDescription = theme.featured_show_description|default(true) %}
@@ -46,8 +52,7 @@
     {% set categoryImages = theme.category_images|default({}) %}
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
-    {% set benefitIcons = {'delivery': 'Доставка', 'quality': 'Качество', 'support': 'Поддержка', 'payment': 'Удобная оплата', 'return': 'Возврат', 'secure': 'Безопасность', 'gift': 'Подарок', 'stock': 'В наличии', 'pickup': 'Самовывоз', 'custom': 'Индивидуальный подход'} %}
-    {% set benefitIconKeys = benefitIcons|keys %}
+    {% set benefitIconKeys = systemBenefitIcons|map(item => item.key) %}
     {% set reviews = theme.reviews|default([]) %}
     {% set reviewAvatarKeys = systemReviewAvatars|map(item => item.key) %}
     {% set faqs = theme.faqs|default([]) %}
@@ -287,18 +292,23 @@
                         <div class="benefit-settings">
                             {% for index in 0..5 %}
                                 {% set benefit = benefits[index]|default({}) %}
-                                {% set benefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : benefitIconKeys[index] %}
+                                {% set fallbackBenefit = systemBenefitIcons[index % (systemBenefitIcons|length)] %}
+                                {% set benefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : fallbackBenefit.key %}
+                                {% set benefitSource = benefit.media_source|default(benefit.image_id|default('') ? 'media:' ~ benefit.image_id : 'system-benefit:' ~ benefitIcon) %}
+                                {% set benefitImageUrl = benefit.image_url|default('/assets/system-media/benefits/' ~ benefitIcon ~ '.svg') %}
+                                {% set benefitColor = benefit.color|default(primaryColor) %}
                                 <div class="benefit-setting">
                                     <div class="benefit-setting-heading">
                                         <strong>Пункт {{ index + 1 }}</strong>
-                                        <span class="benefit-icon-swatch"><img src="/assets/system-media/benefits/{{ benefitIcon }}.svg" alt="" data-benefit-icon-preview></span>
+                                        <span class="benefit-icon-swatch {{ benefitSource starts with 'system-benefit:' ? 'is-system' : '' }}" style="--media-url: url('{{ benefitImageUrl }}'); --media-color: {{ benefitColor }}" data-media-preview>
+                                            <img src="{{ benefitImageUrl }}" alt="">
+                                        </span>
                                     </div>
-                                    <label>
-                                        <span>Иконка</span>
-                                        <select name="benefits[{{ index }}][icon]" data-benefit-icon-select>
-                                            {% for iconKey, iconLabel in benefitIcons %}<option value="{{ iconKey }}" {{ benefitIcon == iconKey ? 'selected' : '' }}>{{ iconLabel }}</option>{% endfor %}
-                                        </select>
-                                    </label>
+                                    <div class="media-choice-control">
+                                        <input type="hidden" name="benefits[{{ index }}][media]" value="{{ benefitSource }}" data-media-value>
+                                        <button class="button button-secondary" type="button" data-media-picker-open data-media-kind="benefit">Выбрать из медиатеки</button>
+                                        <label class="media-color-control"><span>Цвет иконки</span><input type="color" name="benefits[{{ index }}][color]" value="{{ benefitColor }}" data-benefit-color></label>
+                                    </div>
                                     <input name="benefits[{{ index }}][title]" type="text" maxlength="60" value="{{ benefit.title|default('') }}" placeholder="Например, быстрая доставка">
                                     <textarea name="benefits[{{ index }}][text]" maxlength="240" rows="2" placeholder="Короткое пояснение">{{ benefit.text|default('') }}</textarea>
                                 </div>
@@ -358,13 +368,20 @@
                             {% for index in 0..5 %}
                                 {% set review = reviews[index]|default({}) %}
                                 {% set reviewAvatar = review.avatar|default('') in reviewAvatarKeys ? review.avatar : systemReviewAvatars[index % (systemReviewAvatars|length)].key %}
+                                {% set reviewSource = review.media_source|default(review.avatar_image_id|default('') ? 'media:' ~ review.avatar_image_id : 'system-review:' ~ reviewAvatar) %}
+                                {% set reviewAvatarUrl = review.avatar_url|default('/assets/system-media/people/' ~ reviewAvatar ~ '.jpg') %}
+                                {% set reviewShape = review.avatar_shape|default('circle') %}
                                 <div class="editor-item">
                                     <strong>Отзыв {{ index + 1 }}</strong>
                                     <input name="reviews[{{ index }}][author]" type="text" maxlength="80" value="{{ review.author|default('') }}" placeholder="Имя покупателя">
                                     <textarea name="reviews[{{ index }}][text]" maxlength="600" rows="3" placeholder="Текст отзыва">{{ review.text|default('') }}</textarea>
                                     <div class="review-editor-meta">
-                                        <img src="/assets/system-media/people/{{ reviewAvatar }}.jpg" alt="" data-review-avatar-preview>
-                                        <label><span>Фото</span><select name="reviews[{{ index }}][avatar]" data-review-avatar-select>{% for avatar in systemReviewAvatars %}<option value="{{ avatar.key }}" {{ reviewAvatar == avatar.key ? 'selected' : '' }}>{{ avatar.label }}</option>{% endfor %}</select></label>
+                                        <span class="review-avatar-preview shape-{{ reviewShape }}" data-media-preview><img src="{{ reviewAvatarUrl }}" alt=""></span>
+                                        <div class="media-choice-control">
+                                            <input type="hidden" name="reviews[{{ index }}][media]" value="{{ reviewSource }}" data-media-value>
+                                            <button class="button button-secondary" type="button" data-media-picker-open data-media-kind="review">Выбрать фото</button>
+                                        </div>
+                                        <label><span>Форма фото</span><select name="reviews[{{ index }}][avatar_shape]" data-review-shape><option value="circle" {{ reviewShape == 'circle' ? 'selected' : '' }}>Круг</option><option value="rounded" {{ reviewShape == 'rounded' ? 'selected' : '' }}>Скруглённые углы</option><option value="square" {{ reviewShape == 'square' ? 'selected' : '' }}>Квадрат</option></select></label>
                                         <label><span>Оценка</span><select name="reviews[{{ index }}][rating]">{% for rating in 5..1 %}<option value="{{ rating }}" {{ review.rating|default(5) == rating ? 'selected' : '' }}>{{ rating }} из 5</option>{% endfor %}</select></label>
                                     </div>
                                 </div>
@@ -459,12 +476,15 @@
                             </div>
                             <span>Товары&nbsp;&nbsp; Корзина</span>
                         </header>
-                        <div class="preview-section preview-hero align-{{ heroAlignment }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}{% if heroImageId != '' %}; --preview-image: url('{{ firstHeroSlide.image_url|default('') }}'){% endif %}">
+                        <div class="preview-section preview-hero align-{{ heroAlignment }} vertical-{{ heroVerticalAlignment }} content-{{ heroContentWidth }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}; --preview-image-position: {{ heroImagePosition }}{% if heroImageId != '' %}; --preview-image: url('{{ firstHeroSlide.image_url|default('') }}'){% endif %}">
                             {{ _self.preview_tools('hero', sectionLabels.hero, true) }}
-                            <small class="preview-eyebrow" data-preview-eyebrow {{ firstHeroSlide.eyebrow|default('') == '' ? 'hidden' : '' }}>{{ firstHeroSlide.eyebrow|default('') }}</small>
-                            <h2 data-preview-title>{{ firstHeroSlide.title|default(settings.name) }}</h2>
-                            <p data-preview-text>{{ firstHeroSlide.text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
-                            <span class="preview-button" data-preview-button>{{ firstHeroSlide.button_label|default('Смотреть товары') }}</span>
+                            <div class="preview-hero-content" data-preview-hero-content>
+                                <small class="preview-eyebrow" data-preview-eyebrow {{ firstHeroSlide.eyebrow|default('') == '' ? 'hidden' : '' }}>{{ firstHeroSlide.eyebrow|default('') }}</small>
+                                <h2 data-preview-title>{{ firstHeroSlide.title|default(settings.name) }}</h2>
+                                <p data-preview-text>{{ firstHeroSlide.text|default('') ?: 'Описание вашего магазина и его главного предложения.' }}</p>
+                                <div class="preview-hero-actions"><span class="preview-button" data-preview-button>{{ firstHeroSlide.button_label|default('Смотреть товары') }}</span><span class="preview-button is-secondary" data-preview-secondary-button {{ firstHeroSlide.secondary_label|default('') == '' ? 'hidden' : '' }}>{{ firstHeroSlide.secondary_label|default('') }}</span></div>
+                            </div>
+                            <div class="preview-slide-switcher" data-preview-slide-switcher hidden><button type="button" data-preview-slide-prev aria-label="Предыдущий слайд">‹</button><div data-preview-slide-nav></div><button type="button" data-preview-slide-next aria-label="Следующий слайд">›</button></div>
                         </div>
                         <div class="preview-section preview-products" data-preview-section="featured">
                             {{ _self.preview_tools('featured', sectionLabels.featured) }}
@@ -480,7 +500,7 @@
                             {{ _self.preview_tools('benefits', sectionLabels.benefits) }}
                             <h3 data-preview-benefits-title>{{ theme.benefits_title|default('Почему выбирают нас') }}</h3>
                             <div data-preview-benefits-list>
-                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default('')) %}{% set previewBenefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : benefitIconKeys[loop.index0] %}<span><img src="/assets/system-media/benefits/{{ previewBenefitIcon }}.svg" alt=""><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
+                                {% for benefit in benefits|filter(item => item.title|default('') or item.text|default('')) %}{% set previewBenefitIcon = benefit.icon|default('') in benefitIconKeys ? benefit.icon : benefitIconKeys[loop.index0 % (benefitIconKeys|length)] %}{% set previewBenefitUrl = benefit.image_url|default('/assets/system-media/benefits/' ~ previewBenefitIcon ~ '.svg') %}{% set previewBenefitSystem = benefit.media_source|default('system-benefit:' ~ previewBenefitIcon) starts with 'system-benefit:' %}<span><i class="preview-benefit-media {{ previewBenefitSystem ? 'is-system' : '' }}" style="--media-url:url('{{ previewBenefitUrl }}');--media-color:{{ benefit.color|default(primaryColor) }}"><img src="{{ previewBenefitUrl }}" alt=""></i><strong>{{ benefit.title }}</strong><small>{{ benefit.text }}</small></span>{% endfor %}
                             </div>
                         </div>
                         <div class="preview-section preview-content" data-preview-section="content">
@@ -496,9 +516,9 @@
                             <div class="preview-review-list" data-preview-reviews-list>
                                 {% for review in reviews|filter(item => item.author|default('') or item.text|default('')) %}
                                     {% set previewAvatar = review.avatar|default('') in reviewAvatarKeys ? review.avatar : systemReviewAvatars[loop.index0 % (systemReviewAvatars|length)].key %}
-                                    <article><blockquote>{{ review.text }}</blockquote><div class="preview-review-author"><img src="/assets/system-media/people/{{ previewAvatar }}.jpg" alt=""><strong>{{ review.author }}</strong></div></article>
+                                    <article><blockquote>{{ review.text }}</blockquote><div class="preview-review-author"><img class="shape-{{ review.avatar_shape|default('circle') }}" src="{{ review.avatar_url|default('/assets/system-media/people/' ~ previewAvatar ~ '.jpg') }}" alt=""><strong>{{ review.author }}</strong></div></article>
                                 {% else %}
-                                    <article><blockquote>Здесь появится отзыв покупателя.</blockquote><div class="preview-review-author"><img src="/assets/system-media/people/person-1.jpg" alt=""><strong>Имя покупателя</strong></div></article>
+                                    <article><blockquote>Здесь появится отзыв покупателя.</blockquote><div class="preview-review-author"><img class="shape-circle" src="/assets/system-media/people/person-1.jpg" alt=""><strong>Имя покупателя</strong></div></article>
                                 {% endfor %}
                             </div>
                         </div>
@@ -559,9 +579,43 @@
                         </div>
                     </div>
                 </dialog>
+
+                <dialog class="appearance-media-dialog" data-media-picker-dialog aria-labelledby="media-picker-title">
+                    <div class="appearance-block-dialog-head">
+                        <div><p class="eyebrow">Общая медиатека</p><h2 id="media-picker-title" data-media-picker-title>Выберите изображение</h2></div>
+                        <button type="button" class="icon-button" data-media-picker-close aria-label="Закрыть">×</button>
+                    </div>
+                    <div class="appearance-media-picker-body">
+                        <section data-media-picker-group="benefit">
+                            <h3>Иконки Lucide</h3>
+                            <p class="field-hint">Единый аккуратный набор. Цвет задаётся отдельно.</p>
+                            <div class="appearance-media-picker-grid">
+                                {% for icon in systemBenefitIcons %}<button type="button" data-media-option data-media-kind="benefit" data-media-value="system-benefit:{{ icon.key }}" data-media-url="{{ icon.url }}" data-media-system="1"><span class="is-system" style="--media-url:url('{{ icon.url }}')"></span><strong>{{ icon.label }}</strong></button>{% endfor %}
+                            </div>
+                        </section>
+                        <section data-media-picker-group="review">
+                            <h3>Готовые фотографии</h3>
+                            <p class="field-hint">10 защищённых фото для отзывов.</p>
+                            <div class="appearance-media-picker-grid is-people">
+                                {% for avatar in systemReviewAvatars %}<button type="button" data-media-option data-media-kind="review" data-media-value="system-review:{{ avatar.key }}" data-media-url="{{ avatar.url }}"><img src="{{ avatar.url }}" alt=""><strong>{{ avatar.label }}</strong></button>{% endfor %}
+                            </div>
+                        </section>
+                        <section data-media-picker-group="uploads">
+                            <h3>Ваши изображения</h3>
+                            {% if mediaImages is not empty %}
+                                <div class="appearance-media-picker-grid">
+                                    {% for image in mediaImages %}<button type="button" data-media-option data-media-kind="upload" data-media-value="media:{{ image.id }}" data-media-url="{{ image.publicUrl }}"><img src="{{ image.publicUrl }}" alt=""><strong>{{ image.originalName ?: image.key }}</strong></button>{% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="muted">Вы ещё не загрузили своих изображений.</p>
+                            {% endif %}
+                        </section>
+                    </div>
+                    <footer class="appearance-media-dialog-footer"><a class="button button-secondary" href="{{ path('owner_media_library') }}">Открыть медиатеку</a></footer>
+                </dialog>
             </form>
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261014-builder-tabs" defer></script>
+    <script src="/assets/store-appearance.js?v=20261014-media-builder" defer></script>
 {% endblock %}

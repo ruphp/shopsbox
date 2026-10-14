@@ -12,9 +12,16 @@ final class SystemMediaCatalog
     public function reviewAvatars(): array
     {
         return [
-            ['key' => 'person-1', 'label' => 'Покупательница', 'url' => '/assets/system-media/people/person-1.jpg'],
-            ['key' => 'person-2', 'label' => 'Покупатель', 'url' => '/assets/system-media/people/person-2.jpg'],
-            ['key' => 'person-3', 'label' => 'Покупательница старшего возраста', 'url' => '/assets/system-media/people/person-3.jpg'],
+            ['key' => 'person-1', 'label' => 'Женщина, 30 лет', 'url' => '/assets/system-media/people/person-1.jpg'],
+            ['key' => 'person-2', 'label' => 'Мужчина, 35 лет', 'url' => '/assets/system-media/people/person-2.jpg'],
+            ['key' => 'person-3', 'label' => 'Женщина, 55 лет', 'url' => '/assets/system-media/people/person-3.jpg'],
+            ['key' => 'person-4', 'label' => 'Женщина, 28 лет', 'url' => '/assets/system-media/people/person-4.jpg'],
+            ['key' => 'person-5', 'label' => 'Мужчина, 45 лет', 'url' => '/assets/system-media/people/person-5.jpg'],
+            ['key' => 'person-6', 'label' => 'Женщина, 38 лет', 'url' => '/assets/system-media/people/person-6.jpg'],
+            ['key' => 'person-7', 'label' => 'Мужчина, 25 лет', 'url' => '/assets/system-media/people/person-7.jpg'],
+            ['key' => 'person-8', 'label' => 'Женщина, 60 лет', 'url' => '/assets/system-media/people/person-8.jpg'],
+            ['key' => 'person-9', 'label' => 'Мужчина, 60 лет', 'url' => '/assets/system-media/people/person-9.jpg'],
+            ['key' => 'person-10', 'label' => 'Женщина, 45 лет', 'url' => '/assets/system-media/people/person-10.jpg'],
         ];
     }
 

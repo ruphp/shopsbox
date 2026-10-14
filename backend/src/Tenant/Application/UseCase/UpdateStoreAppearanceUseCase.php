@@ -18,7 +18,7 @@ final readonly class UpdateStoreAppearanceUseCase
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
     private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'];
     private const BENEFIT_ICONS = ['delivery', 'quality', 'support', 'payment', 'return', 'secure', 'gift', 'stock', 'pickup', 'custom'];
-    private const REVIEW_AVATARS = ['person-1', 'person-2', 'person-3'];
+    private const REVIEW_AVATARS = ['person-1', 'person-2', 'person-3', 'person-4', 'person-5', 'person-6', 'person-7', 'person-8', 'person-9', 'person-10'];
 
     public function __construct(
         private StoreRepository $storeRepository,
@@ -47,6 +47,11 @@ final readonly class UpdateStoreAppearanceUseCase
         $primaryColor = strtolower(trim($input->primaryColor));
         if (!preg_match('/^#[0-9a-f]{6}$/', $primaryColor)) {
             throw InvalidTenantInput::forField('primary_color', 'Primary color must be HEX color.');
+        }
+
+        $images = [];
+        foreach ($this->mediaLibraryRepository->listByStore($current->storeId, 'image') as $image) {
+            $images[$image->id] = $image;
         }
 
         $heroTitle = trim($input->heroTitle);
@@ -118,11 +123,27 @@ final readonly class UpdateStoreAppearanceUseCase
             if ($title === '' || mb_strlen($title) > 60 || mb_strlen($text) > 240) {
                 throw InvalidTenantInput::forField('benefits', 'Each benefit needs a title up to 60 characters and text up to 240 characters.');
             }
-            $icon = trim((string) ($benefit['icon'] ?? ''));
-            if (!in_array($icon, self::BENEFIT_ICONS, true)) {
-                $icon = self::BENEFIT_ICONS[$benefitIndex % count(self::BENEFIT_ICONS)];
+            $fallbackIcon = self::BENEFIT_ICONS[$benefitIndex % count(self::BENEFIT_ICONS)];
+            $legacyIcon = trim((string) ($benefit['icon'] ?? ''));
+            $media = $this->normalizeMediaChoice(
+                (string) ($benefit['media'] ?? ($legacyIcon === '' ? '' : 'system-benefit:'.$legacyIcon)),
+                'benefit',
+                $fallbackIcon,
+                $images,
+            );
+            $color = strtolower(trim((string) ($benefit['color'] ?? $primaryColor)));
+            if (!preg_match('/^#[0-9a-f]{6}$/', $color)) {
+                $color = $primaryColor;
             }
-            $benefits[] = ['title' => $title, 'text' => $text, 'icon' => $icon];
+            $benefits[] = [
+                'title' => $title,
+                'text' => $text,
+                'icon' => $media['legacy_key'],
+                'media_source' => $media['source'],
+                'image_id' => $media['image_id'],
+                'image_url' => $media['image_url'],
+                'color' => $color,
+            ];
         }
         $contentTitle = trim($input->contentTitle);
         $contentText = trim($input->contentText);
@@ -154,15 +175,26 @@ final readonly class UpdateStoreAppearanceUseCase
             if ($author === '' || mb_strlen($author) > 80 || $text === '' || mb_strlen($text) > 600) {
                 throw InvalidTenantInput::forField('reviews', 'Each review needs an author up to 80 characters and text up to 600 characters.');
             }
-            $avatar = trim((string) ($review['avatar'] ?? ''));
-            if (!in_array($avatar, self::REVIEW_AVATARS, true)) {
-                $avatar = self::REVIEW_AVATARS[$reviewIndex % count(self::REVIEW_AVATARS)];
-            }
+            $fallbackAvatar = self::REVIEW_AVATARS[$reviewIndex % count(self::REVIEW_AVATARS)];
+            $legacyAvatar = trim((string) ($review['avatar'] ?? ''));
+            $media = $this->normalizeMediaChoice(
+                (string) ($review['media'] ?? ($legacyAvatar === '' ? '' : 'system-review:'.$legacyAvatar)),
+                'review',
+                $fallbackAvatar,
+                $images,
+            );
+            $avatarShape = in_array(($review['avatar_shape'] ?? null), ['circle', 'rounded', 'square'], true)
+                ? (string) $review['avatar_shape']
+                : 'circle';
             $reviews[] = [
                 'author' => $author,
                 'text' => $text,
                 'rating' => max(1, min(5, (int) ($review['rating'] ?? 5))),
-                'avatar' => $avatar,
+                'avatar' => $media['legacy_key'],
+                'media_source' => $media['source'],
+                'avatar_image_id' => $media['image_id'],
+                'avatar_url' => $media['image_url'],
+                'avatar_shape' => $avatarShape,
             ];
         }
         $faqTitle = $this->requiredHeading($input->faqTitle, 'faq_title');
@@ -189,10 +221,6 @@ final readonly class UpdateStoreAppearanceUseCase
         $sections = array_values(array_filter($sections, static fn (string $section): bool => $section !== 'hero'));
         array_unshift($sections, 'hero');
 
-        $images = [];
-        foreach ($this->mediaLibraryRepository->listByStore($current->storeId, 'image') as $image) {
-            $images[$image->id] = $image;
-        }
         $logo = $this->selectedImage($input->logoImageId, $images, 'logo_image_id');
         $heroImage = $this->selectedImage($input->heroImageId, $images, 'hero_image_id');
         $contentImage = $this->selectedImage($input->contentImageId, $images, 'content_image_id');
@@ -337,6 +365,42 @@ final readonly class UpdateStoreAppearanceUseCase
     }
 
     /**
+     * @param array<string, StoreMediaFileView> $images
+     *
+     * @return array{source: string, image_id: ?string, image_url: string, legacy_key: string}
+     */
+    private function normalizeMediaChoice(string $choice, string $kind, string $fallbackKey, array $images): array
+    {
+        $choice = trim($choice);
+        if (str_starts_with($choice, 'media:')) {
+            $image = $this->selectedImage(substr($choice, 6) ?: null, $images, $kind === 'benefit' ? 'benefits' : 'reviews');
+
+            return [
+                'source' => 'media:'.$image->id,
+                'image_id' => $image->id,
+                'image_url' => $image->publicUrl,
+                'legacy_key' => $fallbackKey,
+            ];
+        }
+
+        $prefix = $kind === 'benefit' ? 'system-benefit:' : 'system-review:';
+        $allowed = $kind === 'benefit' ? self::BENEFIT_ICONS : self::REVIEW_AVATARS;
+        $key = str_starts_with($choice, $prefix) ? substr($choice, strlen($prefix)) : '';
+        if (!in_array($key, $allowed, true)) {
+            $key = $fallbackKey;
+        }
+        $folder = $kind === 'benefit' ? 'benefits' : 'people';
+        $extension = $kind === 'benefit' ? 'svg' : 'jpg';
+
+        return [
+            'source' => $prefix.$key,
+            'image_id' => null,
+            'image_url' => sprintf('/assets/system-media/%s/%s.%s', $folder, $key, $extension),
+            'legacy_key' => $key,
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $slide
      * @param array<string, StoreMediaFileView> $images
      *
@@ -370,6 +434,15 @@ final readonly class UpdateStoreAppearanceUseCase
         $alignment = in_array(($slide['alignment'] ?? null), ['left', 'center', 'right'], true)
             ? (string) $slide['alignment']
             : 'left';
+        $verticalAlignment = in_array(($slide['vertical_alignment'] ?? null), ['top', 'center', 'bottom'], true)
+            ? (string) $slide['vertical_alignment']
+            : 'center';
+        $contentWidth = in_array(($slide['content_width'] ?? null), ['narrow', 'medium', 'wide'], true)
+            ? (string) $slide['content_width']
+            : 'medium';
+        $imagePosition = in_array(($slide['image_position'] ?? null), ['left', 'center', 'right'], true)
+            ? (string) $slide['image_position']
+            : 'center';
 
         return [
             'eyebrow' => $eyebrow,
@@ -380,6 +453,9 @@ final readonly class UpdateStoreAppearanceUseCase
             'secondary_label' => $secondaryLabel,
             'secondary_url' => $secondaryUrl,
             'alignment' => $alignment,
+            'vertical_alignment' => $verticalAlignment,
+            'content_width' => $contentWidth,
+            'image_position' => $imagePosition,
             'overlay' => max(0, min(90, (int) ($slide['overlay'] ?? 60))),
             'image_id' => $image?->id,
             'image_url' => $image?->publicUrl,

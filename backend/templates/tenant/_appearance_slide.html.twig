@@ -1,9 +1,12 @@
 {% set imageId = slide.image_id|default('') %}
-<article class="appearance-slide" data-hero-slide>
+<article class="appearance-slide {{ index == 0 ? 'is-active' : '' }}" data-hero-slide>
     <header class="appearance-slide-header">
         <div>
-            <span class="appearance-slide-handle" aria-hidden="true">↕</span>
-            <strong data-slide-number>Слайд {{ index + 1 }}</strong>
+            <span class="appearance-slide-handle" draggable="true" title="Перетащить слайд" aria-label="Перетащить слайд">↕</span>
+            <button class="appearance-slide-select" type="button" data-slide-select aria-expanded="{{ index == 0 ? 'true' : 'false' }}">
+                <strong data-slide-number>Слайд {{ index + 1 }}</strong>
+                <small data-slide-summary>{{ slide.title|default('') ?: 'Без заголовка' }}</small>
+            </button>
         </div>
         <div class="appearance-slide-actions">
             <button type="button" class="icon-button" data-slide-up title="Переместить выше" aria-label="Переместить слайд выше">↑</button>
@@ -12,6 +15,7 @@
         </div>
     </header>
 
+    <div class="appearance-slide-body" data-slide-body {{ index > 0 ? 'hidden' : '' }}>
     <label class="appearance-field">
         <span>Изображение</span>
         <select name="hero_slides[{{ index }}][image_id]" data-slide-field="image_id">
@@ -71,12 +75,39 @@
             </select>
         </label>
         <label class="appearance-field">
-            <span>Затемнение фона</span>
-            <select name="hero_slides[{{ index }}][overlay]" data-slide-field="overlay">
-                {% for value, label in {20: 'Слабое', 40: 'Лёгкое', 60: 'Среднее', 75: 'Сильное'} %}
-                    <option value="{{ value }}" {{ slide.overlay|default(60) == value ? 'selected' : '' }}>{{ label }}</option>
+            <span>Текст по высоте</span>
+            <select name="hero_slides[{{ index }}][vertical_alignment]" data-slide-field="vertical_alignment">
+                {% for value, label in {'top': 'Сверху', 'center': 'По центру', 'bottom': 'Снизу'} %}
+                    <option value="{{ value }}" {{ slide.vertical_alignment|default('center') == value ? 'selected' : '' }}>{{ label }}</option>
                 {% endfor %}
             </select>
         </label>
+    </div>
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Ширина текста</span>
+            <select name="hero_slides[{{ index }}][content_width]" data-slide-field="content_width">
+                {% for value, label in {'narrow': 'Узкая', 'medium': 'Средняя', 'wide': 'Широкая'} %}
+                    <option value="{{ value }}" {{ slide.content_width|default('medium') == value ? 'selected' : '' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="appearance-field">
+            <span>Фокус изображения</span>
+            <select name="hero_slides[{{ index }}][image_position]" data-slide-field="image_position">
+                {% for value, label in {'left': 'Слева', 'center': 'По центру', 'right': 'Справа'} %}
+                    <option value="{{ value }}" {{ slide.image_position|default('center') == value ? 'selected' : '' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+    <label class="appearance-field">
+        <span>Затемнение фона</span>
+        <select name="hero_slides[{{ index }}][overlay]" data-slide-field="overlay">
+            {% for value, label in {20: 'Слабое', 40: 'Лёгкое', 60: 'Среднее', 75: 'Сильное'} %}
+                <option value="{{ value }}" {{ slide.overlay|default(60) == value ? 'selected' : '' }}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </label>
     </div>
 </article>

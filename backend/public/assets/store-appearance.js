@@ -11,6 +11,9 @@
     const previewText = preview.querySelector('[data-preview-text]');
     const previewEyebrow = preview.querySelector('[data-preview-eyebrow]');
     const previewButton = preview.querySelector('[data-preview-button]');
+    const previewSecondaryButton = preview.querySelector('[data-preview-secondary-button]');
+    const previewSlideSwitcher = preview.querySelector('[data-preview-slide-switcher]');
+    const previewSlideNav = preview.querySelector('[data-preview-slide-nav]');
     const previewLogo = preview.querySelector('[data-preview-logo]');
     const previewStoreName = preview.querySelector('[data-preview-store-name]');
     const showStoreNameWithLogo = editor.querySelector('[name="show_store_name_with_logo"]');
@@ -24,22 +27,54 @@
     const blockLibrary = editor.querySelector('[data-preview-block-library]');
     const previewStage = editor.querySelector('[data-preview-stage]');
     const blockDialog = editor.querySelector('[data-block-library-dialog]');
+    const mediaPickerDialog = editor.querySelector('[data-media-picker-dialog]');
     const editorTabs = [...editor.querySelectorAll('[data-editor-tab]')];
     const sectionControl = (name) => sectionOptions.querySelector(`[data-section-control="${name}"]`);
     const sectionEnabled = (control) => control.querySelector('input[type="checkbox"]').checked;
     const slideElements = () => [...slides.querySelectorAll('[data-hero-slide]')];
     const field = (slide, name) => slide.querySelector(`[data-slide-field="${name}"]`);
+    let activeSlide = slideElements()[0] || null;
+    let mediaPickerTarget = null;
+
+    const mediaInfo = (value) => {
+        const option = [...mediaPickerDialog.querySelectorAll('[data-media-option]')]
+            .find((item) => item.dataset.mediaValue === value);
+        return {
+            url: option?.dataset.mediaUrl || '',
+            system: option?.dataset.mediaSystem === '1',
+        };
+    };
+
+    const setSlideExpanded = (slide, expanded) => {
+        slide.querySelector('[data-slide-body]').hidden = !expanded;
+        slide.querySelector('[data-slide-select]').setAttribute('aria-expanded', String(expanded));
+    };
+
+    const selectSlide = (slide, expand = false) => {
+        if (!slide) return;
+        activeSlide = slide;
+        slideElements().forEach((item) => {
+            item.classList.toggle('is-active', item === slide);
+            if (expand) setSlideExpanded(item, item === slide);
+        });
+        updateHeroPreview();
+    };
 
     const updateHeroPreview = () => {
-        const first = slideElements()[0];
-        if (!first) return;
-        const title = field(first, 'title').value.trim();
-        const text = field(first, 'text').value.trim();
-        const eyebrow = field(first, 'eyebrow').value.trim();
-        const button = field(first, 'button_label').value.trim();
-        const alignment = field(first, 'alignment').value;
-        const overlay = Number(field(first, 'overlay').value) / 100;
-        const imageUrl = field(first, 'image_id').selectedOptions[0]?.dataset.imageUrl || '';
+        const slide = activeSlide && slides.contains(activeSlide) ? activeSlide : slideElements()[0];
+        if (!slide) return;
+        activeSlide = slide;
+        const title = field(slide, 'title').value.trim();
+        const text = field(slide, 'text').value.trim();
+        const eyebrow = field(slide, 'eyebrow').value.trim();
+        const button = field(slide, 'button_label').value.trim();
+        const secondaryButton = field(slide, 'secondary_label').value.trim();
+        const alignment = field(slide, 'alignment').value;
+        const verticalAlignment = field(slide, 'vertical_alignment').value;
+        const contentWidth = field(slide, 'content_width').value;
+        const imagePosition = field(slide, 'image_position').value;
+        const overlay = Number(field(slide, 'overlay').value) / 100;
+        const imageUrl = field(slide, 'image_id').selectedOptions[0]?.dataset.imageUrl || '';
 
         previewTitle.textContent = title || 'Ваш магазин';
         previewText.textContent = text || 'Описание вашего магазина и его главного предложения.';
@@ -47,12 +82,26 @@
         previewEyebrow.hidden = eyebrow === '';
         previewButton.textContent = button || 'Смотреть товары';
         previewButton.hidden = button === '';
+        previewSecondaryButton.textContent = secondaryButton;
+        previewSecondaryButton.hidden = secondaryButton === '';
         previewHero.classList.remove('align-left', 'align-center', 'align-right');
         previewHero.classList.add(`align-${alignment}`);
+        previewHero.classList.remove('vertical-top', 'vertical-center', 'vertical-bottom');
+        previewHero.classList.add(`vertical-${verticalAlignment}`);
+        previewHero.classList.remove('content-narrow', 'content-medium', 'content-wide');
+        previewHero.classList.add(`content-${contentWidth}`);
         previewHero.style.setProperty('--preview-overlay', overlay);
+        previewHero.style.setProperty('--preview-image-position', imagePosition);
         previewHero.classList.toggle('has-image', imageUrl !== '');
         if (imageUrl === '') previewHero.style.removeProperty('--preview-image');
         else previewHero.style.setProperty('--preview-image', `url("${imageUrl.replaceAll('"', '%22')}")`);
+        slideElements().forEach((item, index) => {
+            const dot = previewSlideNav.children[index];
+            if (!dot) return;
+            const active = item === slide;
+            dot.classList.toggle('is-active', active);
+            dot.setAttribute('aria-pressed', String(active));
+        });
     };
 
     const updateSlideImage = (slide) => {
@@ -62,10 +111,25 @@
         if (imageUrl !== '') imageWrap.querySelector('img').src = imageUrl;
     };
 
+    const updateSlideNavigator = () => {
+        const items = slideElements();
+        previewSlideSwitcher.hidden = items.length <= 1;
+        previewSlideNav.replaceChildren(...items.map((slide, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.previewSlide = String(index);
+            button.setAttribute('aria-label', `Показать слайд ${index + 1}`);
+            button.setAttribute('aria-pressed', String(slide === activeSlide));
+            button.classList.toggle('is-active', slide === activeSlide);
+            return button;
+        }));
+    };
+
     const renumberSlides = () => {
         const items = slideElements();
         items.forEach((slide, index) => {
             slide.querySelector('[data-slide-number]').textContent = `Слайд ${index + 1}`;
+            slide.querySelector('[data-slide-summary]').textContent = field(slide, 'title').value.trim() || 'Без заголовка';
             slide.querySelectorAll('[name]').forEach((input) => {
                 input.name = input.name.replace(/hero_slides\[\d+]/, `hero_slides[${index}]`);
             });
@@ -75,6 +139,8 @@
         });
         addSlide.disabled = items.length >= 5;
         addSlide.textContent = items.length >= 5 ? 'Добавлено максимум 5 слайдов' : 'Добавить слайд';
+        if (!activeSlide || !slides.contains(activeSlide)) activeSlide = items[0] || null;
+        updateSlideNavigator();
         updateHeroPreview();
     };
 
@@ -116,7 +182,8 @@
             .map((titleInput) => ({
                 title: titleInput.value.trim(),
                 text: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[text]')}"]`)?.value.trim() || '',
-                icon: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[icon]')}"]`)?.value || 'delivery',
+                media: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[media]')}"]`)?.value || 'system-benefit:delivery',
+                color: editor.querySelector(`[name="${titleInput.name.replace('[title]', '[color]')}"]`)?.value || '#0077b6',
             }))
             .filter((benefit) => benefit.title || benefit.text)
             .slice(0, 6);
@@ -124,11 +191,17 @@
         preview.querySelector('[data-preview-benefits-title]').textContent = value('benefits_title') || 'Почему выбирают нас';
         benefitsList.replaceChildren(...benefits.map((benefit) => {
             const item = document.createElement('span');
-            const icon = document.createElement('img');
+            const icon = document.createElement('i');
+            const image = document.createElement('img');
             const title = document.createElement('strong');
             const text = document.createElement('small');
-            icon.src = `/assets/system-media/benefits/${benefit.icon}.svg`;
-            icon.alt = '';
+            const info = mediaInfo(benefit.media);
+            icon.className = `preview-benefit-media${info.system ? ' is-system' : ''}`;
+            icon.style.setProperty('--media-url', `url("${info.url.replaceAll('"', '%22')}")`);
+            icon.style.setProperty('--media-color', benefit.color);
+            image.src = info.url;
+            image.alt = '';
+            icon.append(image);
             title.textContent = benefit.title || 'Преимущество';
             text.textContent = benefit.text;
             item.append(icon, title, text);
@@ -151,11 +224,12 @@
             .map((authorInput) => ({
                 author: authorInput.value.trim(),
                 text: editor.querySelector(`[name="${authorInput.name.replace('[author]', '[text]')}"]`)?.value.trim() || '',
-                avatar: editor.querySelector(`[name="${authorInput.name.replace('[author]', '[avatar]')}"]`)?.value || 'person-1',
+                media: editor.querySelector(`[name="${authorInput.name.replace('[author]', '[media]')}"]`)?.value || 'system-review:person-1',
+                shape: editor.querySelector(`[name="${authorInput.name.replace('[author]', '[avatar_shape]')}"]`)?.value || 'circle',
             }))
             .filter((review) => review.author || review.text)
             .slice(0, 8);
-        const reviewItems = reviews.length > 0 ? reviews : [{ author: 'Имя покупателя', text: 'Здесь появится отзыв покупателя.', avatar: 'person-1' }];
+        const reviewItems = reviews.length > 0 ? reviews : [{ author: 'Имя покупателя', text: 'Здесь появится отзыв покупателя.', media: 'system-review:person-1', shape: 'circle' }];
         preview.querySelector('[data-preview-reviews-list]').replaceChildren(...reviewItems.map((review) => {
             const item = document.createElement('article');
             const text = document.createElement('blockquote');
@@ -164,8 +238,9 @@
             const author = document.createElement('strong');
             text.textContent = review.text || 'Отзыв покупателя';
             author.textContent = review.author || 'Покупатель';
-            avatar.src = `/assets/system-media/people/${review.avatar}.jpg`;
+            avatar.src = mediaInfo(review.media).url;
             avatar.alt = '';
+            avatar.className = `shape-${review.shape}`;
             authorRow.className = 'preview-review-author';
             authorRow.append(avatar, author);
             item.append(text, authorRow);
@@ -221,7 +296,14 @@
     };
 
     editor.addEventListener('input', (event) => {
-        if (event.target.closest('[data-hero-slide]')) updateHeroPreview();
+        const slide = event.target.closest('[data-hero-slide]');
+        if (slide) {
+            activeSlide = slide;
+            slide.classList.add('is-active');
+            slideElements().filter((item) => item !== slide).forEach((item) => item.classList.remove('is-active'));
+            slide.querySelector('[data-slide-summary]').textContent = field(slide, 'title').value.trim() || 'Без заголовка';
+            updateHeroPreview();
+        }
         if (event.target === featuredTitleInput) updateProductsPreview();
         if (event.target.closest('[data-config-section="benefits"], [data-config-section="content"], [data-config-section="reviews"], [data-config-section="faq"]')) updateRichPreviews();
     });
@@ -234,13 +316,15 @@
         }
         if (event.target.closest('[data-config-section="benefits"]')) {
             const setting = event.target.closest('.benefit-setting');
-            if (event.target.matches('[data-benefit-icon-select]')) {
-                setting.querySelector('[data-benefit-icon-preview]').src = `/assets/system-media/benefits/${event.target.value}.svg`;
+            if (event.target.matches('[data-benefit-color]')) {
+                setting.querySelector('[data-media-preview]').style.setProperty('--media-color', event.target.value);
             }
             updateRichPreviews();
         }
-        if (event.target.matches('[data-review-avatar-select]')) {
-            event.target.closest('.review-editor-meta').querySelector('[data-review-avatar-preview]').src = `/assets/system-media/people/${event.target.value}.jpg`;
+        if (event.target.matches('[data-review-shape]')) {
+            const avatar = event.target.closest('.review-editor-meta').querySelector('[data-media-preview]');
+            avatar.classList.remove('shape-circle', 'shape-rounded', 'shape-square');
+            avatar.classList.add(`shape-${event.target.value}`);
         }
         if (event.target.closest('[data-config-section="content"], [data-config-section="reviews"], [data-config-section="faq"]')) updateRichPreviews();
     });
@@ -328,6 +412,40 @@
         });
     });
 
+    editor.querySelectorAll('[data-media-picker-open]').forEach((button) => {
+        button.addEventListener('click', () => {
+            mediaPickerTarget = button.closest('.benefit-setting, .editor-item');
+            const kind = button.dataset.mediaKind;
+            mediaPickerDialog.dataset.mediaKind = kind;
+            mediaPickerDialog.querySelector('[data-media-picker-title]').textContent = kind === 'benefit'
+                ? 'Выберите иконку или изображение'
+                : 'Выберите фото для отзыва';
+            mediaPickerDialog.querySelectorAll('[data-media-picker-group]').forEach((group) => {
+                group.hidden = group.dataset.mediaPickerGroup !== kind && group.dataset.mediaPickerGroup !== 'uploads';
+            });
+            const selectedValue = mediaPickerTarget.querySelector('[data-media-value]').value;
+            mediaPickerDialog.querySelectorAll('[data-media-option]').forEach((option) => {
+                option.classList.toggle('is-selected', option.dataset.mediaValue === selectedValue);
+            });
+            mediaPickerDialog.showModal();
+        });
+    });
+    mediaPickerDialog.querySelector('[data-media-picker-close]').addEventListener('click', () => mediaPickerDialog.close());
+    mediaPickerDialog.addEventListener('click', (event) => {
+        if (event.target === mediaPickerDialog) mediaPickerDialog.close();
+        const option = event.target.closest('[data-media-option]');
+        if (!option || !mediaPickerTarget) return;
+        const input = mediaPickerTarget.querySelector('[data-media-value]');
+        const imageWrap = mediaPickerTarget.querySelector('[data-media-preview]');
+        const image = imageWrap.querySelector('img');
+        input.value = option.dataset.mediaValue;
+        image.src = option.dataset.mediaUrl;
+        imageWrap.classList.toggle('is-system', option.dataset.mediaSystem === '1');
+        imageWrap.style.setProperty('--media-url', `url("${option.dataset.mediaUrl.replaceAll('"', '%22')}")`);
+        mediaPickerDialog.close();
+        updateRichPreviews();
+    });
+
     editor.querySelectorAll('button[data-preview-device]').forEach((button) => {
         button.addEventListener('click', () => {
             previewStage.dataset.previewDevice = button.dataset.previewDevice;
@@ -340,6 +458,24 @@
     });
 
     editor.addEventListener('click', (event) => {
+        const previewSlideButton = event.target.closest('[data-preview-slide], [data-preview-slide-prev], [data-preview-slide-next]');
+        if (previewSlideButton) {
+            const items = slideElements();
+            let index = items.indexOf(activeSlide);
+            if (previewSlideButton.matches('[data-preview-slide]')) index = Number(previewSlideButton.dataset.previewSlide);
+            if (previewSlideButton.matches('[data-preview-slide-prev]')) index = (index - 1 + items.length) % items.length;
+            if (previewSlideButton.matches('[data-preview-slide-next]')) index = (index + 1) % items.length;
+            selectSlide(items[index]);
+            return;
+        }
+        const slideSelect = event.target.closest('[data-slide-select]');
+        if (slideSelect) {
+            const slide = slideSelect.closest('[data-hero-slide]');
+            const shouldExpand = slide.querySelector('[data-slide-body]').hidden || slide !== activeSlide;
+            selectSlide(slide, shouldExpand);
+            if (!shouldExpand) setSlideExpanded(slide, false);
+            return;
+        }
         const previewAction = event.target.closest('[data-preview-up], [data-preview-down], [data-preview-edit], [data-preview-hide], [data-preview-add]');
         if (previewAction) {
             const name = previewAction.dataset.previewAdd || previewAction.closest('[data-preview-section]')?.dataset.previewSection;
@@ -387,7 +523,9 @@
         } else if (action.matches('[data-slide-down]') && slide.nextElementSibling) {
             slides.insertBefore(slide.nextElementSibling, slide);
         } else if (action.matches('[data-slide-remove]') && slideElements().length > 1) {
+            const replacement = slide.nextElementSibling || slide.previousElementSibling;
             slide.remove();
+            if (activeSlide === slide) activeSlide = replacement;
         }
         renumberSlides();
     });
@@ -397,6 +535,7 @@
         const slide = slideTemplate.content.firstElementChild.cloneNode(true);
         slides.appendChild(slide);
         updateSlideImage(slide);
+        selectSlide(slide, true);
         renumberSlides();
         slide.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
@@ -431,6 +570,26 @@
     orderedControls.forEach((control) => sectionOptions.appendChild(control));
     const heroControl = sectionOptions.querySelector('[data-section-control="hero"]');
     if (heroControl) sectionOptions.prepend(heroControl);
+
+    slides.addEventListener('dragstart', (event) => {
+        if (!event.target.matches('.appearance-slide-handle')) return;
+        const slide = event.target.closest('[data-hero-slide]');
+        slide.classList.add('is-dragging');
+        activeSlide = slide;
+    });
+    slides.addEventListener('dragover', (event) => {
+        const dragging = slides.querySelector('.is-dragging');
+        if (!dragging) return;
+        event.preventDefault();
+        const target = event.target.closest('[data-hero-slide]');
+        if (!target || target === dragging) return;
+        const bounds = target.getBoundingClientRect();
+        slides.insertBefore(dragging, event.clientY < bounds.top + bounds.height / 2 ? target : target.nextElementSibling);
+    });
+    slides.addEventListener('dragend', () => {
+        slides.querySelector('.is-dragging')?.classList.remove('is-dragging');
+        renumberSlides();
+    });
 
     sectionOptions.addEventListener('dragstart', (event) => {
         if (!event.target.matches('.section-drag-handle')) return;
@@ -477,7 +636,11 @@
         updateSections();
     });
 
-    slideElements().forEach(updateSlideImage);
+    slideElements().forEach((slide, index) => {
+        updateSlideImage(slide);
+        setSlideExpanded(slide, index === 0);
+    });
+    activeSlide = slideElements()[0] || null;
     renumberSlides();
     updateProductsPreview();
     updateFeaturedSource();

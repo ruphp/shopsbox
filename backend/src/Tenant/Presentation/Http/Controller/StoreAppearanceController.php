@@ -65,6 +65,7 @@ final readonly class StoreAppearanceController
             'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
             'categories' => $this->categoryRepository->listByStore($settings->storeId),
             'products' => $this->listProducts->execute($settings->storeId),
+            'systemBenefitIcons' => $this->systemMediaCatalog->benefitIcons(),
             'systemReviewAvatars' => $this->systemMediaCatalog->reviewAvatars(),
         ]));
     }
@@ -138,6 +139,7 @@ final readonly class StoreAppearanceController
                 'mediaImages' => $this->listMediaLibrary->execute($ownerEmail, 'image')->files,
                 'categories' => $this->categoryRepository->listByStore($settings->storeId),
                 'products' => $this->listProducts->execute($settings->storeId),
+                'systemBenefitIcons' => $this->systemMediaCatalog->benefitIcons(),
                 'systemReviewAvatars' => $this->systemMediaCatalog->reviewAvatars(),
             ]), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (StoreSettingsAccessDenied $exception) {

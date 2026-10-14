@@ -14,6 +14,7 @@
         button_label: theme.hero_button_label|default('Смотреть товары'), button_url: '',
         secondary_label: '', secondary_url: '',
         alignment: theme.hero_alignment|default('left'), overlay: theme.hero_overlay|default(60),
+        vertical_alignment: 'center', content_width: 'medium', image_position: 'center',
         image_url: theme.hero_image_url|default('')
     }] %}
 {% endif %}
@@ -24,7 +25,7 @@
 {% set featured_show_description = theme.featured_show_description|default(true) %}
 {% set featured_layout = theme.featured_layout|default('grid') %}
 {% set benefit_icon_keys = ['delivery', 'quality', 'support', 'payment', 'return', 'secure', 'gift', 'stock', 'pickup', 'custom'] %}
-{% set review_avatar_keys = ['person-1', 'person-2', 'person-3'] %}
+{% set review_avatar_keys = ['person-1', 'person-2', 'person-3', 'person-4', 'person-5', 'person-6', 'person-7', 'person-8', 'person-9', 'person-10'] %}
 {% set seo_title = theme.seo_title|default('') ?: store.name %}
 {% set seo_description = theme.seo_description|default('') ?: (store.publicDescription|default('') ?: 'Открытая витрина магазина ' ~ store.name ~ ' с опубликованными товарами.') %}
 
@@ -54,17 +55,19 @@
                         {% for slide in hero_slides %}
                             {% set slide_image = slide.image_url|default('') %}
                             {% set primary_url = slide.button_url|default('') ?: path(storefront_products_route, {storeSlug: store.slug}) %}
-                            <article class="hero storefront-hero storefront-hero-slide align-{{ slide.alignment|default('left') }} {{ slide_image ? 'has-image' : '' }} {{ loop.first ? 'is-active' : '' }}" data-hero-slide aria-hidden="{{ loop.first ? 'false' : 'true' }}" style="--storefront-hero-overlay: {{ slide.overlay|default(60) / 100 }}{% if slide_image %}; --storefront-hero-image: url('{{ slide_image }}'){% endif %}">
+                            <article class="hero storefront-hero storefront-hero-slide align-{{ slide.alignment|default('left') }} vertical-{{ slide.vertical_alignment|default('center') }} content-{{ slide.content_width|default('medium') }} {{ slide_image ? 'has-image' : '' }} {{ loop.first ? 'is-active' : '' }}" data-hero-slide aria-hidden="{{ loop.first ? 'false' : 'true' }}" style="--storefront-hero-overlay: {{ slide.overlay|default(60) / 100 }}; --storefront-hero-position: {{ slide.image_position|default('center') }}{% if slide_image %}; --storefront-hero-image: url('{{ slide_image }}'){% endif %}">
                                 <div class="wrap">
-                                    {% if slide.eyebrow|default('') %}<p class="storefront-hero-eyebrow">{{ slide.eyebrow }}</p>{% endif %}
-                                    {% if loop.first %}<h1>{{ slide.title }}</h1>{% else %}<h2>{{ slide.title }}</h2>{% endif %}
-                                    {% if slide.text|default('') %}<p>{{ slide.text }}</p>{% endif %}
-                                    {% if slide.button_label|default('') or slide.secondary_label|default('') %}
-                                        <div class="storefront-hero-actions">
-                                            {% if slide.button_label|default('') %}<a class="button" href="{{ primary_url }}">{{ slide.button_label }}</a>{% endif %}
-                                            {% if slide.secondary_label|default('') and slide.secondary_url|default('') %}<a class="button button-secondary" href="{{ slide.secondary_url }}">{{ slide.secondary_label }}</a>{% endif %}
-                                        </div>
-                                    {% endif %}
+                                    <div class="storefront-hero-content">
+                                        {% if slide.eyebrow|default('') %}<p class="storefront-hero-eyebrow">{{ slide.eyebrow }}</p>{% endif %}
+                                        {% if loop.first %}<h1>{{ slide.title }}</h1>{% else %}<h2>{{ slide.title }}</h2>{% endif %}
+                                        {% if slide.text|default('') %}<p>{{ slide.text }}</p>{% endif %}
+                                        {% if slide.button_label|default('') or slide.secondary_label|default('') %}
+                                            <div class="storefront-hero-actions">
+                                                {% if slide.button_label|default('') %}<a class="button" href="{{ primary_url }}">{{ slide.button_label }}</a>{% endif %}
+                                                {% if slide.secondary_label|default('') and slide.secondary_url|default('') %}<a class="button button-secondary" href="{{ slide.secondary_url }}">{{ slide.secondary_label }}</a>{% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </article>
                         {% endfor %}
@@ -150,9 +153,11 @@
                         <h2>{{ theme.benefits_title|default('Почему выбирают нас') }}</h2>
                         <div class="storefront-benefit-grid">
                             {% for benefit in theme.benefits %}
-                                {% set benefit_icon = benefit.icon|default('') in benefit_icon_keys ? benefit.icon : benefit_icon_keys[loop.index0] %}
+                                {% set benefit_icon = benefit.icon|default('') in benefit_icon_keys ? benefit.icon : benefit_icon_keys[loop.index0 % (benefit_icon_keys|length)] %}
+                                {% set benefit_url = benefit.image_url|default('/assets/system-media/benefits/' ~ benefit_icon ~ '.svg') %}
+                                {% set benefit_system = benefit.media_source|default('system-benefit:' ~ benefit_icon) starts with 'system-benefit:' %}
                                 <article>
-                                    <span class="storefront-benefit-icon" aria-hidden="true"><img src="/assets/system-media/benefits/{{ benefit_icon }}.svg" alt=""></span>
+                                    <span class="storefront-benefit-icon {{ benefit_system ? 'is-system' : '' }}" style="--benefit-media:url('{{ benefit_url }}');--benefit-color:{{ benefit.color|default(primary_color) }}" aria-hidden="true"><img src="{{ benefit_url }}" alt=""></span>
                                     <h3>{{ benefit.title }}</h3>
                                     {% if benefit.text %}<p>{{ benefit.text }}</p>{% endif %}
                                 </article>
@@ -185,7 +190,7 @@
                                 <article>
                                     <div class="storefront-review-rating" aria-label="Оценка {{ review.rating }} из 5">{% for star in 1..5 %}<span class="{{ star <= review.rating ? 'is-filled' : '' }}" aria-hidden="true">★</span>{% endfor %}</div>
                                     <blockquote>{{ review.text }}</blockquote>
-                                    <div class="storefront-review-author"><img src="/assets/system-media/people/{{ review_avatar }}.jpg" alt=""><strong>{{ review.author }}</strong></div>
+                                    <div class="storefront-review-author"><img class="shape-{{ review.avatar_shape|default('circle') }}" src="{{ review.avatar_url|default('/assets/system-media/people/' ~ review_avatar ~ '.jpg') }}" alt=""><strong>{{ review.author }}</strong></div>
                                 </article>
                             {% endfor %}
                         </div>

@@ -123,6 +123,16 @@ final readonly class DoctrineStoreMediaLibraryRepository implements StoreMediaLi
             }
         }
         if (($theme['content_image_id'] ?? null) === $fileId) { $usage[] = $prefix.'Текстовый блок'; }
+        foreach ((array) ($theme['benefits'] ?? []) as $index => $benefit) {
+            if (is_array($benefit) && ($benefit['image_id'] ?? null) === $fileId) {
+                $usage[] = $prefix.'Преимущество '.($index + 1);
+            }
+        }
+        foreach ((array) ($theme['reviews'] ?? []) as $index => $review) {
+            if (is_array($review) && ($review['avatar_image_id'] ?? null) === $fileId) {
+                $usage[] = $prefix.'Отзыв '.($index + 1);
+            }
+        }
 
         return $usage;
     }
