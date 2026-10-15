@@ -45,11 +45,23 @@
     {% set heroContentWidth = firstHeroSlide.content_width|default('medium') %}
     {% set heroImagePosition = firstHeroSlide.image_position|default('center') %}
     {% set heroOverlay = firstHeroSlide.overlay|default(60) %}
-    {% set featuredColumns = theme.featured_columns|default(4) %}
-    {% set featuredShowDescription = theme.featured_show_description|default(true) %}
-    {% set featuredSource = theme.featured_source|default('latest') %}
-    {% set featuredProductIds = theme.featured_product_ids|default([]) %}
-    {% set featuredLayout = theme.featured_layout|default('grid') %}
+    {% set productBlocks = theme.product_blocks|default([]) %}
+    {% if productBlocks is empty %}
+        {% set productBlocks = [{
+            id: 'featured', title: theme.featured_title|default('Популярное'),
+            columns: theme.featured_columns|default(4), show_description: theme.featured_show_description|default(true),
+            layout: theme.featured_layout|default('grid'), limit: theme.featured_limit|default(6),
+            source: theme.featured_source|default('latest'), category_slug: theme.featured_category_slug|default(''),
+            product_ids: theme.featured_product_ids|default([]), autoplay: theme.featured_autoplay|default(true),
+            interval: theme.featured_interval|default(5)
+        }] %}
+    {% endif %}
+    {% set firstProductBlock = productBlocks|first %}
+    {% set normalizedSections = [] %}
+    {% for section in sections %}
+        {% set normalizedSections = normalizedSections|merge([section == 'featured' ? 'product:' ~ firstProductBlock.id : section]) %}
+    {% endfor %}
+    {% set sections = normalizedSections %}
     {% set categoryImages = theme.category_images|default({}) %}
     {% set benefits = theme.benefits|default([]) %}
     {% if benefits is empty %}{% set benefits = [{title: '', text: ''}, {title: '', text: ''}, {title: '', text: ''}] %}{% endif %}
@@ -57,7 +69,10 @@
     {% set reviews = theme.reviews|default([]) %}
     {% set reviewAvatarKeys = systemReviewAvatars|map(item => item.key) %}
     {% set faqs = theme.faqs|default([]) %}
-    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'featured': 'Товары', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'reviews': 'Отзывы', 'faq': 'Частые вопросы', 'contacts': 'Контакты'} %}
+    {% set sectionLabels = {'hero': 'Главный блок', 'categories': 'Категории', 'benefits': 'Преимущества', 'content': 'Текст и изображение', 'reviews': 'Отзывы', 'faq': 'Частые вопросы', 'contacts': 'Контакты'} %}
+    {% for productBlock in productBlocks %}
+        {% set sectionLabels = sectionLabels|merge({('product:' ~ productBlock.id): productBlock.title}) %}
+    {% endfor %}
     {% set sectionPositions = {} %}
     {% for enabledSection in sections %}
         {% set sectionPositions = sectionPositions|merge({(enabledSection): loop.index}) %}
@@ -219,82 +234,15 @@
                         </template>
                     </fieldset>
 
-                    <fieldset class="appearance-group" data-config-section="featured" data-editor-panel="layout">
-                        <legend>Товары на главной</legend>
-                        <label class="appearance-field" for="featured-source">
-                            <span>Какие товары показывать</span>
-                            <select id="featured-source" name="featured_source" data-featured-source>
-                                <option value="latest" {{ featuredSource == 'latest' ? 'selected' : '' }}>Новинки</option>
-                                <option value="popular" {{ featuredSource == 'popular' ? 'selected' : '' }}>Популярные по просмотрам</option>
-                                <option value="category" {{ featuredSource == 'category' ? 'selected' : '' }}>Из категории</option>
-                                <option value="manual" {{ featuredSource == 'manual' ? 'selected' : '' }}>Рекомендуемые (выбрать вручную)</option>
-                            </select>
-                            <small class="field-hint">Новинки сортируются по дате, популярные по просмотрам, рекомендуемые вы выбираете сами.</small>
-                        </label>
-                        <div data-featured-source-panel="category" {{ featuredSource != 'category' ? 'hidden' : '' }}>
-                            <label class="appearance-field" for="featured-category">
-                                <span>Категория</span>
-                                <select id="featured-category" name="featured_category_slug">
-                                    <option value="">Выберите категорию</option>
-                                    {% for category in categories %}<option value="{{ category.slug }}" {{ theme.featured_category_slug|default('') == category.slug ? 'selected' : '' }}>{{ category.name }}</option>{% endfor %}
-                                </select>
-                            </label>
-                        </div>
-                        <div class="featured-product-picker" data-featured-source-panel="manual" {{ featuredSource != 'manual' ? 'hidden' : '' }}>
-                            <span>Товары и порядок</span>
-                            <p class="field-hint">Отметьте товары. На витрине они появятся в порядке этого списка.</p>
-                            {% for product in products %}
-                                <label>
-                                    <input type="checkbox" name="featured_product_ids[]" value="{{ product.id }}" {{ product.id in featuredProductIds ? 'checked' : '' }}>
-                                    <span>{{ product.name }}</span>
-                                    <small>{{ product.price|number_format(2, ',', ' ') }} ₽</small>
-                                </label>
-                            {% else %}
-                                <p class="muted">Сначала добавьте товары.</p>
-                            {% endfor %}
-                        </div>
-                        <label class="appearance-field" for="featured-title">
-                            <span>Заголовок блока</span>
-                            <input id="featured-title" name="featured_title" type="text" maxlength="80" value="{{ theme.featured_title|default('Популярное') }}">
-                        </label>
-                        <label class="appearance-field" for="featured-columns">
-                            <span>Колонок на большом экране</span>
-                            <select id="featured-columns" name="featured_columns">
-                                {% for columns in [3, 4, 5] %}<option value="{{ columns }}" {{ featuredColumns == columns ? 'selected' : '' }}>{{ columns }}</option>{% endfor %}
-                            </select>
-                        </label>
-                        <div class="appearance-field-row">
-                            <label class="appearance-field" for="featured-layout">
-                                <span>Отображение</span>
-                                <select id="featured-layout" name="featured_layout">
-                                    <option value="grid" {{ featuredLayout == 'grid' ? 'selected' : '' }}>Сетка</option>
-                                    <option value="carousel" {{ featuredLayout == 'carousel' ? 'selected' : '' }}>Карусель со стрелками</option>
-                                </select>
-                            </label>
-                            <label class="appearance-field" for="featured-limit">
-                                <span>Количество товаров</span>
-                                <select id="featured-limit" name="featured_limit">
-                                    {% for limit in [4, 6, 8, 10, 12] %}<option value="{{ limit }}" {{ theme.featured_limit|default(6) == limit ? 'selected' : '' }}>{{ limit }}</option>{% endfor %}
-                                </select>
-                            </label>
-                        </div>
-                        <div class="appearance-slider-settings" data-featured-carousel-settings {{ featuredLayout != 'carousel' ? 'hidden' : '' }}>
-                            <label class="active-check">
-                                <input type="checkbox" name="featured_autoplay" value="1" {{ theme.featured_autoplay|default(true) ? 'checked' : '' }}>
-                                Прокручивать товары автоматически
-                            </label>
-                            <label class="appearance-field">
-                                <span>Интервал</span>
-                                <select name="featured_interval">
-                                    {% for seconds in [3, 5, 7, 10] %}<option value="{{ seconds }}" {{ theme.featured_interval|default(5) == seconds ? 'selected' : '' }}>{{ seconds }} сек.</option>{% endfor %}
-                                </select>
-                            </label>
-                        </div>
-                        <label class="active-check">
-                            <input type="checkbox" name="featured_show_description" value="1" {{ featuredShowDescription ? 'checked' : '' }}>
-                            Показывать краткое описание товара
-                        </label>
-                    </fieldset>
+                    <div data-product-block-editors>
+                        {% for productBlock in productBlocks %}
+                            {% include 'tenant/_appearance_product_block.html.twig' with {block: productBlock, categories: categories, products: products} only %}
+                        {% endfor %}
+                    </div>
+                    <button class="button button-secondary product-block-add" type="button" data-product-block-add>Добавить товарный блок</button>
+                    <template data-product-block-template>
+                        {% include 'tenant/_appearance_product_block.html.twig' with {block: {id: '__ID__', title: 'Новая подборка', source: 'latest', layout: 'carousel', columns: 4, limit: 6, show_description: true, autoplay: true, interval: 5}, categories: categories, products: products} only %}
+                    </template>
 
                     <fieldset class="appearance-group" data-config-section="benefits" data-editor-panel="layout">
                         <legend>Преимущества</legend>
@@ -423,7 +371,15 @@
                         <legend>Блоки на главной</legend>
                         <p class="field-hint">Включите нужные блоки и задайте их порядок.</p>
                         <div class="section-options">
-                            {% for section in ['hero', 'categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
+                            {% set allSections = sections %}
+                            {% for section in ['hero', 'categories', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
+                                {% if section not in allSections %}{% set allSections = allSections|merge([section]) %}{% endif %}
+                            {% endfor %}
+                            {% for productBlock in productBlocks %}
+                                {% set productSection = 'product:' ~ productBlock.id %}
+                                {% if productSection not in allSections %}{% set allSections = allSections|merge([productSection]) %}{% endif %}
+                            {% endfor %}
+                            {% for section in allSections %}
                                 {% set position = sectionPositions[section]|default(loop.index) %}
                                 <div class="section-option" data-section-control="{{ section }}">
                                     <span class="section-drag-handle" draggable="true" title="Перетащить блок" aria-label="Перетащить блок">↕</span>
@@ -434,13 +390,13 @@
                                         {% else %}
                                             <input type="checkbox" name="enabled_sections[]" value="{{ section }}" {{ section in sections ? 'checked' : '' }}>
                                         {% endif %}
-                                        <span>{{ sectionLabels[section] }}</span>
+                                        <span data-section-label>{{ sectionLabels[section]|default('Товарный блок') }}</span>
                                     </label>
-                                    <select class="section-position" name="section_positions[{{ section }}]" aria-label="Порядок блока {{ sectionLabels[section] }}">
-                                        {% for number in 1..8 %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
+                                    <select class="section-position" name="section_positions[{{ section }}]" aria-label="Порядок блока {{ sectionLabels[section]|default('Товарный блок') }}">
+                                        {% for number in 1..(allSections|length) %}<option value="{{ number }}" {{ position == number ? 'selected' : '' }}>{{ number }}</option>{% endfor %}
                                     </select>
-                                    <button type="button" class="icon-button" data-section-up aria-label="Переместить {{ sectionLabels[section] }} выше">↑</button>
-                                    <button type="button" class="icon-button" data-section-down aria-label="Переместить {{ sectionLabels[section] }} ниже">↓</button>
+                                    <button type="button" class="icon-button" data-section-up aria-label="Переместить {{ sectionLabels[section]|default('товарный блок') }} выше">↑</button>
+                                    <button type="button" class="icon-button" data-section-down aria-label="Переместить {{ sectionLabels[section]|default('товарный блок') }} ниже">↓</button>
                                 </div>
                             {% endfor %}
                         </div>
@@ -500,11 +456,21 @@
                             </div>
                             <div class="preview-slide-switcher" data-preview-slide-switcher hidden><button type="button" data-preview-slide-prev aria-label="Предыдущий слайд">‹</button><div data-preview-slide-nav></div><button type="button" data-preview-slide-next aria-label="Следующий слайд">›</button></div>
                         </div>
-                        <div class="preview-section preview-products" data-preview-section="featured">
-                            {{ _self.preview_tools('featured', sectionLabels.featured) }}
-                            <h3 data-preview-featured-title>{{ theme.featured_title|default('Популярное') }}</h3>
-                            <div class="{{ featuredLayout == 'carousel' ? 'is-carousel' : '' }}" data-preview-product-grid style="--preview-columns: {{ featuredColumns }}">{% for item in 1..featuredColumns %}<i></i>{% endfor %}</div>
-                        </div>
+                        {% for productBlock in productBlocks %}
+                            {% set productSection = 'product:' ~ productBlock.id %}
+                            <div class="preview-section preview-products" data-preview-section="{{ productSection }}" data-preview-product-block="{{ productBlock.id }}">
+                                {{ _self.preview_tools(productSection, productBlock.title) }}
+                                <h3 data-preview-product-title>{{ productBlock.title }}</h3>
+                                <div class="{{ productBlock.layout|default('carousel') == 'carousel' ? 'is-carousel' : '' }}" data-preview-product-grid style="--preview-columns: {{ productBlock.columns|default(4) }}">{% for item in 1..(productBlock.columns|default(4)) %}<i></i>{% endfor %}</div>
+                            </div>
+                        {% endfor %}
+                        <template data-product-preview-template>
+                            <div class="preview-section preview-products" data-preview-section="product:__ID__" data-preview-product-block="__ID__">
+                                {{ _self.preview_tools('product:__ID__', 'Новая подборка') }}
+                                <h3 data-preview-product-title>Новая подборка</h3>
+                                <div class="is-carousel" data-preview-product-grid style="--preview-columns: 4"><i></i><i></i><i></i><i></i></div>
+                            </div>
+                        </template>
                         <div class="preview-section preview-categories" data-preview-section="categories">
                             {{ _self.preview_tools('categories', sectionLabels.categories) }}
                             <h3>Категории</h3>
@@ -572,14 +538,14 @@
                         <div class="appearance-block-grid" data-preview-block-library>
                             {% set blockDescriptions = {
                                 'categories': 'Навигация по разделам каталога',
-                                'featured': 'Сетка или карусель товаров',
                                 'benefits': 'Преимущества магазина',
                                 'content': 'Текст с изображением и кнопкой',
                                 'reviews': 'Отзывы покупателей',
                                 'faq': 'Ответы на частые вопросы',
                                 'contacts': 'Контактные данные магазина'
                             } %}
-                            {% for section in ['categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
+                            <button type="button" data-product-block-add><strong>Товарная подборка</strong><span>Новая сетка или карусель товаров</span></button>
+                            {% for section in ['categories', 'benefits', 'content', 'reviews', 'faq', 'contacts'] %}
                                 <button type="button" data-preview-add="{{ section }}"><strong>{{ sectionLabels[section] }}</strong><span>{{ blockDescriptions[section] }}</span></button>
                             {% endfor %}
                             <p data-preview-library-empty hidden>Все доступные блоки уже добавлены.</p>
@@ -587,9 +553,9 @@
                     </div>
                     <div data-library-panel="presets" hidden>
                         <div class="appearance-preset-grid">
-                            <button type="button" data-layout-preset="hero,categories,featured,benefits,contacts"><strong>Каталог</strong><span>Категории, товары, преимущества и контакты</span></button>
-                            <button type="button" data-layout-preset="hero,featured,content,reviews,contacts"><strong>Брендовый магазин</strong><span>Товары, история магазина, отзывы и контакты</span></button>
-                            <button type="button" data-layout-preset="hero,categories,featured,benefits,content,reviews,faq,contacts"><strong>Полная витрина</strong><span>Все доступные блоки главной страницы</span></button>
+                            <button type="button" data-layout-preset="hero,categories,product:{{ firstProductBlock.id }},benefits,contacts"><strong>Каталог</strong><span>Категории, товары, преимущества и контакты</span></button>
+                            <button type="button" data-layout-preset="hero,product:{{ firstProductBlock.id }},content,reviews,contacts"><strong>Брендовый магазин</strong><span>Товары, история магазина, отзывы и контакты</span></button>
+                            <button type="button" data-layout-preset="hero,categories,product:{{ firstProductBlock.id }},benefits,content,reviews,faq,contacts"><strong>Полная витрина</strong><span>Все доступные блоки главной страницы</span></button>
                         </div>
                     </div>
                 </dialog>
@@ -631,5 +597,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261014-product-carousel" defer></script>
+    <script src="/assets/store-appearance.js?v=20261014-multiple-products" defer></script>
 {% endblock %}

@@ -48,6 +48,39 @@ final class ShowStorefrontHomeUseCaseTest extends TestCase
         self::assertSame('category', $view->categories[0]->slug);
     }
 
+    public function testItBuildsIndependentProductBlocksAndKeepsManualOrder(): void
+    {
+        $stores = $this->createStub(StorefrontStoreRepository::class);
+        $products = $this->createMock(StorefrontProductRepository::class);
+        $products->expects(self::once())
+            ->method('listActiveByStore')
+            ->with('store-id')
+            ->willReturn([$this->product('1'), $this->product('2'), $this->product('3')]);
+        $products->expects(self::once())
+            ->method('listCategoriesByStore')
+            ->with('store-id')
+            ->willReturn([]);
+        $store = new StorefrontStoreView(
+            'store-id',
+            'tenant-id',
+            'Магазин',
+            'store',
+            'store.shopsbox.ru',
+            [
+                'product_blocks' => [
+                    ['id' => 'new', 'title' => 'Новинки', 'source' => 'latest', 'limit' => 4],
+                    ['id' => 'recommended', 'title' => 'Рекомендуем', 'source' => 'manual', 'product_ids' => ['3', '1'], 'limit' => 4],
+                ],
+            ],
+        );
+
+        $view = (new ShowStorefrontHomeUseCase($stores, $products))->forStore($store);
+
+        self::assertCount(2, $view->productBlocks);
+        self::assertSame(['1', '2', '3'], array_column($view->productBlocksById['new']->products, 'id'));
+        self::assertSame(['3', '1'], array_column($view->productBlocksById['recommended']->products, 'id'));
+    }
+
     private function product(string $id): StorefrontProductView
     {
         return new StorefrontProductView($id, 'store-id', 'Товар '.$id, 'product-'.$id, null);

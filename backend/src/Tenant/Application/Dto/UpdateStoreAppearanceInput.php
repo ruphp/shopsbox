@@ -13,6 +13,7 @@ final readonly class UpdateStoreAppearanceInput
      * @param list<array<string, mixed>> $benefits
      * @param list<array<string, mixed>> $reviews
      * @param list<array<string, mixed>> $faqs
+     * @param list<array<string, mixed>> $productBlocks
      */
     public function __construct(
         public string $ownerEmail,
@@ -57,6 +58,7 @@ final readonly class UpdateStoreAppearanceInput
         public string $action = 'publish',
         public bool $featuredAutoplay = true,
         public int $featuredInterval = 5,
+        public array $productBlocks = [],
     ) {
     }
 }

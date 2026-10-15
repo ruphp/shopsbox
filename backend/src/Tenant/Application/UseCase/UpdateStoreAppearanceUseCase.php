@@ -112,6 +112,33 @@ final readonly class UpdateStoreAppearanceUseCase
             throw InvalidTenantInput::forField('featured_product_ids', 'Choose at least one product for the product block.');
         }
 
+        $productBlockInputs = $input->productBlocks;
+        if ($productBlockInputs === []) {
+            $productBlockInputs = [[
+                'id' => 'featured',
+                'title' => $featuredTitle,
+                'columns' => $featuredColumns,
+                'show_description' => $input->featuredShowDescription,
+                'layout' => $featuredLayout,
+                'limit' => $featuredLimit,
+                'source' => $featuredSource,
+                'category_slug' => $featuredCategorySlug,
+                'product_ids' => $featuredProductIds,
+                'autoplay' => $input->featuredAutoplay,
+                'interval' => $featuredInterval,
+            ]];
+        }
+        $productBlocks = $this->normalizeProductBlocks($productBlockInputs);
+        $firstProductBlock = $productBlocks[0];
+        $featuredTitle = $firstProductBlock['title'];
+        $featuredColumns = $firstProductBlock['columns'];
+        $featuredLayout = $firstProductBlock['layout'];
+        $featuredLimit = $firstProductBlock['limit'];
+        $featuredSource = $firstProductBlock['source'];
+        $featuredCategorySlug = $firstProductBlock['category_slug'];
+        $featuredProductIds = $firstProductBlock['product_ids'];
+        $featuredInterval = $firstProductBlock['interval'];
+
         $benefitsTitle = trim($input->benefitsTitle);
         if ($benefitsTitle === '' || mb_strlen($benefitsTitle) > 80) {
             throw InvalidTenantInput::forField('benefits_title', 'Benefits title must contain up to 80 characters.');
@@ -214,9 +241,15 @@ final readonly class UpdateStoreAppearanceUseCase
             $faqs[] = ['question' => $question, 'answer' => $answer];
         }
 
-        $sections = array_values(array_unique(array_filter(
+        $productBlockIds = array_column($productBlocks, 'id');
+        $sections = array_map(
+            static fn (string $section): string => $section === 'featured' ? 'product:'.$productBlockIds[0] : $section,
             $input->sections,
-            static fn (string $section): bool => in_array($section, self::SECTIONS, true),
+        );
+        $sections = array_values(array_unique(array_filter(
+            $sections,
+            static fn (string $section): bool => in_array($section, self::SECTIONS, true)
+                || (str_starts_with($section, 'product:') && in_array(substr($section, 8), $productBlockIds, true)),
         )));
         if ($sections === []) {
             throw InvalidTenantInput::forField('sections', 'Choose at least one storefront section.');
@@ -287,8 +320,9 @@ final readonly class UpdateStoreAppearanceUseCase
             'featured_source' => $featuredSource,
             'featured_category_slug' => $featuredCategorySlug,
             'featured_product_ids' => $featuredProductIds,
-            'featured_autoplay' => $input->featuredAutoplay,
+            'featured_autoplay' => $firstProductBlock['autoplay'],
             'featured_interval' => $featuredInterval,
+            'product_blocks' => $productBlocks,
             'category_images' => $categoryImages,
             'benefits_title' => $benefitsTitle,
             'benefits' => $benefits,
@@ -352,6 +386,70 @@ final readonly class UpdateStoreAppearanceUseCase
             '#ff5a3c' => 'coral',
             default => 'blue',
         };
+    }
+
+    /**
+     * @param list<array<string, mixed>> $blocks
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function normalizeProductBlocks(array $blocks): array
+    {
+        if (count($blocks) > 6) {
+            throw InvalidTenantInput::forField('product_blocks', 'The homepage can contain up to six product blocks.');
+        }
+
+        $normalized = [];
+        $usedIds = [];
+        foreach ($blocks as $index => $block) {
+            $id = strtolower(trim((string) ($block['id'] ?? '')));
+            if (!preg_match('/^[a-z0-9][a-z0-9-]{0,39}$/', $id) || isset($usedIds[$id])) {
+                $id = 'products-'.($index + 1);
+            }
+            while (isset($usedIds[$id])) {
+                $id = 'products-'.($index + 1).'-'.count($usedIds);
+            }
+            $usedIds[$id] = true;
+
+            $title = trim((string) ($block['title'] ?? ''));
+            if ($title === '' || mb_strlen($title) > 80) {
+                throw InvalidTenantInput::forField('product_blocks', 'Each product block needs a title up to 80 characters.');
+            }
+            $source = in_array(($block['source'] ?? null), ['latest', 'popular', 'category', 'manual'], true)
+                ? (string) $block['source']
+                : 'latest';
+            $categorySlug = mb_substr(trim((string) ($block['category_slug'] ?? '')), 0, 120);
+            $productIds = array_values(array_unique(array_slice(array_filter(
+                array_map(static fn (mixed $productId): string => trim((string) $productId), (array) ($block['product_ids'] ?? [])),
+                static fn (string $productId): bool => preg_match('/^[0-9a-f-]{20,40}$/i', $productId) === 1,
+            ), 0, 20)));
+            if ($source === 'category' && $categorySlug === '') {
+                throw InvalidTenantInput::forField('product_blocks', 'Choose a category for each category product block.');
+            }
+            if ($source === 'manual' && $productIds === []) {
+                throw InvalidTenantInput::forField('product_blocks', 'Choose at least one product for each manual product block.');
+            }
+
+            $normalized[] = [
+                'id' => $id,
+                'title' => $title,
+                'columns' => in_array((int) ($block['columns'] ?? 4), [3, 4, 5], true) ? (int) $block['columns'] : 4,
+                'show_description' => filter_var($block['show_description'] ?? false, FILTER_VALIDATE_BOOL),
+                'layout' => in_array(($block['layout'] ?? null), ['grid', 'carousel'], true) ? (string) $block['layout'] : 'carousel',
+                'limit' => max(4, min(12, (int) ($block['limit'] ?? 6))),
+                'source' => $source,
+                'category_slug' => $categorySlug,
+                'product_ids' => $productIds,
+                'autoplay' => filter_var($block['autoplay'] ?? false, FILTER_VALIDATE_BOOL),
+                'interval' => in_array((int) ($block['interval'] ?? 5), [3, 5, 7, 10], true) ? (int) $block['interval'] : 5,
+            ];
+        }
+
+        if ($normalized === []) {
+            throw InvalidTenantInput::forField('product_blocks', 'Add at least one product block.');
+        }
+
+        return $normalized;
     }
 
     /**

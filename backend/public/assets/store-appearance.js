@@ -17,13 +17,9 @@
     const previewLogo = preview.querySelector('[data-preview-logo]');
     const previewStoreName = preview.querySelector('[data-preview-store-name]');
     const showStoreNameWithLogo = editor.querySelector('[name="show_store_name_with_logo"]');
-    const featuredTitleInput = editor.querySelector('[name="featured_title"]');
-    const featuredColumnsInput = editor.querySelector('[name="featured_columns"]');
-    const featuredLayoutInput = editor.querySelector('[name="featured_layout"]');
-    const featuredCarouselSettings = editor.querySelector('[data-featured-carousel-settings]');
-    const previewFeaturedTitle = preview.querySelector('[data-preview-featured-title]');
-    const previewProductGrid = preview.querySelector('[data-preview-product-grid]');
-    const featuredSourceInput = editor.querySelector('[data-featured-source]');
+    const productBlockEditors = editor.querySelector('[data-product-block-editors]');
+    const productBlockTemplate = editor.querySelector('[data-product-block-template]');
+    const productPreviewTemplate = editor.querySelector('[data-product-preview-template]');
     const sectionOptions = editor.querySelector('.section-options');
     const blockLibrary = editor.querySelector('[data-preview-block-library]');
     const previewStage = editor.querySelector('[data-preview-stage]');
@@ -146,18 +142,55 @@
         updateHeroPreview();
     };
 
-    const updateProductsPreview = () => {
-        previewFeaturedTitle.textContent = featuredTitleInput.value.trim() || 'Популярное';
-        const columns = Number(featuredColumnsInput.value);
-        previewProductGrid.style.setProperty('--preview-columns', columns);
-        previewProductGrid.replaceChildren(...Array.from({ length: columns }, () => document.createElement('i')));
-        previewProductGrid.classList.toggle('is-carousel', featuredLayoutInput.value === 'carousel');
-        featuredCarouselSettings.hidden = featuredLayoutInput.value !== 'carousel';
+    const productBlocks = () => [...productBlockEditors.querySelectorAll('[data-product-block]')];
+    const productPreview = (block) => preview.querySelector(`[data-preview-product-block="${block.dataset.productBlockId}"]`);
+
+    const updateProductBlock = (block) => {
+        const title = block.querySelector('[data-product-title]').value.trim() || 'Товары';
+        const columns = Number(block.querySelector('[data-product-columns]').value);
+        const layout = block.querySelector('[data-product-layout]').value;
+        const item = productPreview(block);
+        if (!item) return;
+        item.querySelector('[data-preview-product-title]').textContent = title;
+        const grid = item.querySelector('[data-preview-product-grid]');
+        grid.style.setProperty('--preview-columns', columns);
+        grid.replaceChildren(...Array.from({ length: columns }, () => document.createElement('i')));
+        grid.classList.toggle('is-carousel', layout === 'carousel');
+        block.querySelector('[data-product-carousel-settings]').hidden = layout !== 'carousel';
+        block.querySelector('[data-product-block-legend]').textContent = title;
+        const control = sectionControl(`product:${block.dataset.productBlockId}`);
+        if (control) control.querySelector('[data-section-label]').textContent = title;
     };
 
-    const updateFeaturedSource = () => {
-        editor.querySelectorAll('[data-featured-source-panel]').forEach((panel) => {
-            panel.hidden = panel.dataset.featuredSourcePanel !== featuredSourceInput.value;
+    const updateProductSource = (block) => {
+        const source = block.querySelector('[data-product-source]').value;
+        block.querySelectorAll('[data-product-source-panel]').forEach((panel) => {
+            panel.hidden = panel.dataset.productSourcePanel !== source;
+        });
+    };
+
+    const createProductSectionControl = (id, title) => {
+        const control = document.createElement('div');
+        control.className = 'section-option';
+        control.dataset.sectionControl = `product:${id}`;
+        control.innerHTML = `<span class="section-drag-handle" draggable="true" title="Перетащить блок" aria-label="Перетащить блок">↕</span><label><input type="checkbox" name="enabled_sections[]" value="product:${id}" checked><span data-section-label></span></label><select class="section-position" name="section_positions[product:${id}]" aria-label="Порядок товарного блока"></select><button type="button" class="icon-button" data-section-up aria-label="Переместить товарный блок выше">↑</button><button type="button" class="icon-button" data-section-down aria-label="Переместить товарный блок ниже">↓</button>`;
+        control.querySelector('[data-section-label]').textContent = title;
+        sectionOptions.appendChild(control);
+        return control;
+    };
+
+    const renumberProductBlocks = () => {
+        const blocks = productBlocks();
+        blocks.forEach((block) => {
+            block.querySelector('[data-product-block-remove]').disabled = blocks.length === 1;
+            updateProductBlock(block);
+            updateProductSource(block);
+        });
+        editor.querySelectorAll('[data-product-block-add]').forEach((button) => {
+            button.disabled = blocks.length >= 6;
+            if (button.classList.contains('product-block-add')) {
+                button.textContent = blocks.length >= 6 ? 'Добавлено максимум 6 блоков' : 'Добавить товарный блок';
+            }
         });
     };
 
@@ -264,7 +297,16 @@
         const controls = [...sectionOptions.querySelectorAll('[data-section-control]')];
         controls.forEach((control, index) => {
                 const isHero = control.dataset.sectionControl === 'hero';
-                control.querySelector('.section-position').value = String(index + 1);
+                const position = control.querySelector('.section-position');
+                if (position.options.length !== controls.length) {
+                    position.replaceChildren(...controls.map((item, optionIndex) => {
+                        const option = document.createElement('option');
+                        option.value = String(optionIndex + 1);
+                        option.textContent = String(optionIndex + 1);
+                        return option;
+                    }));
+                }
+                position.value = String(index + 1);
                 control.querySelector('.section-drag-handle').draggable = !isHero;
                 control.querySelector('[data-section-up]').disabled = isHero || index <= 1;
                 control.querySelector('[data-section-down]').disabled = isHero || index === controls.length - 1;
@@ -284,7 +326,7 @@
         addButtons.forEach((button) => {
             button.hidden = sectionEnabled(sectionControl(button.dataset.previewAdd));
         });
-        const hasAvailableBlocks = addButtons.some((button) => !button.hidden);
+        const hasAvailableBlocks = addButtons.some((button) => !button.hidden) || productBlocks().length < 6;
         blockLibrary.querySelector('[data-preview-library-empty]').hidden = hasAvailableBlocks;
     };
 
@@ -307,7 +349,8 @@
             slide.querySelector('[data-slide-summary]').textContent = field(slide, 'title').value.trim() || 'Без заголовка';
             updateHeroPreview();
         }
-        if (event.target === featuredTitleInput) updateProductsPreview();
+        const productBlock = event.target.closest('[data-product-block]');
+        if (productBlock && event.target.matches('[data-product-title]')) updateProductBlock(productBlock);
         if (event.target.matches('[name^="faqs"][name$="[question]"], [name^="faqs"][name$="[answer]"]') && event.target.value.trim() !== '') {
             const faqControl = sectionControl('faq');
             faqControl.querySelector('input[type="checkbox"]').checked = true;
@@ -321,6 +364,11 @@
         if (slide) {
             if (event.target.matches('[data-slide-field="image_id"]')) updateSlideImage(slide);
             updateHeroPreview();
+        }
+        const productBlock = event.target.closest('[data-product-block]');
+        if (productBlock) {
+            if (event.target.matches('[data-product-source]')) updateProductSource(productBlock);
+            if (event.target.matches('[data-product-columns], [data-product-layout]')) updateProductBlock(productBlock);
         }
         if (event.target.closest('[data-config-section="benefits"]')) {
             const setting = event.target.closest('.benefit-setting');
@@ -354,16 +402,15 @@
         });
     };
 
-    const initializedPanels = new Set();
-    editor.querySelectorAll('.appearance-group').forEach((panel) => {
+    const initializeCollapsiblePanel = (panel, expanded) => {
+        if (panel.dataset.collapsibleReady === '1') return;
         const legend = panel.querySelector(':scope > legend');
         if (!legend) return;
+        panel.dataset.collapsibleReady = '1';
         panel.classList.add('is-collapsible');
         legend.setAttribute('role', 'button');
         legend.setAttribute('tabindex', '0');
-        const panelName = panel.dataset.editorPanel || 'layout';
-        setPanelExpanded(panel, !initializedPanels.has(panelName));
-        initializedPanels.add(panelName);
+        setPanelExpanded(panel, expanded);
         const toggle = () => setPanelExpanded(panel, panel.classList.contains('is-collapsed'));
         legend.addEventListener('click', toggle);
         legend.addEventListener('keydown', (event) => {
@@ -371,6 +418,13 @@
             event.preventDefault();
             toggle();
         });
+    };
+
+    const initializedPanels = new Set();
+    editor.querySelectorAll('.appearance-group').forEach((panel) => {
+        const panelName = panel.dataset.editorPanel || 'layout';
+        initializeCollapsiblePanel(panel, !initializedPanels.has(panelName));
+        initializedPanels.add(panelName);
     });
 
     editorTabs.forEach((button) => {
@@ -466,6 +520,38 @@
     });
 
     editor.addEventListener('click', (event) => {
+        const addProductBlock = event.target.closest('[data-product-block-add]');
+        if (addProductBlock) {
+            if (productBlocks().length >= 6) return;
+            const id = `products-${Date.now().toString(36)}`;
+            const editorHolder = document.createElement('template');
+            editorHolder.innerHTML = productBlockTemplate.innerHTML.replaceAll('__ID__', id).trim();
+            const block = editorHolder.content.firstElementChild;
+            const previewHolder = document.createElement('template');
+            previewHolder.innerHTML = productPreviewTemplate.innerHTML.replaceAll('__ID__', id).trim();
+            const previewBlock = previewHolder.content.firstElementChild;
+            productBlockEditors.appendChild(block);
+            preview.appendChild(previewBlock);
+            createProductSectionControl(id, 'Новая подборка');
+            initializeCollapsiblePanel(block, true);
+            renumberProductBlocks();
+            updateSections();
+            if (blockDialog.open) blockDialog.close();
+            block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+        const removeProductBlock = event.target.closest('[data-product-block-remove]');
+        if (removeProductBlock) {
+            if (productBlocks().length <= 1) return;
+            const block = removeProductBlock.closest('[data-product-block]');
+            const id = block.dataset.productBlockId;
+            productPreview(block)?.remove();
+            sectionControl(`product:${id}`)?.remove();
+            block.remove();
+            renumberProductBlocks();
+            updateSections();
+            return;
+        }
         const previewSlideButton = event.target.closest('[data-preview-slide], [data-preview-slide-prev], [data-preview-slide-next]');
         if (previewSlideButton) {
             const items = previewSlideElements();
@@ -553,11 +639,9 @@
     editor.querySelectorAll('[name="primary_color"]').forEach((input) => input.addEventListener('change', updateColor));
     editor.querySelectorAll('[name="logo_image_id"]').forEach((input) => input.addEventListener('change', updateLogo));
     showStoreNameWithLogo.addEventListener('change', updateLogo);
-    featuredColumnsInput.addEventListener('change', updateProductsPreview);
-    featuredLayoutInput.addEventListener('change', updateProductsPreview);
-    featuredSourceInput.addEventListener('change', updateFeaturedSource);
-    editor.querySelectorAll('[data-section-control] input[type="checkbox"]')
-        .forEach((input) => input.addEventListener('change', updateSections));
+    sectionOptions.addEventListener('change', (event) => {
+        if (event.target.matches('[data-section-control] input[type="checkbox"], .section-position')) updateSections();
+    });
     editor.querySelectorAll('[data-category-image-select]').forEach((select) => {
         select.addEventListener('change', () => {
             const thumb = select.closest('.category-image-setting').querySelector('[data-category-image-thumb]');
@@ -651,8 +735,7 @@
     });
     activeSlide = slideElements()[0] || null;
     renumberSlides();
-    updateProductsPreview();
-    updateFeaturedSource();
+    renumberProductBlocks();
     updateTemplate();
     updateColor();
     updateLogo();

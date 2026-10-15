@@ -70,6 +70,10 @@ final readonly class UpdateStoreAppearanceForm
             (string) $request->request->get('appearance_action', 'draft'),
             $request->request->getBoolean('featured_autoplay'),
             $request->request->getInt('featured_interval', 5),
+            array_values(array_filter(
+                $request->request->all('product_blocks'),
+                static fn (mixed $block): bool => is_array($block),
+            )),
         );
     }
 

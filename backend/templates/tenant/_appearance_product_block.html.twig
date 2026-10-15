@@ -1,0 +1,85 @@
+{% set blockId = block.id|default('featured') %}
+{% set source = block.source|default('latest') %}
+{% set layout = block.layout|default('carousel') %}
+{% set selectedProductIds = block.product_ids|default([]) %}
+<fieldset class="appearance-group product-block-editor" data-config-section="product:{{ blockId }}" data-product-block data-product-block-id="{{ blockId }}" data-editor-panel="layout">
+    <legend>Товарный блок: <span data-product-block-legend>{{ block.title|default('Товары') }}</span></legend>
+    <input type="hidden" name="product_blocks[{{ blockId }}][id]" value="{{ blockId }}">
+    <div class="product-block-heading">
+        <p class="field-hint">Независимая сетка или карусель. Блок можно перемещать в общем порядке страницы.</p>
+        <button class="icon-button" type="button" data-product-block-remove title="Удалить товарный блок" aria-label="Удалить товарный блок">×</button>
+    </div>
+    <label class="appearance-field">
+        <span>Какие товары показывать</span>
+        <select name="product_blocks[{{ blockId }}][source]" data-product-source>
+            <option value="latest" {{ source == 'latest' ? 'selected' : '' }}>Новинки</option>
+            <option value="popular" {{ source == 'popular' ? 'selected' : '' }}>Популярные по просмотрам</option>
+            <option value="category" {{ source == 'category' ? 'selected' : '' }}>Из категории</option>
+            <option value="manual" {{ source == 'manual' ? 'selected' : '' }}>Рекомендуемые (выбрать вручную)</option>
+        </select>
+        <small class="field-hint">Новинки сортируются по дате, популярные по просмотрам, рекомендуемые вы выбираете сами.</small>
+    </label>
+    <div data-product-source-panel="category" {{ source != 'category' ? 'hidden' : '' }}>
+        <label class="appearance-field">
+            <span>Категория</span>
+            <select name="product_blocks[{{ blockId }}][category_slug]">
+                <option value="">Выберите категорию</option>
+                {% for category in categories %}<option value="{{ category.slug }}" {{ block.category_slug|default('') == category.slug ? 'selected' : '' }}>{{ category.name }}</option>{% endfor %}
+            </select>
+        </label>
+    </div>
+    <div class="featured-product-picker" data-product-source-panel="manual" {{ source != 'manual' ? 'hidden' : '' }}>
+        <span>Товары и порядок</span>
+        <p class="field-hint">Отметьте товары. На витрине они появятся в порядке этого списка.</p>
+        {% for product in products %}
+            <label>
+                <input type="checkbox" name="product_blocks[{{ blockId }}][product_ids][]" value="{{ product.id }}" {{ product.id in selectedProductIds ? 'checked' : '' }}>
+                <span>{{ product.name }}</span>
+                <small>{{ product.price|number_format(2, ',', ' ') }} ₽</small>
+            </label>
+        {% else %}
+            <p class="muted">Сначала добавьте товары.</p>
+        {% endfor %}
+    </div>
+    <label class="appearance-field">
+        <span>Заголовок блока</span>
+        <input name="product_blocks[{{ blockId }}][title]" type="text" maxlength="80" value="{{ block.title|default('Товары') }}" data-product-title>
+    </label>
+    <label class="appearance-field">
+        <span>Колонок на большом экране</span>
+        <select name="product_blocks[{{ blockId }}][columns]" data-product-columns>
+            {% for columns in [3, 4, 5] %}<option value="{{ columns }}" {{ block.columns|default(4) == columns ? 'selected' : '' }}>{{ columns }}</option>{% endfor %}
+        </select>
+    </label>
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Отображение</span>
+            <select name="product_blocks[{{ blockId }}][layout]" data-product-layout>
+                <option value="grid" {{ layout == 'grid' ? 'selected' : '' }}>Сетка</option>
+                <option value="carousel" {{ layout == 'carousel' ? 'selected' : '' }}>Карусель со стрелками</option>
+            </select>
+        </label>
+        <label class="appearance-field">
+            <span>Количество товаров</span>
+            <select name="product_blocks[{{ blockId }}][limit]">
+                {% for limit in [4, 6, 8, 10, 12] %}<option value="{{ limit }}" {{ block.limit|default(6) == limit ? 'selected' : '' }}>{{ limit }}</option>{% endfor %}
+            </select>
+        </label>
+    </div>
+    <div class="appearance-slider-settings" data-product-carousel-settings {{ layout != 'carousel' ? 'hidden' : '' }}>
+        <label class="active-check">
+            <input type="checkbox" name="product_blocks[{{ blockId }}][autoplay]" value="1" {{ block.autoplay|default(true) ? 'checked' : '' }}>
+            Прокручивать товары автоматически
+        </label>
+        <label class="appearance-field">
+            <span>Интервал</span>
+            <select name="product_blocks[{{ blockId }}][interval]">
+                {% for seconds in [3, 5, 7, 10] %}<option value="{{ seconds }}" {{ block.interval|default(5) == seconds ? 'selected' : '' }}>{{ seconds }} сек.</option>{% endfor %}
+            </select>
+        </label>
+    </div>
+    <label class="active-check">
+        <input type="checkbox" name="product_blocks[{{ blockId }}][show_description]" value="1" {{ block.show_description|default(true) ? 'checked' : '' }}>
+        Показывать краткое описание товара
+    </label>
+</fieldset>
