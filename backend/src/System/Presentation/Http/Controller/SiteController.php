@@ -191,7 +191,7 @@ final readonly class SiteController
     public function robots(): Response
     {
         return new Response(
-            "User-agent: *\nAllow: /\nSitemap: https://shopsbox.ru/sitemap.xml\n",
+            "User-agent: *\nAllow: /\nDisallow: /auth/\nDisallow: /owner/\nDisallow: /admin/\nDisallow: /api/\nDisallow: /s/*/cart\nDisallow: /s/*/checkout\n\nSitemap: https://shopsbox.ru/sitemap.xml\n",
             Response::HTTP_OK,
             ['Content-Type' => 'text/plain; charset=UTF-8'],
         );
@@ -206,10 +206,6 @@ final readonly class SiteController
     <url>
         <loc>https://shopsbox.ru/</loc>
         <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>https://shopsbox.ru/s/demo-store/products</loc>
-        <priority>0.7</priority>
     </url>
     <url>
         <loc>https://shopsbox.ru/pricing</loc>

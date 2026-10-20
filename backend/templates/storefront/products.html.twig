@@ -7,6 +7,7 @@
 {% block og_title %}{{ page_title }} - {{ store.name }}{% endblock %}
 {% block meta_description %}Каталог опубликованных товаров магазина {{ store.name }} на ShopsBox.{% endblock %}
 {% block og_description %}Каталог товаров магазина {{ store.name }}.{% endblock %}
+{% block meta_robots %}{{ store.slug == 'demo-store' ? 'noindex, follow' : 'index, follow' }}{% endblock %}
 {% block canonical_url %}{{ site_public_base_url ~ app.request.pathInfo }}{% endblock %}
 
 {% block storefront_content %}

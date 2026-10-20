@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /owner/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /s/*/cart
+Disallow: /s/*/checkout
+
+Sitemap: https://shopsbox.ru/sitemap.xml
