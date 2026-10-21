@@ -1680,8 +1680,24 @@
 .preview-hero.vertical-bottom { justify-content: flex-end; }
 
 .preview-hero-content {
+    display: flex;
     width: 100%;
+    flex-direction: column;
 }
+
+.preview-hero-content > .preview-eyebrow { order: 1; }
+.preview-hero-content > h2 { order: 2; }
+.preview-hero-content > p { order: 3; }
+.preview-hero-content > .preview-hero-actions { order: 4; }
+.preview-hero.order-buttons-first .preview-hero-content > p { order: 4; }
+.preview-hero.order-buttons-first .preview-hero-content > .preview-hero-actions {
+    order: 3;
+    margin-bottom: 9px;
+}
+
+.preview-hero.height-compact { min-height: 210px; }
+.preview-hero.height-regular { min-height: 250px; }
+.preview-hero.height-tall { min-height: 330px; }
 
 .preview-hero.content-narrow .preview-hero-content { max-width: 46%; }
 .preview-hero.content-medium .preview-hero-content { max-width: 68%; }
@@ -1942,6 +1958,25 @@
 .appearance-preview.template-accent .preview-button {
     color: var(--preview-accent);
     background: #ffffff;
+}
+
+.appearance-preview .preview-hero.tone-light,
+.appearance-preview .preview-hero.tone-light h2 { color: #ffffff; }
+.appearance-preview .preview-hero.tone-light .preview-hero-content > p,
+.appearance-preview .preview-hero.tone-light .preview-eyebrow { color: rgba(255, 255, 255, 0.9); }
+.appearance-preview .preview-hero.tone-dark,
+.appearance-preview .preview-hero.tone-dark h2 { color: #10263d; }
+.appearance-preview .preview-hero.tone-dark .preview-hero-content > p { color: #40566d; }
+.appearance-preview .preview-hero.tone-dark .preview-eyebrow { color: var(--preview-accent); }
+.appearance-preview .preview-hero.buttons-light .preview-button:first-child {
+    border-color: #ffffff;
+    color: var(--preview-accent);
+    background: #ffffff;
+}
+.appearance-preview .preview-hero.buttons-outline .preview-button:first-child {
+    border: 1px solid currentColor;
+    color: inherit;
+    background: transparent;
 }
 
 .appearance-preview-stage[data-preview-device="tablet"] .preview-review-list {

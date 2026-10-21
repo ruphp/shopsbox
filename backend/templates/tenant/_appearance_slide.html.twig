@@ -101,6 +101,41 @@
             </select>
         </label>
     </div>
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Высота баннера</span>
+            <select name="hero_slides[{{ index }}][height]" data-slide-field="height">
+                {% for value, label in {'compact': 'Компактная', 'regular': 'Обычная', 'tall': 'Высокая'} %}
+                    <option value="{{ value }}" {{ slide.height|default('regular') == value ? 'selected' : '' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="appearance-field">
+            <span>Цвет текста</span>
+            <select name="hero_slides[{{ index }}][text_tone]" data-slide-field="text_tone">
+                {% for value, label in {'auto': 'Автоматически', 'light': 'Светлый', 'dark': 'Тёмный'} %}
+                    <option value="{{ value }}" {{ slide.text_tone|default('auto') == value ? 'selected' : '' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+    <div class="appearance-field-row">
+        <label class="appearance-field">
+            <span>Оформление основной кнопки</span>
+            <select name="hero_slides[{{ index }}][button_style]" data-slide-field="button_style">
+                {% for value, label in {'accent': 'Цветная', 'light': 'Светлая', 'outline': 'Контурная'} %}
+                    <option value="{{ value }}" {{ slide.button_style|default('accent') == value ? 'selected' : '' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="appearance-field">
+            <span>Порядок содержимого</span>
+            <select name="hero_slides[{{ index }}][content_order]" data-slide-field="content_order">
+                <option value="text-first" {{ slide.content_order|default('text-first') == 'text-first' ? 'selected' : '' }}>Описание, затем кнопки</option>
+                <option value="buttons-first" {{ slide.content_order|default('text-first') == 'buttons-first' ? 'selected' : '' }}>Кнопки, затем описание</option>
+            </select>
+        </label>
+    </div>
     <label class="appearance-field">
         <span>Затемнение фона</span>
         <select name="hero_slides[{{ index }}][overlay]" data-slide-field="overlay">

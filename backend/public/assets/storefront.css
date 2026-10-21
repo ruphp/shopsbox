@@ -583,7 +583,20 @@
 .storefront-hero-slide.vertical-bottom { align-items: flex-end; }
 
 .storefront-hero-content {
+    display: flex;
     width: 100%;
+    flex-direction: column;
+}
+
+.storefront-hero-content > .storefront-hero-eyebrow { order: 1; }
+.storefront-hero-content > h1,
+.storefront-hero-content > h2 { order: 2; }
+.storefront-hero-content > p { order: 3; }
+.storefront-hero-content > .storefront-hero-actions { order: 4; }
+.storefront-hero.order-buttons-first .storefront-hero-content > p:not(.storefront-hero-eyebrow) { order: 4; }
+.storefront-hero.order-buttons-first .storefront-hero-content > .storefront-hero-actions {
+    order: 3;
+    margin-bottom: 14px;
 }
 
 .storefront-hero.content-narrow .storefront-hero-content { max-width: 520px; }
@@ -728,6 +741,10 @@
         var(--storefront-hero-image) var(--storefront-hero-position, center) / cover no-repeat;
 }
 
+.storefront-hero.height-compact { min-height: 300px; }
+.storefront-hero.height-regular { min-height: 380px; }
+.storefront-hero.height-tall { min-height: 520px; }
+
 .storefront-hero.align-center { text-align: center; }
 .storefront-hero.align-right { text-align: right; }
 .storefront-hero.align-center p { margin-right: auto; margin-left: auto; }
@@ -825,6 +842,38 @@
 .storefront-template-accent .storefront-hero .button {
     color: var(--storefront-accent);
     background: #ffffff;
+}
+
+.storefront-hero.tone-light,
+.storefront-hero.tone-light h1,
+.storefront-hero.tone-light h2 {
+    color: #ffffff;
+}
+
+.storefront-hero.tone-light p,
+.storefront-hero.tone-light .storefront-hero-eyebrow {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.storefront-hero.tone-dark,
+.storefront-hero.tone-dark h1,
+.storefront-hero.tone-dark h2 {
+    color: #10263d;
+}
+
+.storefront-hero.tone-dark p { color: #40566d; }
+.storefront-hero.tone-dark .storefront-hero-eyebrow { color: var(--storefront-accent); }
+
+.storefront-hero.buttons-light .storefront-hero-actions .button:first-child {
+    border-color: #ffffff;
+    color: var(--storefront-accent);
+    background: #ffffff;
+}
+
+.storefront-hero.buttons-outline .storefront-hero-actions .button:first-child {
+    border-color: currentColor;
+    color: inherit;
+    background: transparent;
 }
 
 .storefront-contacts {
@@ -1092,6 +1141,10 @@
     .storefront-hero-content {
         max-width: 100% !important;
     }
+
+    .storefront-hero.height-compact { min-height: 280px; }
+    .storefront-hero.height-regular { min-height: 340px; }
+    .storefront-hero.height-tall { min-height: 430px; }
 
     .storefront-content-band.image-right .storefront-content-layout > img {
         grid-column: 1;

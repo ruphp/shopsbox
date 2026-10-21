@@ -546,6 +546,18 @@ final readonly class UpdateStoreAppearanceUseCase
         $imagePosition = in_array(($slide['image_position'] ?? null), ['left', 'center', 'right'], true)
             ? (string) $slide['image_position']
             : 'center';
+        $height = in_array(($slide['height'] ?? null), ['compact', 'regular', 'tall'], true)
+            ? (string) $slide['height']
+            : 'regular';
+        $textTone = in_array(($slide['text_tone'] ?? null), ['auto', 'light', 'dark'], true)
+            ? (string) $slide['text_tone']
+            : 'auto';
+        $buttonStyle = in_array(($slide['button_style'] ?? null), ['accent', 'light', 'outline'], true)
+            ? (string) $slide['button_style']
+            : 'accent';
+        $contentOrder = in_array(($slide['content_order'] ?? null), ['text-first', 'buttons-first'], true)
+            ? (string) $slide['content_order']
+            : 'text-first';
 
         return [
             'eyebrow' => $eyebrow,
@@ -559,6 +571,10 @@ final readonly class UpdateStoreAppearanceUseCase
             'vertical_alignment' => $verticalAlignment,
             'content_width' => $contentWidth,
             'image_position' => $imagePosition,
+            'height' => $height,
+            'text_tone' => $textTone,
+            'button_style' => $buttonStyle,
+            'content_order' => $contentOrder,
             'overlay' => max(0, min(90, (int) ($slide['overlay'] ?? 60))),
             'image_id' => $image?->id,
             'image_url' => $image?->publicUrl,

@@ -33,6 +33,10 @@
             vertical_alignment: 'center',
             content_width: 'medium',
             image_position: 'center',
+            height: 'regular',
+            text_tone: 'auto',
+            button_style: 'accent',
+            content_order: 'text-first',
             overlay: theme.hero_overlay|default(60),
             image_id: heroImageId,
             image_url: theme.hero_image_url|default('')
@@ -44,6 +48,10 @@
     {% set heroVerticalAlignment = firstHeroSlide.vertical_alignment|default('center') %}
     {% set heroContentWidth = firstHeroSlide.content_width|default('medium') %}
     {% set heroImagePosition = firstHeroSlide.image_position|default('center') %}
+    {% set heroHeight = firstHeroSlide.height|default('regular') %}
+    {% set heroTextTone = firstHeroSlide.text_tone|default('auto') %}
+    {% set heroButtonStyle = firstHeroSlide.button_style|default('accent') %}
+    {% set heroContentOrder = firstHeroSlide.content_order|default('text-first') %}
     {% set heroOverlay = firstHeroSlide.overlay|default(60) %}
     {% set productBlocks = theme.product_blocks|default([]) %}
     {% if productBlocks is empty %}
@@ -446,7 +454,7 @@
                             </div>
                             <span>Товары&nbsp;&nbsp; Корзина</span>
                         </header>
-                        <div class="preview-section preview-hero align-{{ heroAlignment }} vertical-{{ heroVerticalAlignment }} content-{{ heroContentWidth }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}; --preview-image-position: {{ heroImagePosition }}{% if heroImageId != '' %}; --preview-image: url('{{ firstHeroSlide.image_url|default('') }}'){% endif %}">
+                        <div class="preview-section preview-hero align-{{ heroAlignment }} vertical-{{ heroVerticalAlignment }} content-{{ heroContentWidth }} height-{{ heroHeight }} tone-{{ heroTextTone }} buttons-{{ heroButtonStyle }} order-{{ heroContentOrder }} {{ heroImageId != '' ? 'has-image' : '' }}" data-preview-section="hero" style="--preview-overlay: {{ heroOverlay / 100 }}; --preview-image-position: {{ heroImagePosition }}{% if heroImageId != '' %}; --preview-image: url('{{ firstHeroSlide.image_url|default('') }}'){% endif %}">
                             {{ _self.preview_tools('hero', sectionLabels.hero, true) }}
                             <div class="preview-hero-content" data-preview-hero-content>
                                 <small class="preview-eyebrow" data-preview-eyebrow {{ firstHeroSlide.eyebrow|default('') == '' ? 'hidden' : '' }}>{{ firstHeroSlide.eyebrow|default('') }}</small>
@@ -597,5 +605,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261014-multiple-products" defer></script>
+    <script src="/assets/store-appearance.js?v=20261016-banner-styles" defer></script>
 {% endblock %}

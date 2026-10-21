@@ -71,6 +71,10 @@
         const verticalAlignment = field(slide, 'vertical_alignment').value;
         const contentWidth = field(slide, 'content_width').value;
         const imagePosition = field(slide, 'image_position').value;
+        const height = field(slide, 'height').value;
+        const textTone = field(slide, 'text_tone').value;
+        const buttonStyle = field(slide, 'button_style').value;
+        const contentOrder = field(slide, 'content_order').value;
         const overlay = Number(field(slide, 'overlay').value) / 100;
         const imageUrl = field(slide, 'image_id').selectedOptions[0]?.dataset.imageUrl || '';
 
@@ -88,6 +92,14 @@
         previewHero.classList.add(`vertical-${verticalAlignment}`);
         previewHero.classList.remove('content-narrow', 'content-medium', 'content-wide');
         previewHero.classList.add(`content-${contentWidth}`);
+        previewHero.classList.remove('height-compact', 'height-regular', 'height-tall');
+        previewHero.classList.add(`height-${height}`);
+        previewHero.classList.remove('tone-auto', 'tone-light', 'tone-dark');
+        previewHero.classList.add(`tone-${textTone}`);
+        previewHero.classList.remove('buttons-accent', 'buttons-light', 'buttons-outline');
+        previewHero.classList.add(`buttons-${buttonStyle}`);
+        previewHero.classList.remove('order-text-first', 'order-buttons-first');
+        previewHero.classList.add(`order-${contentOrder}`);
         previewHero.style.setProperty('--preview-overlay', overlay);
         previewHero.style.setProperty('--preview-image-position', imagePosition);
         previewHero.classList.toggle('has-image', imageUrl !== '');
