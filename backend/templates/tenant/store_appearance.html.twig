@@ -17,6 +17,12 @@
     {% set theme = appearanceTheme|default(settings.themeSettings) %}
     {% set template = theme.template|default('classic') %}
     {% set primaryColor = theme.primary_color|default('#0077b6') %}
+    {% set fontFamily = theme.font_family|default('system') %}
+    {% set contentWidth = theme.content_width|default('standard') %}
+    {% set pageBackground = theme.page_background|default('white') %}
+    {% set cornerStyle = theme.corner_style|default('soft') %}
+    {% set sectionSpacing = theme.section_spacing|default('standard') %}
+    {% set cardStyle = theme.card_style|default('outlined') %}
     {% set sections = theme.sections|default(['hero', 'featured']) %}
     {% set logoImageId = theme.logo_image_id|default('') %}
     {% set showStoreNameWithLogo = theme.show_store_name_with_logo|default(false) %}
@@ -141,6 +147,71 @@
                             <label class="template-option">
                                 <input type="radio" name="template" value="accent" {{ template == 'accent' ? 'checked' : '' }}>
                                 <span><strong>Акцентный</strong><small>Выразительный главный блок</small></span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="appearance-group" data-editor-panel="style">
+                        <legend>Типографика</legend>
+                        <label class="appearance-field">
+                            <span>Шрифт витрины</span>
+                            <select name="font_family" data-global-style>
+                                {% for value, label in {'system': 'Системный', 'modern': 'Современный', 'humanist': 'Мягкий', 'serif': 'С засечками'} %}
+                                    <option value="{{ value }}" {{ fontFamily == value ? 'selected' : '' }}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="field-hint">Используются системные шрифты: витрина загружается без обращения к внешним сервисам.</small>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="appearance-group" data-editor-panel="style">
+                        <legend>Размеры страницы</legend>
+                        <div class="appearance-field-row">
+                            <label class="appearance-field">
+                                <span>Ширина контента</span>
+                                <select name="content_width" data-global-style>
+                                    <option value="compact" {{ contentWidth == 'compact' ? 'selected' : '' }}>Компактная</option>
+                                    <option value="standard" {{ contentWidth == 'standard' ? 'selected' : '' }}>Стандартная</option>
+                                    <option value="wide" {{ contentWidth == 'wide' ? 'selected' : '' }}>Широкая</option>
+                                </select>
+                            </label>
+                            <label class="appearance-field">
+                                <span>Отступы секций</span>
+                                <select name="section_spacing" data-global-style>
+                                    <option value="compact" {{ sectionSpacing == 'compact' ? 'selected' : '' }}>Компактные</option>
+                                    <option value="standard" {{ sectionSpacing == 'standard' ? 'selected' : '' }}>Обычные</option>
+                                    <option value="spacious" {{ sectionSpacing == 'spacious' ? 'selected' : '' }}>Просторные</option>
+                                </select>
+                            </label>
+                        </div>
+                        <label class="appearance-field">
+                            <span>Фон витрины</span>
+                            <select name="page_background" data-global-style>
+                                <option value="white" {{ pageBackground == 'white' ? 'selected' : '' }}>Белый</option>
+                                <option value="soft" {{ pageBackground == 'soft' ? 'selected' : '' }}>Светло-серый</option>
+                                <option value="cool" {{ pageBackground == 'cool' ? 'selected' : '' }}>Холодный светлый</option>
+                            </select>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="appearance-group" data-editor-panel="style">
+                        <legend>Элементы интерфейса</legend>
+                        <div class="appearance-field-row">
+                            <label class="appearance-field">
+                                <span>Скругление</span>
+                                <select name="corner_style" data-global-style>
+                                    <option value="square" {{ cornerStyle == 'square' ? 'selected' : '' }}>Без скругления</option>
+                                    <option value="soft" {{ cornerStyle == 'soft' ? 'selected' : '' }}>Небольшое</option>
+                                    <option value="rounded" {{ cornerStyle == 'rounded' ? 'selected' : '' }}>Выраженное</option>
+                                </select>
+                            </label>
+                            <label class="appearance-field">
+                                <span>Карточки товаров</span>
+                                <select name="card_style" data-global-style>
+                                    <option value="outlined" {{ cardStyle == 'outlined' ? 'selected' : '' }}>С рамкой</option>
+                                    <option value="shadow" {{ cardStyle == 'shadow' ? 'selected' : '' }}>С тенью</option>
+                                    <option value="flat" {{ cardStyle == 'flat' ? 'selected' : '' }}>Без рамки</option>
+                                </select>
                             </label>
                         </div>
                     </fieldset>
@@ -446,7 +517,7 @@
                         <button type="button" data-block-library-open>Добавить блок</button>
                         <span data-preview-library-summary>Соберите главную страницу из готовых блоков</span>
                     </div>
-                    <div class="appearance-preview template-{{ template }}" style="--preview-accent: {{ primaryColor }}" data-appearance-preview>
+                    <div class="appearance-preview template-{{ template }} font-{{ fontFamily }} width-{{ contentWidth }} background-{{ pageBackground }} corners-{{ cornerStyle }} spacing-{{ sectionSpacing }} cards-{{ cardStyle }}" style="--preview-accent: {{ primaryColor }}" data-appearance-preview>
                         <header>
                             <div class="preview-brand">
                                 <img data-preview-logo src="{{ theme.logo_image_url|default('') }}" alt="" {{ logoImageId == '' ? 'hidden' : '' }}>
@@ -605,5 +676,5 @@
         </div>
     </section>
 
-    <script src="/assets/store-appearance.js?v=20261016-banner-styles" defer></script>
+    <script src="/assets/store-appearance.js?v=20261022-global-style" defer></script>
 {% endblock %}

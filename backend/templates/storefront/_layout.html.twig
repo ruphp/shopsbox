@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/storefront.css?v=20261016-banner-styles">
+    <link rel="stylesheet" href="/assets/storefront.css?v=20261022-global-style">
 {% endblock %}
 
 {% block body %}
@@ -16,8 +16,10 @@
     {% set storefront_cart_update_route = route_prefix ~ 'storefront_cart_update' %}
     {% set storefront_checkout_route = route_prefix ~ 'storefront_checkout' %}
     {% set currency_symbol = store.currency == 'RUB' ? '₽' : store.currency %}
-    {% set storefront_logo = store.themeSettings.logo_image_url|default('') %}
-    {% set show_store_name_with_logo = store.themeSettings.show_store_name_with_logo|default(false) %}
+    {% set storefront_theme = store.themeSettings %}
+    {% set storefront_logo = storefront_theme.logo_image_url|default('') %}
+    {% set show_store_name_with_logo = storefront_theme.show_store_name_with_logo|default(false) %}
+    <div class="storefront-shell font-{{ storefront_theme.font_family|default('system') }} width-{{ storefront_theme.content_width|default('standard') }} background-{{ storefront_theme.page_background|default('white') }} corners-{{ storefront_theme.corner_style|default('soft') }} spacing-{{ storefront_theme.section_spacing|default('standard') }} cards-{{ storefront_theme.card_style|default('outlined') }}" style="--storefront-accent: {{ storefront_theme.primary_color|default('#0077b6') }}">
     {% if appearancePreview|default(false) %}
         <div class="storefront-preview-bar">
             <div class="wrap">
@@ -59,4 +61,5 @@
             <span>{{ store.domain }}</span>
         </div>
     </footer>
+    </div>
 {% endblock %}

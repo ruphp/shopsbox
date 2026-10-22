@@ -59,6 +59,12 @@ final readonly class UpdateStoreAppearanceInput
         public bool $featuredAutoplay = true,
         public int $featuredInterval = 5,
         public array $productBlocks = [],
+        public string $fontFamily = 'system',
+        public string $contentWidth = 'standard',
+        public string $pageBackground = 'white',
+        public string $cornerStyle = 'soft',
+        public string $sectionSpacing = 'standard',
+        public string $cardStyle = 'outlined',
     ) {
     }
 }

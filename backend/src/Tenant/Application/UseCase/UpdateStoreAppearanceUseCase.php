@@ -16,6 +16,12 @@ use App\Tenant\Application\Exception\StoreSettingsAccessDenied;
 final readonly class UpdateStoreAppearanceUseCase
 {
     private const TEMPLATES = ['classic', 'catalog', 'accent'];
+    private const FONT_FAMILIES = ['system', 'modern', 'humanist', 'serif'];
+    private const CONTENT_WIDTHS = ['compact', 'standard', 'wide'];
+    private const PAGE_BACKGROUNDS = ['white', 'soft', 'cool'];
+    private const CORNER_STYLES = ['square', 'soft', 'rounded'];
+    private const SECTION_SPACINGS = ['compact', 'standard', 'spacious'];
+    private const CARD_STYLES = ['outlined', 'shadow', 'flat'];
     private const SECTIONS = ['hero', 'categories', 'featured', 'benefits', 'content', 'reviews', 'faq', 'contacts'];
     private const BENEFIT_ICONS = ['delivery', 'quality', 'support', 'payment', 'return', 'secure', 'gift', 'stock', 'pickup', 'custom'];
     private const REVIEW_AVATARS = ['person-1', 'person-2', 'person-3', 'person-4', 'person-5', 'person-6', 'person-7', 'person-8', 'person-9', 'person-10'];
@@ -48,6 +54,12 @@ final readonly class UpdateStoreAppearanceUseCase
         if (!preg_match('/^#[0-9a-f]{6}$/', $primaryColor)) {
             throw InvalidTenantInput::forField('primary_color', 'Primary color must be HEX color.');
         }
+        $fontFamily = in_array($input->fontFamily, self::FONT_FAMILIES, true) ? $input->fontFamily : 'system';
+        $contentWidth = in_array($input->contentWidth, self::CONTENT_WIDTHS, true) ? $input->contentWidth : 'standard';
+        $pageBackground = in_array($input->pageBackground, self::PAGE_BACKGROUNDS, true) ? $input->pageBackground : 'white';
+        $cornerStyle = in_array($input->cornerStyle, self::CORNER_STYLES, true) ? $input->cornerStyle : 'soft';
+        $sectionSpacing = in_array($input->sectionSpacing, self::SECTION_SPACINGS, true) ? $input->sectionSpacing : 'standard';
+        $cardStyle = in_array($input->cardStyle, self::CARD_STYLES, true) ? $input->cardStyle : 'outlined';
 
         $images = [];
         foreach ($this->mediaLibraryRepository->listByStore($current->storeId, 'image') as $image) {
@@ -301,6 +313,12 @@ final readonly class UpdateStoreAppearanceUseCase
             'template' => $template,
             'primary_color' => $primaryColor,
             'accent' => $this->legacyAccent($primaryColor),
+            'font_family' => $fontFamily,
+            'content_width' => $contentWidth,
+            'page_background' => $pageBackground,
+            'corner_style' => $cornerStyle,
+            'section_spacing' => $sectionSpacing,
+            'card_style' => $cardStyle,
             'hero_title' => $heroTitle,
             'hero_text' => $heroText,
             'hero_eyebrow' => $heroEyebrow,

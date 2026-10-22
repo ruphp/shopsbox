@@ -217,6 +217,29 @@
         preview.style.setProperty('--preview-accent', selected);
     };
 
+    const updateGlobalStyle = () => {
+        const settings = {
+            font: editor.querySelector('[name="font_family"]')?.value || 'system',
+            width: editor.querySelector('[name="content_width"]')?.value || 'standard',
+            background: editor.querySelector('[name="page_background"]')?.value || 'white',
+            corners: editor.querySelector('[name="corner_style"]')?.value || 'soft',
+            spacing: editor.querySelector('[name="section_spacing"]')?.value || 'standard',
+            cards: editor.querySelector('[name="card_style"]')?.value || 'outlined',
+        };
+        const choices = {
+            font: ['system', 'modern', 'humanist', 'serif'],
+            width: ['compact', 'standard', 'wide'],
+            background: ['white', 'soft', 'cool'],
+            corners: ['square', 'soft', 'rounded'],
+            spacing: ['compact', 'standard', 'spacious'],
+            cards: ['outlined', 'shadow', 'flat'],
+        };
+        Object.entries(settings).forEach(([group, value]) => {
+            preview.classList.remove(...choices[group].map((choice) => `${group}-${choice}`));
+            preview.classList.add(`${group}-${value}`);
+        });
+    };
+
     const updateLogo = () => {
         const logoUrl = editor.querySelector('[name="logo_image_id"]:checked')?.dataset.imageUrl || '';
         previewLogo.hidden = logoUrl === '';
@@ -649,6 +672,7 @@
 
     editor.querySelectorAll('[name="template"]').forEach((input) => input.addEventListener('change', updateTemplate));
     editor.querySelectorAll('[name="primary_color"]').forEach((input) => input.addEventListener('change', updateColor));
+    editor.querySelectorAll('[data-global-style]').forEach((input) => input.addEventListener('change', updateGlobalStyle));
     editor.querySelectorAll('[name="logo_image_id"]').forEach((input) => input.addEventListener('change', updateLogo));
     showStoreNameWithLogo.addEventListener('change', updateLogo);
     sectionOptions.addEventListener('change', (event) => {
@@ -750,6 +774,7 @@
     renumberProductBlocks();
     updateTemplate();
     updateColor();
+    updateGlobalStyle();
     updateLogo();
     updateRichPreviews();
     updateSections();

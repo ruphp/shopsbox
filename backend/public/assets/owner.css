@@ -1979,6 +1979,67 @@
     background: transparent;
 }
 
+.appearance-preview {
+    --preview-radius: 6px;
+    --preview-section-space: 24px;
+    --preview-content-inset: 24px;
+    --preview-page-bg: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.appearance-preview.font-modern { font-family: "Segoe UI", Arial, sans-serif; }
+.appearance-preview.font-humanist { font-family: "Trebuchet MS", Arial, sans-serif; }
+.appearance-preview.font-serif { font-family: Georgia, "Times New Roman", serif; }
+
+.appearance-preview.width-compact { --preview-content-inset: clamp(24px, 8%, 52px); }
+.appearance-preview.width-wide { --preview-content-inset: 14px; }
+.appearance-preview.background-soft { --preview-page-bg: #f4f6f8; }
+.appearance-preview.background-cool { --preview-page-bg: #eef5f6; }
+.appearance-preview.corners-square { --preview-radius: 0; }
+.appearance-preview.corners-rounded { --preview-radius: 12px; }
+.appearance-preview.spacing-compact { --preview-section-space: 16px; }
+.appearance-preview.spacing-spacious { --preview-section-space: 36px; }
+
+.appearance-preview,
+.appearance-preview > header,
+.appearance-preview .preview-section:not(.preview-hero) {
+    background-color: var(--preview-page-bg);
+}
+
+.appearance-preview > header {
+    padding-right: var(--preview-content-inset);
+    padding-left: var(--preview-content-inset);
+}
+
+.appearance-preview .preview-section:not(.preview-hero) {
+    padding: var(--preview-section-space) var(--preview-content-inset);
+}
+
+.appearance-preview .preview-button,
+.appearance-preview .preview-products i,
+.appearance-preview .preview-categories span,
+.appearance-preview .preview-review-list article,
+.appearance-preview .preview-faq > div:last-child span,
+.appearance-preview .preview-content-image {
+    border-radius: var(--preview-radius);
+}
+
+.appearance-preview.cards-outlined .preview-products i {
+    border: 1px solid #cdd7e1;
+    box-shadow: none;
+}
+
+.appearance-preview.cards-shadow .preview-products i {
+    border-color: transparent;
+    box-shadow: 0 8px 18px rgba(16, 38, 61, 0.18);
+}
+
+.appearance-preview.cards-flat .preview-products i {
+    border-color: transparent;
+    background: #e6ecf1;
+    box-shadow: none;
+}
+
 .appearance-preview-stage[data-preview-device="tablet"] .preview-review-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }

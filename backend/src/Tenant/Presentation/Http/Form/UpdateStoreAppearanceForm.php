@@ -74,6 +74,12 @@ final readonly class UpdateStoreAppearanceForm
                 $request->request->all('product_blocks'),
                 static fn (mixed $block): bool => is_array($block),
             )),
+            (string) $request->request->get('font_family', 'system'),
+            (string) $request->request->get('content_width', 'standard'),
+            (string) $request->request->get('page_background', 'white'),
+            (string) $request->request->get('corner_style', 'soft'),
+            (string) $request->request->get('section_spacing', 'standard'),
+            (string) $request->request->get('card_style', 'outlined'),
         );
     }
 

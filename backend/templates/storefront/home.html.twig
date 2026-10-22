@@ -43,7 +43,7 @@
 {% endblock %}
 
 {% block storefront_content %}
-    <div class="storefront-page storefront-template-{{ template }}" style="--storefront-accent: {{ primary_color }}">
+    <div class="storefront-page storefront-template-{{ template }}">
         {% for section in sections %}
             {% if section == 'hero' %}
                 <section class="storefront-hero-slider" data-hero-slider data-autoplay="{{ theme.hero_autoplay|default(true) ? '1' : '0' }}" data-interval="{{ theme.hero_interval|default(5) * 1000 }}" aria-label="Главные предложения">

@@ -876,6 +876,78 @@
     background: transparent;
 }
 
+.storefront-shell {
+    --storefront-content-width: 1080px;
+    --storefront-page-bg: #ffffff;
+    --storefront-radius: 8px;
+    --storefront-section-space: 36px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--ink);
+    background: var(--storefront-page-bg);
+    font-family: Arial, Helvetica, sans-serif;
+    --accent: var(--storefront-accent);
+    --accent-dark: var(--storefront-accent);
+}
+
+.storefront-shell .main { flex: 1; background: var(--storefront-page-bg); }
+.storefront-shell .wrap { width: min(var(--storefront-content-width), calc(100% - 32px)); }
+.storefront-shell .section { padding-top: var(--storefront-section-space); padding-bottom: var(--storefront-section-space); }
+
+.storefront-shell.font-modern { font-family: "Segoe UI", Arial, sans-serif; }
+.storefront-shell.font-humanist { font-family: "Trebuchet MS", Arial, sans-serif; }
+.storefront-shell.font-serif { font-family: Georgia, "Times New Roman", serif; }
+.storefront-shell.font-serif button,
+.storefront-shell.font-serif input,
+.storefront-shell.font-serif select,
+.storefront-shell.font-serif textarea { font-family: inherit; }
+
+.storefront-shell.width-compact { --storefront-content-width: 960px; }
+.storefront-shell.width-wide { --storefront-content-width: 1280px; }
+
+.storefront-shell.background-soft { --storefront-page-bg: #f4f6f8; --surface: #ffffff; }
+.storefront-shell.background-cool { --storefront-page-bg: #eef5f6; --surface: #ffffff; }
+
+.storefront-shell.corners-square { --storefront-radius: 0; }
+.storefront-shell.corners-rounded { --storefront-radius: 16px; }
+
+.storefront-shell.spacing-compact { --storefront-section-space: 24px; }
+.storefront-shell.spacing-spacious { --storefront-section-space: 56px; }
+
+.storefront-shell .button,
+.storefront-shell .product-card,
+.storefront-shell .category-nav a,
+.storefront-shell .storefront-category-grid a,
+.storefront-shell .storefront-benefit-grid article,
+.storefront-shell .storefront-review-grid article,
+.storefront-shell .storefront-faq-list details,
+.storefront-shell .checkout-panel,
+.storefront-shell .cart-image,
+.storefront-shell .add-to-cart select,
+.storefront-shell .add-to-cart input,
+.storefront-shell .checkout-form input,
+.storefront-shell .checkout-form textarea,
+.storefront-shell .cart-row input {
+    border-radius: var(--storefront-radius);
+}
+
+.storefront-shell.cards-outlined .product-card {
+    border: 1px solid var(--line);
+    box-shadow: none;
+}
+
+.storefront-shell.cards-shadow .product-card {
+    border-color: transparent;
+    box-shadow: 0 12px 30px rgba(16, 38, 61, 0.14);
+}
+
+.storefront-shell.cards-flat .product-card {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+}
+
 .storefront-contacts {
     background: var(--surface);
 }
